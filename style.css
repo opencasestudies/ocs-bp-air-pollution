@@ -1,0 +1,64 @@
+li.toctree-l2:first-child {
+    display: none;
+}
+
+.reference_block {
+    margin: .2em;
+    padding: .2em;
+    border: 1px solid black;
+    border-radius: 5px;
+    background: #4B0082;
+    color: white;
+    font-weight: bold;
+}
+
+.question_block {
+    margin: .2em;
+    padding: .2em;
+    border: 1px solid black;
+    border-radius: 5px;
+    background: #1E90FF;
+    color: white;
+    font-weight: bold;
+}
+
+.main_question_block {
+    margin: .2em;
+    padding: .2em;
+    border: 1px solid black;
+    border-radius: 5px;
+    background: #000000;
+    color: white;
+    font-weight: bold;
+}
+.blue-outline {
+   background-color: #1E90FF;
+   padding:10px;
+   display: inline-block;
+}
+
+.disclaimer_block {
+    margin: .2em;
+    padding: .2em;
+    border: 1px solid black;
+    border-radius: 5px;
+    background: #ffffeb;
+    color: black;
+    font-size: 20px;
+}
+
+.scrollable {
+   white-space: pre !important;
+   max-height: 400px;
+   overflow-y: scroll !important;
+   height: 50vh !important;
+}
+
+
+.outline {
+   padding: .1em;
+   border: 1px solid black;
+   background-color: #000000;
+   display: inline-block;
+}
+
