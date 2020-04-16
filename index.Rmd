@@ -931,9 +931,10 @@ The tidymodels package collection, which includes parsnip, has other packages fo
 
 ### An illustration of the overall tidymodels ecosystem
 
-```{r, echo=FALSE, out.width="400px"}
-knitr::include_graphics(here::here("img","tidymodels_ecosystem.png"))
+```{r, echo=FALSE, out.width="800px"}
+knitr::include_graphics(here::here("img","simpletidymodels.png"))
 ```
+
 
 
 
@@ -1015,7 +1016,7 @@ count(test_pm, state)
 
 We will use the `rsample` package again we look at implementing what are called cross validation techniques.
 
-Cross validation splits our training data into multiple training data sets to allow for an assessment of the accuracy of the model as we are training it. 
+Cross validation splits our training data into multiple training data sets to allow for an assessment of the accuracy of the model as we are training it.  (workflows::fit_resamples())
 
 Note: People typically ignore spatial dependence with cross validation of air pollution monitoring data in the air pollution field, so we will do the same.  However, it might make sense to leave out blocks of monitors rather than  random individual monitors to help account for some spatial dependence.
 
@@ -1296,9 +1297,9 @@ PM_wflow <-workflows::workflow() %>%
 PM_wflow
 ```
 
-Ah, nice. Notice how it tells us both what our preprocessing steps are and our model specifications.
+Ah, nice. Notice how it tells us about both our preprocessing steps and our model specifications.
 
-Now we can prepare the recipe (estimate the parameters) and fit the model to our training data all at once:
+Now we can prepare the recipe (estimate the parameters) and fit the model to our training data all at once. Printing the output we can see the coefficients of the model.
 
 ```{r}
 PM_wflow_fit <- fit(PM_wflow, data = train_pm)
@@ -1307,8 +1308,11 @@ PM_wflow_fit
 
 
 
+Let's review everything:
 
-
+```{r, echo=FALSE, out.width="800px"}
+knitr::include_graphics(here::here("img","tidymodels_ecosystem.png"))
+```
 
 
 
