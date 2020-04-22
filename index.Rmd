@@ -209,6 +209,7 @@ library(magrittr)
 library(GGally)
 
 library(tidymodels)# broom, dials, infer, parsnip, purrr, recipes, rsample, tibble, yardstick
+
 library(workflows)
 library(tune)
 
@@ -888,7 +889,7 @@ select(log_nei_2008_pm25_sum_10000, popdens_county, log_pri_length_10000, imp_a1
        layout.exp=2, label = TRUE)
 
 pm %>%
-select(log_nei_2008_pm25_sum_10000, popdens_county, log_pri_length_10000, imp_a10000) %>%
+select(log_nei_2008_pm25_sum_10000, popdens_county, log_pri_length_10000, imp_a10000, county_pop) %>%
   ggpairs()
 ```
 
@@ -906,19 +907,22 @@ select(log_nei_2008_pm25_sum_10000, log_popdens_county, log_pri_length_10000, im
 
 pm %>%
   mutate(log_popdens_county= log(popdens_county)) %>%
-select(log_nei_2008_pm25_sum_10000, log_popdens_county, log_pri_length_10000, imp_a10000) %>%
+  mutate(log_pop_county = log(county_pop)) %>%
+select(log_nei_2008_pm25_sum_10000, log_popdens_county, log_pri_length_10000, imp_a10000, log_pop_county) %>%
   ggpairs()
 ```
 
 Indeed this increased the correlation, but variables from each of these categories may still prove to be useful for prediction.
 
-Now that we have a sense of what our data is like we can get started.
 
 ## Data Analysis
 
+Now that we have a sense of what our data is like we can get started with data analysis.
+
+
 ### The tidymodels ecosystem
 
-To perform our analysis we will be using the `tidymodels` suite of packages. You may be familiar with the older packages `caret` or `mlr` which are also for machine learning and modeling but are not a part of the `tidyverse`. [Max Kuhn](https://resources.rstudio.com/authors/max-kuhn){target="_blank"} describes `tidymodles` like this:
+To perform our analysis we will be using the `tidymodels` suite of packages. You may be familiar with the older packages `caret` or `mlr` which are also for machine learning and modeling but are not a part of the `tidyverse`. [Max Kuhn](https://resources.rstudio.com/authors/max-kuhn){target="_blank"} describes `tidymodels` like this:
 
 > "Other packages, such as caret and mlr, help to solve the R model API issue. These packages do a lot of other things too: preprocessing, model tuning, resampling, feature selection, ensembling, and so on. In the tidyverse, we strive to make our packages modular and parsnip is designed only to solve the interface issue. It is not designed to be a drop-in replacement for caret.
 The tidymodels package collection, which includes parsnip, has other packages for many of these tasks, and they are designed to work together. We are working towards higher-level APIs that can replicate and extend what the current model packages can do."
@@ -926,25 +930,45 @@ The tidymodels package collection, which includes parsnip, has other packages fo
 
 ### The major benefits of tidymodels
 1) standardized workflow/format/notation across different types of algorithms
-2) can easily modify preprocessing and parameter and hyper-parameter tuning making optimization easy
+2) can easily modify preprocessing, algorithm choice, and hyper-parameter tuning making optimization easy
 
 
-### An illustration of the overall tidymodels ecosystem
+### The machine learning process
+
+
+### The tidymodels ecosystem - an overview
+
+There are many packages in the tidymodels ecosystem which assist with the various steps of the machine learning process:
 
 ```{r, echo=FALSE, out.width="800px"}
 knitr::include_graphics(here::here("img","simpletidymodels.png"))
 ```
 
 
+This is the overall process:
 
+```{r, echo=FALSE, out.width="800px"}
+knitr::include_graphics(here::here("img","MachineLearning.png"))
+```
+
+There are two distinct goals of supervised machine learning:  
+
+1) Prediction  
+2) Classification  
+
+We will be performing a prediction analysis (which is also refered to as regression), which aims to predict **continuous outcome** variables given a number of predictors/explanatory variables/features/parameters, as we have already described.
+
+Classification on the other hand aims to discern or predict group identity for a **categorical outcome** based on a number of predictors/explanatory variables/features/parameters.
+
+The overall process is the same in either case. 
 
 ### Splitting the Data
 
 The first step after data exploration in machine learning analysis is to [split the data](https://towardsdatascience.com/train-validation-and-test-sets-72cb40cba9e7){target="_blank"} into **training** and **testing** datasets. 
 
-The training dataset will be used to build and tune our model. This is the data that the model "learns"on.
+The training dataset will be used to build and tune our model. This is the data that the model "learns" on.
 
-The testing set will be used to evaluate the performance of our model in a more generalizable way. What do we mean by "generalizable".
+The testing set will be used to evaluate the performance of our model in a more generalizable way. What do we mean by "generalizable"?
 
 Remember that our main goal is to use our model to be able to predict air pollution levels in areas where there are no gravimetric monitors. Therefore, if our model is super good at predicting air pollution with the data that we use to build it, it might not do the best job for the areas where there are few to no monitors. This would cause us to have really good prediction accuracy and we might assume that we were going to do a good job estimating air pollution any time we use our model, but in fact this would likely not be the case. This situation is what we call **[overfitting](https://towardsdatascience.com/train-test-split-and-cross-validation-in-python-80b61beca4b6){target="_blank"} **.
 
@@ -957,9 +981,9 @@ knitr::include_graphics("https://miro.medium.com/max/1110/1*tBErXYVvTw2jSUYK7thU
 
 ##### [[source](https://miro.medium.com/max/1110/1*tBErXYVvTw2jSUYK7thU2A.png)]
 
-If we get fairly good prediction with our testing set then we will know that our model can be applied to other data and will perform fairly well. We will discuss the more later.
+If we get fairly good prediction with our testing set then we will know that our model can be applied to other data and will perform fairly well. We will discuss this more later.
 
-We will not touch the testing set until we have completed tuning or model with the training set. This will allow us to have a less biased evaluation of how well our model can do with other data besides the data used in the training set to build the model. Ideally you would also want a completely independent dataset to further test the performance of your model.
+We will not touch the testing set until we have completed optimizing our model with the training set. This will allow us to have a less biased evaluation of how well our model can do with other data besides the data used in the training set to build the model. Ideally you would also want a completely independent dataset to further test the performance of your model.
 
 [Here](https://machinelearningmastery.com/difference-test-validation-datasets/){target="_blank"} is a great description of the differences between testing and training datasets.
 
@@ -968,11 +992,11 @@ knitr::include_graphics(here::here("img","split.png"))
 ```
 We will use the `rsample` package to perform this step.
 
-The`initial_split()` function allows us to specify how we want to split our data. Typically data is split into 3/4 for training and 1/4 for testing.This is the default proportion and does not need to be specified. However you can change the proportion using the `prop` argument, we will do that here for illustrative purposes. You can also specify a variable to stratify by with the `strata` argument. This is useful if you have imbalanced categorical variables and you would like to intentionally make sure that there are similar number of samples of the rarer categories in both the testing and training sets. Otherwise the split is performed randomly. 
+The`initial_split()` function allows us to specify how we want to split our data. Typically data is split into 3/4 for training and 1/4 for testing.This is the default proportion and does not need to be specified. However you can change the proportion using the `prop` argument, which we will do that here for illustrative purposes. You can also specify a variable to stratify by with the `strata` argument. This is useful if you have imbalanced categorical variables and you would like to intentionally make sure that there are similar number of samples of the rarer categories in both the testing and training sets. Otherwise the split is performed randomly. 
 
 > The strata argument causes the random sampling to be conducted within the stratification variable. The can help ensure that the number of data points in the training data is equivalent to the proportions in the original data set.
 
-In the case with our dataset, perhaps would like our training set to have similar proportions of monitors from each of the states as in the initial data. This might be useful if we want our model to be generalizable across all of the states.
+In the case with our dataset, perhaps we would like our training set to have similar proportions of monitors from each of the states as in the initial data. This might be useful if we want our model to be generalizable across all of the states.
 
 We can see that indeed there are different proportions of monitors in each state by using the `count()` function of the `dpyr` package. 
 
@@ -984,7 +1008,7 @@ count(pm, state) %>%
 ```
 ####
 
-If our dataset were large enough it might be nice then to stratify by state, but our data is not unfortunately not large enough. We will show how one would do this though for illustrative purposes. This option is more important for classification applications of machine learning than it is for prediction.
+If our dataset were large enough it might be nice then to stratify by state, but our data is unfortunately not large enough. We will show how one would do this though for illustrative purposes. This option is often more important for classification applications of machine learning than it is for prediction.
 
 Since the split is performed randomly, it is a good idea to use the `set.seed()` base function to ensure that if your rerun your code that your split will be the same next time. We can see the number of monitors in our training, testing, and original data by typing in the name of our split object. The result will look like this:
 <training data sample number, testing data sample number, original sample number> 
@@ -1014,17 +1038,13 @@ count(test_pm, state)
 ```
 ####
 
-We will use the `rsample` package again we look at implementing what are called cross validation techniques.
 
-Cross validation splits our training data into multiple training data sets to allow for an assessment of the accuracy of the model as we are training it.  (workflows::fit_resamples())
-
-Note: People typically ignore spatial dependence with cross validation of air pollution monitoring data in the air pollution field, so we will do the same.  However, it might make sense to leave out blocks of monitors rather than  random individual monitors to help account for some spatial dependence.
 
 ### Variable Role Assignment and Preprocessing
 
-A recipe is a standardized format for a sequence of steps for processing the data.
+In tidymodels we will create a recipe, which is a standardized format for a sequence of steps for processing the data.
 
-This can be very useful because it makes testing out different preprocessing steps or different algorithms with the same preprocessing very easy and reproducible.
+This can be very useful because it makes testing out different pre-processing steps or different algorithms with the same pre-processing very easy and reproducible.
 
 **Creating a recipe specifies how a dataframe of predictors should be created  - it specifies what  variables to be used  and the  preprocessing steps  but it does not execute these steps or create the dataframe of predictors.**
 
@@ -1037,28 +1057,28 @@ knitr::include_graphics(here::here("img","recipes1.png"))
 ```
 
 
-In our case recall that our `value` variable, which is the average annual gravimetric monitor PM~2.5~ concentration in ug/m^3^. Our predictors are all the other variables except the monitor ID, which is the `id` variable.
+In our case recall that our `value` variable, which is the average annual gravimetric monitor PM~2.5~ concentration in ug/m^3^. Our predictors are all the other variables except the monitor ID, which is an `id` variable.
 
-The reason not to include this variable is because this variable includes the county number and a number designating which particular monitor the values came from of the monitors there are in that county. Since this number is arbitrary and the county information is also given in the data, and the fact that each monitor only has one value in the `value` variable, nothing is gained by including this variable and it may instead introduce noise. However, it is useful to keep this data to take a look at what is happening later. We will show you want to do in this case in just a bit.
+The reason not to include this variable is because this variable includes the county number and a number designating which particular monitor the values came from of the monitors there are in that county. Since this number is arbitrary and the county information is also given in the data, and the fact that each monitor only has one value in the `value` variable, nothing is gained by including this variable and it may instead introduce noise. However, it is useful to keep this data to take a look at what is happening later. We will show you what to do in this case in just a bit.
 
 The simplest recipe with no preprocessing steps, would be to simply list the outcome and predictor variables.
 
-We can do so in two ways. 
+We can do so in two ways:  
 
-1) Using formula notation
-2) Assigning roles to each variable
+1) Using formula notation  
+2) Assigning roles to each variable  
 
-Let's look at the first way using formula notation, which looks like this:
+Let's look at the first way using formula notation, which looks like this:  
 
 outcome(s) ~ predictor(s)  
 
-If in the case of multiple predictors or a multivariate situation with two outcomes, use a plus sign
+If in the case of multiple predictors or a multivariate situation with two outcomes, use a plus sign  
 
-outcome1 + outcome2 ~ predictor1 + predictor2
+outcome1 + outcome2 ~ predictor1 + predictor2  
 
-If we want to include all predictors we can use a period like so:
+If we want to include all predictors we can use a period like so:  
 
-outcome_variable_name ~ .
+outcome_variable_name ~ .  
 
 Now with our data we will start by making a recipe for our training data. In the simplest case we might use all predictors like this:
 
@@ -1081,7 +1101,10 @@ simple_rec <-train_pm %>%
 
 simple_rec
 ```
-We could also specify the outcome and predictors in the same way as the id variable. Please see [here](https://tidymodels.github.io/recipes/reference/recipe.html) for examples of other roles for variables. The role can be however any value. The order is important here, as we first make all variables predictors and then override this role for the outcome and id variable. We will use the `everything()` function of the `dplyr` package to start with all of the variables in `train_pm`.
+
+We could also specify the outcome and predictors in the same way as the id variable. Please see [here](https://tidymodels.github.io/recipes/reference/recipe.html) for examples of other roles for variables. The role can be actually be any value. 
+
+The order is important here, as we first make all variables predictors and then override this role for the outcome and id variable. We will use the `everything()` function of the `dplyr` package to start with all of the variables in `train_pm`.
 
 ```{r}
 
@@ -1108,7 +1131,7 @@ summary(simple_rec)
 
 #### List the preprocessing steps using the step functions of the `recipe` package
 
-The other thing the recipes package allows for is specifying preprocessing steps.
+The other thing the recipes package allows for is specifying pre-processing steps using a variety of `step*()` functions.
 
 ```{r, echo=FALSE, out.width="400px"}
 knitr::include_graphics(here::here("img","recipes2.png"))
@@ -1143,7 +1166,7 @@ There are several ways to select what variables to apply steps to:
 
 Let's try adding some steps to our recipe.
 
-We might consider log transforming our population and area variables (that aren't densities)- let's take a look at the range of these variables.
+We might consider log transforming our population and area variables (that aren't densities) - let's take a look at the range of these variables.
 ```{r}
 pm %>%
   select(matches("_pop|_area")) %>%
@@ -1151,8 +1174,7 @@ pm %>%
 ```
 We can see that the range for each of these variables is quite large, we can log transform this data using the `step_log()` function of the `recipes` package.
 
-
-We would also want to potentially one hot encode some of our categorical variables so that they can be used with certain algorithms. We can do this with the `step_dummy()` function and the `one_hot = TRUE` argument. Our fips variable includes a numeric code for state and county - and therefore is essentially a proxy for county.  So if we one hot encode county, we would want to include this rather than the fips id. This would be preferable because the fips is relatively speaking arbitrary- the numbers although meaningful don't really have an order. Just because Alabama comes first in the alphabet, does not mean that monitors in this state have a rank order different from monitors in Wyoming.
+We would also want to potentially one hot encode some of our categorical variables so that they can be used with certain algorithms. We can do this with the `step_dummy()` function and the `one_hot = TRUE` argument. Our fips variable includes a numeric code for state and county - and therefore is essentially a proxy for county.  Since we already have county, we will just use it and keep the fips id as another ID variable.
 
 We can remove the `fips` variable from the predictors using `update_role()` to make sure that the role is no longer `"predictor"`. We can make the role anything we want actually, so we will keep it something identifiable.
 
@@ -1165,12 +1187,14 @@ simple_rec %<>%
   #step_log(matches("_pop|_area")) %>%
   update_role("fips", new_role = "county id") %>%
   step_dummy(state, county, city, zcta) %>%
-  #step_dummy(state, county, city, zcta, one_hot = TRUE) %>%
-  step_nzv(all_predictors())
-  #step_corr(all_predictors(), - CMAQ, - aod) %>%
+  step_corr(all_numeric(), - CMAQ, - aod)%>%
+  step_nzv(all_numeric()) 
+  #step_dummy(state, county, city, zcta)
+#  step_dummy(state, county, city, zcta, one_hot = TRUE)
  # check_new_values(all_predictors()) %>%
   #check_range(all_predictors())
 
+#can use step_rm() to remove predictors
   
 simple_rec
 ```
@@ -1221,6 +1245,24 @@ glimpse(prepped_train)
 ```
 ####
 
+
+For easy comparison sake - here is our original data:
+#### {.scrollable }
+```{r}
+# Scroll therough the output!
+glimpse(pm)
+```
+####
+
+Notice how we only have 36 variables now instead of 50! Two of these are our ID variables (`fips` and the actual monitor ID (`id`)) and one is our outcome (`value`). Thus we only have 33 predictors now. We can also see that variables that we no longer have any categorical variables. Variables like `state` are gone and only `state_California` remains as it was the only state identity to have nonzero variance.  We can see that California had the largest number of monitors compared to the other states. We can also see that there were more monitors listed as `"Not in a city"` than any city. 
+
+#### {.scrollable }
+```{r}
+pm %>% count(state)
+pm %>% count(city)
+```
+####
+
 **Note**:  Recall that you must specify `retain = TRUE` argument of the `prep()` function to use `juice()`.
 
 #### Extracting the preprocessed testing data
@@ -1255,7 +1297,16 @@ So far we have used `rsample` to split the data and `recipes` to assign variable
 
 We will now use the `parsnip` package (which is similar to the previous `caret` package - and hence why it is named after the vegetable) to specify our model.
 
-We are going to start with a linear regression but we will demonstrate how we can try different models.
+There are four aspects to define about our model:  
+1) the **type** of model (using specific funtions in parsnip like `rand_forest()`, `logistic_reg()` etc.)  
+2) the **mode** of learning - classification or regression (using the `set_mode()` function)  
+3) the package or **engine** that we will use to implement the type of model selected (using the `set_engine()` function)  
+4) any **arguments** necessary for the model/package selected (using the `set_args()`function -  for example the `mtry =` argument for random forest which is the number of variables to be used as options for splitting at each tree node)  
+
+We are going to start our analysis with a linear regression but we will demonstrate how we can try different models.
+
+The first thing we do is define what type of model we would like to use. See [here](https://tidymodels.github.io/parsnip/articles/articles/Models.html
+){target="_blank"} for modeling [options]in parsnip.
 
 ```{r}
 PM_model <- parsnip::linear_reg() #PM for particulate mater
@@ -1264,7 +1315,7 @@ PM_model
 
 OK. So far all we have told `parsnip` is we want to use a linear regression...  Let's tell `parsnip` more about what we want.
 
-We would like to use the ordinary least squares method to fit our linear regression. So we will tell `parnsip` that we want to use the `lm` package to implement our linear regression (there are many options actually). We will do so by using the `set_engine()` function of the `parsnip` package.
+We would like to use the ordinary least squares method to fit our linear regression. So we will tell `parsnip` that we want to use the `lm` package to implement our linear regression (there are many options actually- such as [`rstan`](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html) [`glmnet`](https://cran.r-project.org/web/packages/glmnet/index.html), [`keras`](https://keras.rstudio.com/), and [`sparklyr`](https://therinspark.com/starting.html#starting-sparklyr-hello-world)). We will do so by using the `set_engine()` function of the `parsnip` package.
 
 ```{r}
 lm_PM_model <- 
@@ -1275,12 +1326,23 @@ lm_PM_model
 
 ```
 
+In some cases some packages can do either classification or prediction, so it is a good idea to specify which mode you intend to perform. You can do this with the `set_mode()` function of the `parsnip` package, by using either `set_mode("classification")` or `set_mode("regression")`.
 
-### Fitting the Model
+```{r}
+lm_PM_model <- 
+  PM_model  %>%
+  parsnip::set_engine("lm") %>%
+  set_mode("regression")
+
+lm_PM_model
+
+```
+
+### Fitting the Model with `workflows` and `parsnip`
 
 To fit our model we could use `parsnip` and then assess our fit using the `yardstick` package.
 
-However a newer package called `workflows` allows us to keep track of both our preprocessing steps and our model specification. It also allows us to implement fancier optimizations in an automated way, so it is good to learn about it!
+However a newer package called `workflows` allows us to keep track of both our preprocessing steps and our model specification. It also allows us to implement fancier optimizations in an automated way and it is currently being developed to also handle post-processing operations, so it is good to learn about it!
 
 So we will now create a workflow with the recipe (our preprocessing specifications) that we made and the model that we just specified.
 
@@ -1302,10 +1364,264 @@ Ah, nice. Notice how it tells us about both our preprocessing steps and our mode
 Now we can prepare the recipe (estimate the parameters) and fit the model to our training data all at once. Printing the output we can see the coefficients of the model.
 
 ```{r}
-PM_wflow_fit <- fit(PM_wflow, data = train_pm)
+PM_wflow_fit <- parsnip::fit(PM_wflow, data = train_pm)
 PM_wflow_fit
 ```
 
+Otherwise we could have done this without the `workflows` package:
+```{r}
+PM_fit <- lm_PM_model %>% 
+  parsnip::fit(value ~., data =prepped_train)
+
+```
+
+### Looking at model fit with `broom`
+
+The `broom` package allows for an easy/tidy way to look at the fitted model:  
+
+`tidy()` grabs the coefficients from the model  
+`glance()` summarizes the model fit  
+`augment()` gives a 150 row observation level summary  
+
+These `broom` functions currently only work with `parsnip` objects not raw `workflows` objects. To use these functions with `workflows` we need to first use the `pull_workflow_fit()` function.
+
+```{r}
+broom::tidy(PM_fit)
+broom::glance(PM_fit$fit)
+broom::augment(PM_fit$fit)
+
+
+PM_wflow_fit %>% 
+  pull_workflow_fit() %>% 
+  tidy()
+```
+
+
+OK, so we have fit our model on our training data, which means we have created a model to predict values of air pollution based on the predictors that we have included. Yay!
+
+
+At this point we could take a look at the accuracy of our model performance, but we will only have one reference point: our testing dataset. And we haven't done any tuning of our model or cross validation... so generally speaking you <u>**should not**</u> do this. 
+
+However if you were short on time you could continue like this.
+
+need tune_*(), fit_resamples() or last_fit() to get any assessment of fit.
+
+
+We could stop here and use the `yardstick` package to evaluate performance. First we would want to fit the model with hmmm not sure if I will do this or just skip and use tune even if we dont have any tuning??
+
+Using parsnip we need to use the baked data testing data... or not???
+```{r}
+# lm_fit <-lm_PM_model %>%
+#   parsnip::fit(value ~.,data = juiced_rec)
+#yardstick::metrics(lm_fit, truth, predicted)
+
+# values_pred <- 
+#   predict(PM_wflow_fit, baked_rec) %>% 
+#   bind_cols(baked_rec %>% select(value, fips)) 
+# values_pred
+
+
+values_pred <- 
+  predict(PM_wflow_fit, test_pm) %>% 
+  bind_cols(test_pm %>% select(value, fips)) 
+values_pred
+#With Tune package:
+#overallfit <-tune::last_fit(PM_wflow, pm_split)
+#count(values_pred, .pred)
+```
+
+
+Say we were done optimizing our parameters we could then use the `last_fit()` function of the `workflows` package.
+
+#### {.scrollable }
+```{r}
+#overallfit <-tune::last_fit(PM_wflow, pm_split)
+ # or
+#overallfit <-PM_wflow %>%
+#  tune::last_fit(pm_split)
+
+##overallfit
+```
+
+We could check out test performance using the `collect_metrics()` function of the `tune` package.
+
+model performance :https://medium.com/@limavallantin/metrics-to-measure-machine-learning-model-performance-e8c963665476
+
+```{r}
+#test_performance <- overallfit  %>%tune::collect_metrics()
+#test_performance
+```
+
+Here you can see the predictions for the test set (the 292 rows with predicitions out of the 876 original monitor values) also using the `tune` package with the `collect_predictions()` function.
+
+```{r}
+#test_predictions <- overallfit  %>%tune::collect_predictions()
+#print(test_predictions, n=1e3)
+```
+####
+
+
+However we would really want to tune parameters and use cross validation for this.
+
+
+
+yardstick can't talk directly to workflows... need tune for that...
+
+
+
+### Cross validation sample splitting
+
+We will use the `rsample` package again in order to further implement what are called [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} techniques. This is also called **resampling** or **repartioning**.
+Note: we are not actually getting new samples from the underlying distribution so the term resampling is a bit of a misnomer.
+
+[Cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} splits our training data into multiple training data sets to allow for an assessment of the accuracy of the model.
+
+Here is a visualization of the concept for cross validation/resampling/repartitioning from [Max Kuhn](https://resources.rstudio.com/authors/max-kuhn){target="_blank"}:
+
+```{r, echo=FALSE, out.width="800px"}
+knitr::include_graphics(here::here("img","resampling.png"))
+```
+
+Technically creating our testing and training set out of our original training data is sometimes considered a form of [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} called the holdout method. As we just learned this can give us a better sense of the accuracy of our data in a more generalizable way. 
+
+However, we can do a better job of optimizing our model for accuracy if we also perform another type of [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} on the newly defined training set that we just created. There are many [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} methods and most can be easily implemented using `rsamples` package. We will use a very popular method called either [k-fold or v-fold cross validation](https://machinelearningmastery.com/k-fold-cross-validation/){target="_blank"}. 
+
+This method involves essentially preforming the hold out method iteratively with the training data. 
+
+First the training set is divided into k or v equally sized smaller pieces. 
+
+Then the model is trained on the model on k-1 or v-1 subsets of the data iteratively (removing a different v or k untill all possible k-1 or v-1 sets have been evaluated) to get a sense of the performance of the model. This is really useful for fine tuning specific aspects of the model in a process called model tuning.
+
+
+Here is a visualization of how the folds are created:
+
+```{r, echo=FALSE, out.width="800px"}
+knitr::include_graphics(here::here("img","vfold.png"))
+```
+
+
+Note: People typically ignore spatial dependence with cross validation of air pollution monitoring data in the air pollution field, so we will do the same.  However, it might make sense to leave out blocks of monitors rather than  random individual monitors to help account for some spatial dependence.
+
+The [`vfold_cv()`](https://tidymodels.github.io/rsample/reference/vfold_cv.html){target="_blank"} function of the `rsample` package can be used to parse the training data into folds for k-fold/v-fold cross validation.
+
+The `v` argument specifies the number of folds to create.
+The `repeats` argument specifies if any samples should be repeated across folds - defualt is `FALSE`
+The `strata` argument specifies a variable to stratify samples across folds (just like in `initial_split()`).
+
+Again because these are created at random, we need to use the base `set.seed()` function in order to obtain the same results each time we knit this document.
+
+```{r}
+set.seed(1234)
+
+vfold_pm <-rsample::vfold_cv(data = train_pm, v = 10 )
+
+vfold_pm
+
+
+vfold_pm$splits$`1`
+vfold_pm$splits$`2`
+```
+
+Once the folds are created they can be used to evaluate peformance by fitting the model to each of the resamples that we created:
+
+
+```{r, echo=FALSE, out.width="800px"}
+knitr::include_graphics(here::here("img","cross_validation.png"))
+```
+
+
+We can fit the model to our cross validation folds using the `fit_resamples()` function of the `tune` package, by specifying our workflow object and the cross validation fold object we just created. See [here](https://tidymodels.github.io/tune/reference/fit_resamples.html) for more information.
+
+```{r}
+control <- control_resamples(save_pred = TRUE)
+resample_fit <-tune::fit_resamples(PM_wflow, vfold_pm)
+
+```
+
+We can now take a look at various metrics of performance based on the fit of our 10 cross validation "resamples". To do this we will use the `show_best()` function of the `tune` package.
+
+```{r}
+tune::show_best(resample_fit, metric = "rmse", "rsq")
+```
+
+### Tuning
+
+Now let's try some tuning.
+
+Let's take a closer look at how the monitor values vary with latitude and longitude.
+
+```{r}
+
+train_pm %>% 
+  dplyr::select(value, lon, lat) %>% 
+  tidyr::pivot_longer(cols = c(lon, lat), 
+                      names_to = "predictor", values_to = "loc_value") %>% 
+  ggplot(aes(x = loc_value, value)) + 
+  geom_point(alpha = .2) + 
+  geom_smooth(se = FALSE) + 
+  #scale_y_log10() +
+  facet_wrap(~ predictor, scales = "free_x")
+```
+
+We can see that there does not appear to be a single linear relationship for either of these predictors. Thus we might want to think about using  [splines](https://www.math.uh.edu/~jingqiu/math4364/spline.pdf) or this(https://towardsdatascience.com/numerical-interpolation-natural-cubic-spline-52c1157b98ac) or just this(https://tidymodels.github.io/tune/articles/getting_started.html) or this(https://www.psych.mcgill.ca/misc/fda/ex-basis-b1.html) to model the relationship in our training data more closely. For example for the latitude plot (left) if we had 2 lines and one breakpoint called a knot around 40, with the first line having a positive slope and the second with a negative slope this would fit the data more similarly to the blue line shown in the figure.
+
+We can tune for the number of knots by using a step function in the `recipes` package called `step_ns()` where ns stands for natural splines. In order to tune for the number of knots or degrees of freedom, we can set the `deg_free` argument to `tune()`. This is helpful, becuase we aren't exactly sure how closely we should be following the relationship with the value and our longitude and latitude data in our training data to achieve good accuracy yet keep our model generalizable for other data. 
+
+This is when our cross validation methods become really handy. We can test out different values for the `deg_free` argument and see how our model performance varies across our training folds to try to find the optimal value.
+
+We will update our recipe to add these steps. It is a good idea to do this for individual predictors because you can name each with the `tune` argument so that you can keep track of it later. We can see what we intend to tune with the `parameters()` function of the `dials` package. 
+
+See [here](this(https://tidymodels.github.io/tune/articles/getting_started.html)) for more information about implementing this in tidymodels.
+
+```{r}
+
+simple_rec %<>%
+  step_ns(lon, deg_free = tune("lon df")) %>%
+  step_ns(lat,  deg_free = tune("lat df"))
+# simple_rec %<>%
+#   step_ns(lat,  deg_free = tune())
+# simple_rec
+
+pm_param <-dials::parameters(simple_rec)
+pm_param
+```
+Genearlly you could use the `grid_*()` functions of the `dials` package to create the different combinations of degrees of freedom to test for both variables to optimize the model. In our case we can visably see that if we add more than say 4 or 5 degrees of freedom we will likely overfit the data. So instead of using these functions we will create our own grid using the base `seq()` and `expand.grid()` functions.
+
+```{r}
+#an example of what you could do:
+#spline_grid <-dials::grid_regular(pm_param, levels = 3)
+df_vals <- seq(1, 5, by = 2)
+spline_grid <- expand.grid(`lon df` = df_vals, `lat df` = df_vals)
+spline_grid
+```
+
+
+Now we will tune this hyper-parameter (degrees of freedom) for both the `lat` and `lon` variables using our cross validation folds. To do this we will use the `tune_grid()` function of the `tune` package.
+
+```{r}
+
+df_tuning <-lm_PM_model %>% 
+  tune::tune_grid(simple_rec, resamples =vfold_pm, 
+                  grid = spline_grid)
+
+#df_tuning <-PM_wflow %>% tune::tune_grid(resamples =vfold_pm, 
+ #                                        grid = spline_grid, 
+  
+#                                       param_set =pm_param)
+
+df_tuning
+```
+
+
+
+```{r}
+
+df_tuning %>%
+  collect_metrics()
+
+collect_metrics(df_tuning)
+show_best(df_tuning, metric = "rmse", n =1)
+```
 
 
 Let's review everything:
@@ -1332,12 +1648,7 @@ variable changed in the new data.
 prepper for cross validation?
 
 
-From Broom:
 
-allows for an easy/tidy way to look at the fitted model
-tidy() grabs the coefficients from the model
-glance() summarizes the model fit
-augment() gives 150 row observation level summary
 
 
 
