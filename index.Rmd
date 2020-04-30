@@ -1368,7 +1368,8 @@ PM_wflow_fit <- parsnip::fit(PM_wflow, data = train_pm)
 PM_wflow_fit
 ```
 
-Otherwise we could have done this without the `workflows` package:
+Otherwise we could have done this without the `workflows` package. Notice here we will used the prepped training data as opposed to the raw training data that we used with the workflow we created with `workflows`.
+
 ```{r}
 PM_fit <- lm_PM_model %>% 
   parsnip::fit(value ~., data =prepped_train)
@@ -1621,6 +1622,50 @@ df_tuning %>%
 
 collect_metrics(df_tuning)
 show_best(df_tuning, metric = "rmse", n =1)
+```
+
+
+### Linear Regression Model with PCA
+
+```{r}
+lm_PCA_rec <-recipe(train_pm) %>%
+    update_role(everything(), new_role = "predictor")%>%
+    update_role(value, new_role = "outcome")%>%
+    update_role(id, new_role = "id variable") %>%
+    update_role("fips", new_role = "county id") %>%
+    step_dummy(state, county, city, zcta) %>%
+    step_pca(all_predictors()) 
+```
+
+We wtill want to use the `lm` package for our regression so we can use the same model object:
+```{r}
+lm_PM_model
+```
+
+We can create another workflow:
+```{r}
+pca_wflow <-workflows::workflow() %>%
+           workflows::add_recipe(lm_PCA_rec) %>%
+           workflows::add_model(lm_PM_model)
+pca_wflow
+```
+
+Fit the cross validation samples:
+
+```{r}
+resample_pca_fit <-tune::fit_resamples(pca_wflow, vfold_pm)
+```
+
+
+Look at the performance:
+```{r}
+collect_metrics(resample_pca_fit)
+```
+
+And we can compare this with our previous performance:
+
+```{r}
+collect_metrics(resample_fit)
 ```
 
 
