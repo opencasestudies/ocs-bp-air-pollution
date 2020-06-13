@@ -1214,21 +1214,33 @@ We can remove the `fips` variable from the predictors using `update_role()` to m
 
 We might also want to remove variables that appear to be redundant and are highly correlated with others, as we know from our exploratory data analysis that many of our variables are correlated with one another. We can do this using the `step_corr()` function.
 
+It is also a good idea to remove variables with near-zero variance, which can be done with the `step_nzv()` function. Variables have low variance if all the values are very similar, the values are very sparse, or if they are highly imbalanced. 
+
+Examples where you might have near-zero variance variables include: ### I Struggled to find links for this... to back up my statements###
+
+1) **Similar Values** - If the population density was nearly the same for every zcta that contained a monitor, then knowing the population density near our monitorwould contribute little to our model in assisting us to predict monitor air pollution values. 
+2) **Sparse Data** - If all of the monitors were in locations where the populations did not attend graduate school, then these values would mostly be zero, again this would do very little to help us distinguish our air pollution monitors.When many of the values are zero this is also called sparse data.  
+3) **Imbalanced Data** If nearly all of the monitors were located in one particular state, and all the others only had one monitor each, then the real predictive value would simply be in knowing if a monitor is located in that particular state or not. In this case we don't want to remove our variable, we just want to simplify it.
+
 **It is important to add the steps to the recipe in an order that makes sense just like with a cooking recipe.**
+
+Thus first we are going to create numeric values for our categorical variables, then we will look at correlation and near-zero variance. We don't want to remove some of our variables, like the CMAQ and aod variables so we can make sure they are kept in the model by excluding them from those steps. If we specifically wanted to remove a predictor we could use `step_rm()`.
 
 ```{r}
 simple_rec %<>%
-  #step_log(matches("_pop|_area")) %>%
+  step_log(matches("_pop|_area")) %>%
   update_role("fips", new_role = "county id") %>%
-  step_dummy(state, county, city, zcta) %>%
-  step_corr(all_numeric(), - CMAQ, - aod)%>%
-  step_nzv(all_numeric()) 
-  #step_dummy(state, county, city, zcta)
-#  step_dummy(state, county, city, zcta, one_hot = TRUE)
- # check_new_values(all_predictors()) %>%
-  #check_range(all_predictors())
+# create numeric dummy variables to encode for categorical variables
+  step_dummy(state, county, city, zcta, one_hot = TRUE) %>%
+  # identify and reomve all correlated predictors (now that they are numeric)
+   step_corr(all_predictors(), - CMAQ, - aod)%>%
+  # identify variables with near zero variance and remove
+  step_nzv(all_predictors(), - CMAQ, - aod) # 
+ 
 
-#can use step_rm() to remove predictors
+ # check_new_values(all_predictors()) %>%
+#check_range(all_predictors())
+
   
 simple_rec
 
@@ -1312,13 +1324,72 @@ Later on if you want to look at the preprocessed testing data you would use the 
 However you would want to leave your testing data alone at this point.
 
 #### {.scrollable }
-```{r}
+```{r,}
 # Scroll therough the output!
 baked_rec <- recipes::bake(prepped_rec, new_data = test_pm)
 glimpse(baked_rec)
 ```
 ####
 
+
+Notice that our `city_Not.in.a.city` variable seems to be NA values. Why might that be?
+
+Ah! Perphas it is because some of our levels were not previously seen in the training set!
+
+Let's take a look using the set operations of the `dplyr` package. We can take a look at cities that were different between the test and training set and that were the same
+```{r}
+traincities <- train_pm %>% distinct(city)
+testcities <- test_pm %>% distinct(city)
+
+#get the number of cities that were different
+dim(dplyr::setdiff(traincities, testcities))
+
+#get the number of cities that overlapped
+dim(dplyr::intersect(traincities, testcities))
+```
+
+
+Thus we need to update our original recipe to include a very important step function called `step_novel()` this helps in cases like this were there are new factors in our testing set that were not in our training set. It is a good idea to include this in most of your recipes where you have a categorical variables with many distinct values. This step needs to come before we create dummy variables. However, we are also creating a dummy variable from this, which still results in a problem. Instead let's modify the city variable to be values of `in a city` or `not in a city` using the `if_else()` function of `dplyr`. Alternatively you could create a [custom step function](https://recipes.tidymodels.org/articles/Custom_Steps.html) to do this, but that is beyond our scope. 
+
+If we were to use step_novel we would do something like this:
+```{r, eval }
+
+train_pm[["city"]] <- if_else(
+  train_pm[["city"]] == "Not in a city", 
+  true = "Not in a city", false = "In a city")
+
+test_pm[["city"]] <- if_else(
+  test_pm[["city"]] == "Not in a city", 
+  true = "Not in a city", false = "In a city")
+  
+novel_rec <-recipe(train_pm) %>%
+    update_role(everything(), new_role = "predictor")%>%
+    update_role(value, new_role = "outcome")%>%
+    update_role(id, new_role = "id variable")%>%
+    update_role("fips", new_role = "county id")%>%
+    step_string2factor(city, county, state)%>%
+    step_novel(city, county, state)%>%
+    step_log(matches("_pop|_area")) %>%
+    update_role("fips", new_role = "county id") %>%
+# create numeric dummy variables to encode for categorical variables
+    #step_dummy(state, county, city, zcta, one_hot = TRUE) %>%
+# identify and reomve all correlated predictors (now that they are numeric)
+   step_corr(all_numeric(), - CMAQ, - aod)%>%
+# identify variables with near zero variance and remove
+  step_nzv(all_numeric(), - CMAQ, - aod) # 
+ 
+```
+
+Now let's retrain our training data and try baking our test data:
+
+```{r}
+prepped_rec <- prep(novel_rec, verbose = TRUE, retain = TRUE)
+baked_rec <- recipes::bake(prepped_rec, new_data = test_pm)
+glimpse(baked_rec)
+
+```
+
+if city
 > bake() takes a trained recipe and applies the operations to a data set to create a design matrix.
  for example:  it applies the centering to new data sets using these means used to create the recipe
 
