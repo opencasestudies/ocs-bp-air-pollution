@@ -953,6 +953,19 @@ Indeed this increased the correlation, but variables from each of these categori
 
 Now that we have a sense of what our data is like we can get started with data analysis.
 
+### The machine learning process
+
+There are two distinct goals of supervised machine learning:  
+
+1) Prediction  
+2) Classification  
+
+We will be performing a prediction analysis (which is also refered to as regression), which aims to predict **continuous outcome** variables given a number of predictors/explanatory variables/features/parameters, as we have already described.
+
+Classification on the other hand aims to discern or predict group identity for a **categorical outcome** based on a number of predictors/explanatory variables/features/parameters.
+
+The overall process is the same in either case. 
+
 
 ### The tidymodels ecosystem
 
@@ -960,17 +973,6 @@ To perform our analysis we will be using the `tidymodels` suite of packages. You
 
 > "Other packages, such as caret and mlr, help to solve the R model API issue. These packages do a lot of other things too: preprocessing, model tuning, resampling, feature selection, ensembling, and so on. In the tidyverse, we strive to make our packages modular and parsnip is designed only to solve the interface issue. It is not designed to be a drop-in replacement for caret.
 The tidymodels package collection, which includes parsnip, has other packages for many of these tasks, and they are designed to work together. We are working towards higher-level APIs that can replicate and extend what the current model packages can do."
-
-
-### The major benefits of tidymodels
-1) standardized workflow/format/notation across different types of algorithms
-2) can easily modify preprocessing, algorithm choice, and hyper-parameter tuning making optimization easy
-
-
-### The machine learning process
-
-
-### The tidymodels ecosystem - an overview
 
 There are many packages in the tidymodels ecosystem which assist with the various steps of the machine learning process:
 
@@ -985,16 +987,12 @@ This is the overall process:
 knitr::include_graphics(here::here("img","MachineLearning.png"))
 ```
 
-There are two distinct goals of supervised machine learning:  
+### The major benefits of tidymodels
+1) standardized workflow/format/notation across different types of algorithms
+2) can easily modify preprocessing, algorithm choice, and hyper-parameter tuning making optimization easy
 
-1) Prediction  
-2) Classification  
 
-We will be performing a prediction analysis (which is also refered to as regression), which aims to predict **continuous outcome** variables given a number of predictors/explanatory variables/features/parameters, as we have already described.
 
-Classification on the other hand aims to discern or predict group identity for a **categorical outcome** based on a number of predictors/explanatory variables/features/parameters.
-
-The overall process is the same in either case. 
 
 ### Splitting the Data
 
@@ -1629,14 +1627,14 @@ yardstick::mae(values_pred_wfs, truth = value, estimate = .pred)
 
 Say we were done optimizing our parameters we could then use the `last_fit()` function of the `workflows` package.
 
-#### {.scrollable }
+
 ```{r}
-# overallfit <-tune::last_fit(PM_wflow, pm_split)
-#  # or
-# overallfit <-PM_wflow %>%
-#   tune::last_fit(pm_split)
-# 
-# overallfit
+overallfit <-tune::last_fit(PM_wflow, pm_split)
+ # or
+overallfit <-PM_wflow %>%
+  tune::last_fit(pm_split)
+
+overallfit
 ```
 
 We could check out test performance using the `collect_metrics()` function of the `tune` package.
@@ -1644,24 +1642,19 @@ We could check out test performance using the `collect_metrics()` function of th
 model performance :https://medium.com/@limavallantin/metrics-to-measure-machine-learning-model-performance-e8c963665476
 
 ```{r}
-# test_performance <- overallfit  %>%tune::collect_metrics()
-# test_performance
+test_performance <- overallfit  %>%tune::collect_metrics()
+test_performance
 ```
 
 Here you can see the predictions for the test set (the 292 rows with predicitions out of the 876 original monitor values) also using the `tune` package with the `collect_predictions()` function.
 
+#### {.scrollable }
 ```{r}
-#test_predictions <- overallfit  %>%tune::collect_predictions()
-#print(test_predictions, n=1e3)
+test_predictions <- overallfit  %>%tune::collect_predictions()
+print(test_predictions, n=1e3)
 ```
 ####
 
-
-However we would really want to tune parameters and use cross validation for this.
-
-
-
-yardstick can't talk directly to workflows... need tune for that...
 
 
 
@@ -1822,7 +1815,7 @@ show_best(df_tuning, metric = "rmse", n =1)
 
 ### Linear Regression Model with PCA
 
-We can create another workflow to see how model pefromance compares using a different model. In this case we are going to peform something called Principal Component Analysis or PCA. 
+We can create another workflow to see how model pefromance compares using a different model. In this case we are going to perform something called Principal Component Analysis or PCA. 
 
 So what is PCA?
 
@@ -1856,7 +1849,7 @@ pca_wflow <-workflows::workflow() %>%
 pca_wflow
 ```
 
-Remember that using `workflows` we dont actually need to prep our recipe, we can just fit our model directly. So now we will use tune to fit our resamples... WAIT DOES THIS WORK?? or do you need to use fit...
+Remember that using `workflows` we dont actually need to prep our recipe, we can just fit our model directly. 
 
 Fit the cross validation samples:
 
@@ -1877,6 +1870,24 @@ collect_metrics(resample_fit)
 ```
 
 So we can see that our performance isn't quite as good - especially if we look at the `rmse` value.  
+
+
+### Random Forest
+
+
+Now for one last recipe, we are going to predict using a decision tree method called random forests.
+
+
+
+### 
+
+
+
+## Data Visualization
+
+## Summary
+
+
 
 Let's review everything:
 
@@ -1908,9 +1919,6 @@ prepper for cross validation?
 
 great blog about cross validation etc https://towardsdatascience.com/train-test-split-and-cross-validation-in-python-80b61beca4b6
 
-## Data Visualization
-
-## Summary
 
 We have evaluated average consumption estimates of 15 dietary factors with probably non-communicable disease (NCD) risk from 195 different countries around the world. To do so we imported data from a PDF using the `pdftools` package, as well as data from two CSV files using readr. We used `tidyverse` packages such as `dplyr`, `stringr`, and `tidy` to clean and join the data from the PDF with the CSV files. 
 
