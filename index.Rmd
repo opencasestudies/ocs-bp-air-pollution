@@ -211,7 +211,10 @@ library(ggcorrplot)
 library(GGally)
 library(tidymodels)# broom, dials, infer, parsnip, purrr, recipes, rsample, tibble, yardstick
 library(workflows)
+library(vip)
 library(tune)
+library(randomForest)
+
 
 
 # library(stringr)
@@ -1558,6 +1561,17 @@ identical(tidy(PM_fit), wflowoutput)
 OK, so we have fit our model on our training data, which means we have created a model to predict values of air pollution based on the predictors that we have included. Yay!
 
 
+We can get a sense of the variable importance using the `vip()` function of the `vip` package. 
+
+Let's take a look at the top 10 contributing variables:
+
+```{r}
+PM_wflow_fit %>% 
+  pull_workflow_fit() %>% 
+  vip(num_features = 10)
+
+```
+
 ### Model Performance
 
 Let's take a look at how well our model fit our training data:
@@ -1902,7 +1916,14 @@ So we can see that our performance isn't quite as good - especially if we look a
 
 Now for one last recipe, we are going to predict using a decision tree method called random forests.
 
-A decision tree is a tool to partition options to help narrow down AVOCADO
+A decision tree is a tool to partition data based on a series of sequential binary decisions.
+
+```{r}
+knitr::include_graphics("https://miro.medium.com/max/1000/1*LMoJmXCsQlciGTEyoSN39g.jpeg")
+
+```
+
+#### [[source](https://towardsdatascience.com/understanding-random-forest-58381e0602d2)]
 
 
 ```{r}
@@ -1911,6 +1932,12 @@ knitr::include_graphics("https://miro.medium.com/max/1400/0*f_qQPFpdofWGLQqc.png
 
 
 ```{r}
+
+# train_pm[["state"]]<- as.factor(train_pm[["state"]])
+# train_pm[["county"]]<- as.factor(train_pm[["county"]])
+# train_pm[["city"]]<- as.factor(train_pm[["city"]])
+#train_2 <-train_pm %>% select(-fips, -id)
+
 RF_rec <-recipe(train_pm) %>%
     update_role(everything(), new_role = "predictor")%>%
     update_role(value, new_role = "outcome")%>%
@@ -1918,6 +1945,9 @@ RF_rec <-recipe(train_pm) %>%
     update_role("fips", new_role = "county id") %>%
     step_string2factor("state", "county", "city") %>%
     step_rm("county") %>%
+    step_rm("id") %>%
+    step_rm("fips")%>%
+    step_rm("zcta") %>%
     step_corr(all_numeric())%>%
     step_nzv(all_numeric())
 ```
@@ -1931,8 +1961,7 @@ PMtree_model
 RF_PM_model <- 
   PMtree_model  %>%
   parsnip::set_engine("randomForest") %>%
-  set_mode("regression") %>%
-  translate()
+  set_mode("regression")
 
 RF_PM_model
 
@@ -1943,24 +1972,39 @@ RF_wflow <-workflows::workflow() %>%
 RF_wflow
 ```
 
-
-```{r,eval=FALSE}
-library(randomForest)
-
-resample_RF_fit <-tune::fit_resamples(RF_wflow, vfold_pm)
-collect_metrics(resample_RF_fit)
-
-RF_wflow_fit <- parsnip::fit(RF_wflow, data = train_pm)
-RF_wflow_fit
-
-
-
-
-
+Fitting the data with just parsnip and with workflows:
+```{r}
 RF_fit <- RF_PM_model %>% 
 parsnip::fit(value ~., data =juiced_train_ready)
 
+RF_wflow_fit <- parsnip::fit(RF_wflow, data = train_pm)
+RF_wflow_fit
 ```
+
+
+Fitting the data using cross validation:
+```{r}
+
+resample_RF_fit <-tune::fit_resamples(RF_wflow, vfold_pm)
+collect_metrics(resample_RF_fit)
+```
+
+Again for comparison sake:
+
+```{r}
+# our initial linear regression model:
+collect_metrics(resample_fit)
+# our initial linear regression model with lat/lon degrees of freedom tuning:
+show_best(df_tuning, metric = "rmse", n =1)
+# our PCA model:
+collect_metrics(resample_pca_fit)
+
+```
+
+Looks like the model with the lowest rmse is the linear regression model with 5 degrees of freedom for latitude and longitude.
+
+If we tuned our random forest model based on the number of trees or the value for `mtry` (which is "The number of predictors that will be randomly sampled at each split when creating the tree models"), we might get a model with even better performance.
+
 
 ```{r, eval = FALSE}
 tidypredict_fit(parsnip_model)[[1]]
