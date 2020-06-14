@@ -1228,19 +1228,13 @@ Thus first we are going to create numeric values for our categorical variables, 
 
 ```{r}
 simple_rec %<>%
-  step_log(matches("_pop|_area")) %>%
   update_role("fips", new_role = "county id") %>%
 # create numeric dummy variables to encode for categorical variables
   step_dummy(state, county, city, zcta, one_hot = TRUE) %>%
   # identify and reomve all correlated predictors (now that they are numeric)
    step_corr(all_predictors(), - CMAQ, - aod)%>%
   # identify variables with near zero variance and remove
-  step_nzv(all_predictors(), - CMAQ, - aod) # 
- 
-
- # check_new_values(all_predictors()) %>%
-#check_range(all_predictors())
-
+  step_nzv(all_predictors(), - CMAQ, - aod)
   
 simple_rec
 
@@ -1248,7 +1242,7 @@ simple_rec
 
 
 
-### OPTIONAL: Running the preprocessing (to see it)
+### OPTIONAL(but recommended): Running the preprocessing (to see it)
 
 The next major function of the `recipes` package is `prep()`.
 
@@ -1288,8 +1282,8 @@ Since we retained our preprocessed training data, we can take a look at it like 
 #### {.scrollable }
 ```{r}
 # Scroll therough the output!
-prepped_train<- juice(prepped_rec)
-glimpse(prepped_train)
+juiced_train<- juice(prepped_rec)
+glimpse(juiced_train)
 ```
 ####
 
@@ -1319,15 +1313,22 @@ pm %>% count(city)
 knitr::include_graphics(here::here("img","testing_preprocessing_recipes4.png"))
 ```
 
-Later on if you want to look at the preprocessed testing data you would use the `bake()` function of the `recipes` package like this:
+Accroding to the tidymodels documentation:
 
-However you would want to leave your testing data alone at this point.
+> `bake()` takes a trained recipe and applies the operations to a data set to create a design matrix.
+ for example:  it applies the centering to new data sets using these means used to create the recipe
+
+
+NOTE this next section could be removed if it is confusing... and we would therefore update the orginal simple_rec recipe. But it shows what I had difficulty with - the new levels in testing data..
+
+If you wanted to look at the preprocessed testing data you would use the `bake()` function of the `recipes` package.
+(You generally want to leave your testing data alone, but it is good to look for issues like the introduction of NA values).
 
 #### {.scrollable }
 ```{r,}
 # Scroll therough the output!
-baked_rec <- recipes::bake(prepped_rec, new_data = test_pm)
-glimpse(baked_rec)
+baked_test_pm <- recipes::bake(prepped_rec, new_data = test_pm)
+glimpse(baked_test_pm )
 ```
 ####
 
@@ -1336,7 +1337,8 @@ Notice that our `city_Not.in.a.city` variable seems to be NA values. Why might t
 
 Ah! Perphas it is because some of our levels were not previously seen in the training set!
 
-Let's take a look using the set operations of the `dplyr` package. We can take a look at cities that were different between the test and training set and that were the same
+Let's take a look using the [set operations](https://www.probabilitycourse.com/chapter1/1_2_2_set_operations.php) of the `dplyr` package. We can take a look at cities that were different between the test and training set.
+
 ```{r}
 traincities <- train_pm %>% distinct(city)
 testcities <- test_pm %>% distinct(city)
@@ -1348,11 +1350,17 @@ dim(dplyr::setdiff(traincities, testcities))
 dim(dplyr::intersect(traincities, testcities))
 ```
 
+Indeed, there are lots of different cities in our test data that are not in our training data!
 
-Thus we need to update our original recipe to include a very important step function called `step_novel()` this helps in cases like this were there are new factors in our testing set that were not in our training set. It is a good idea to include this in most of your recipes where you have a categorical variables with many distinct values. This step needs to come before we create dummy variables. However, we are also creating a dummy variable from this, which still results in a problem. Instead let's modify the city variable to be values of `in a city` or `not in a city` using the `if_else()` function of `dplyr`. Alternatively you could create a [custom step function](https://recipes.tidymodels.org/articles/Custom_Steps.html) to do this, but that is beyond our scope. 
+Maybe remove this?: Thus we need to update our original recipe to include a very important step function called `step_novel()` this helps in cases like this were there are new factors in our testing set that were not in our training set. It is a good idea to include this in most of your recipes where you have a categorical variables with many distinct values. This step needs to come before we create dummy variables. However, we are also creating a dummy variable from this, which still results in a problem. 
 
-If we were to use step_novel we would do something like this:
-```{r, eval }
+
+Let's modify the city variable to be values of `in a city` or `not in a city` using the `if_else()` function of `dplyr`. Alternatively you could create a [custom step function](https://recipes.tidymodels.org/articles/Custom_Steps.html) to do this and add the step function to your recipe, but that is beyond the scope of this case study. 
+
+We need to create a new recipe to move forward, as the levels of our variables are established then. We would also potentially have this issue for state and county. So let's also do a similar thing for `state`. The `county` variables appears to get dropped due to either correlation or near zero variance. It is likely due to near zero variance becuase this is the more granular of these geographic categorical variables and likely sparse.
+
+
+```{r}
 
 train_pm[["city"]] <- if_else(
   train_pm[["city"]] == "Not in a city", 
@@ -1361,22 +1369,26 @@ train_pm[["city"]] <- if_else(
 test_pm[["city"]] <- if_else(
   test_pm[["city"]] == "Not in a city", 
   true = "Not in a city", false = "In a city")
+
+train_pm[["state"]] <- if_else(
+  train_pm[["state"]] == "California", 
+  true = "California", false = "Not California")
+
+test_pm[["state"]] <- if_else(
+  test_pm[["state"]] == "California", 
+  true = "California", false = "Not California")
   
 novel_rec <-recipe(train_pm) %>%
     update_role(everything(), new_role = "predictor")%>%
     update_role(value, new_role = "outcome")%>%
     update_role(id, new_role = "id variable")%>%
     update_role("fips", new_role = "county id")%>%
-    step_string2factor(city, county, state)%>%
-    step_novel(city, county, state)%>%
-    step_log(matches("_pop|_area")) %>%
-    update_role("fips", new_role = "county id") %>%
 # create numeric dummy variables to encode for categorical variables
-    #step_dummy(state, county, city, zcta, one_hot = TRUE) %>%
+    step_dummy(state, county, city, zcta, one_hot = TRUE) %>%
 # identify and reomve all correlated predictors (now that they are numeric)
-   step_corr(all_numeric(), - CMAQ, - aod)%>%
+   step_corr(all_numeric())%>%
 # identify variables with near zero variance and remove
-  step_nzv(all_numeric(), - CMAQ, - aod) # 
+  step_nzv(all_numeric()) # 
  
 ```
 
@@ -1384,18 +1396,29 @@ Now let's retrain our training data and try baking our test data:
 
 ```{r}
 prepped_rec <- prep(novel_rec, verbose = TRUE, retain = TRUE)
-baked_rec <- recipes::bake(prepped_rec, new_data = test_pm)
-glimpse(baked_rec)
-
 ```
 
-if city
-> bake() takes a trained recipe and applies the operations to a data set to create a design matrix.
- for example:  it applies the centering to new data sets using these means used to create the recipe
+
+#### {.scrollable }
+```{r}
+# Scroll therough the output!
+juiced_train<- juice(prepped_rec)
+glimpse(juiced_train)
+```
+
+####
+
+Notice, it looks like we gained the `log_prisec_length_25000` back with this recipe using the data with our changes to `state` and `city`.
+
+```{r}
+baked_test_pm<- recipes::bake(prepped_rec, new_data = test_pm)
+glimpse(baked_test_pm)
+```
+
+Great now we no longer have NA values! :)
 
 
 Note: if you use the skip option for some of the preprocessing steps, be careful. `juice()` will show all of the results ignoring `skip = TRUE`. `bake()` will not necessarily conduct these steps on the new data. 
-
 
 
 ### Specifying the Model
@@ -1445,9 +1468,10 @@ lm_PM_model
 
 ```
 
-### Fitting the Model with `workflows` and `parsnip`
+### Fitting the Model: two ways - `workflows` and `parsnip`
 
-To fit our model we could use `parsnip` and then assess our fit using the `yardstick` package.
+There are two w
+To fit our model we can use the `parsnip` package and then assess our fit using the `yardstick` package.
 
 However a newer package called `workflows` allows us to keep track of both our preprocessing steps and our model specification. It also allows us to implement fancier optimizations in an automated way and it is currently being developed to also handle post-processing operations, so it is good to learn about it!
 
@@ -1461,7 +1485,7 @@ Note: We do not need to actually prep our recipe before using workflows!
 
 ```{r}
 PM_wflow <-workflows::workflow() %>%
-           workflows::add_recipe(simple_rec) %>%
+           workflows::add_recipe(novel_rec) %>%
            workflows::add_model(lm_PM_model)
 PM_wflow
 ```
@@ -1475,11 +1499,14 @@ PM_wflow_fit <- parsnip::fit(PM_wflow, data = train_pm)
 PM_wflow_fit
 ```
 
-Otherwise we could have done this without the `workflows` package. Notice here we will used the prepped training data as opposed to the raw training data that we used with the workflow we created with `workflows`.
+Otherwise we could have done this without the `workflows` package. Notice here we will used the processed training data (`juiced_train`) as opposed to the raw training data that we used with the workflow we created with `workflows`.
+
+Remember that in this case, we need to write your model again! Recall that `id` and `fips` are ID variables and that `values` is our outcome of interest (the pm air pollution measure at each monitor). 
 
 ```{r}
+juiced_train_ready <- juiced_train%>% select( -id, -fips)
 PM_fit <- lm_PM_model %>% 
-  parsnip::fit(value ~., data =prepped_train)
+parsnip::fit(value ~., data =juiced_train_ready)
 
 ```
 
@@ -1488,65 +1515,129 @@ PM_fit <- lm_PM_model %>%
 The `broom` package allows for an easy/tidy way to look at the fitted model:  
 
 `tidy()` grabs the coefficients from the model  
-`glance()` summarizes the model fit  
-`augment()` gives a 150 row observation level summary  
+`glance()` summarizes the model fit and gives us an idea about how well the model might perform
+`augment()` gives a 150 row observation level summary of the data and fit 
 
-These `broom` functions currently only work with `parsnip` objects not raw `workflows` objects. To use these functions with `workflows` we need to first use the `pull_workflow_fit()` function.
+These `broom` functions currently only work with `parsnip` objects not raw `workflows` objects. To use the `tidy()` function with `workflows` we need to first use the `pull_workflow_fit()` function.
 
 ```{r}
-broom::tidy(PM_fit)
-broom::glance(PM_fit$fit)
-broom::augment(PM_fit$fit)
+broom::tidy(PM_fit) %>% arrange(p.value)
+broom::glance(PM_fit[["fit"]])
+broom::augment(PM_fit[["fit"]]) # this also gives us the fitted values, standard error for each and more!
 
 
-PM_wflow_fit %>% 
+wflowoutput<-PM_wflow_fit %>% 
   pull_workflow_fit() %>% 
-  tidy()
+  broom::tidy() 
+
+
+#The output is identical using workflows to fit the model or just parsnip
+identical(tidy(PM_fit), wflowoutput)
+
 ```
 
 
 OK, so we have fit our model on our training data, which means we have created a model to predict values of air pollution based on the predictors that we have included. Yay!
 
 
+### Model Performance
+
+Let's take a look at how well our model fit our training data:
+
+```{r}
+##using the parsnip version
+#can grab the fitted values simply like this:
+parsnip_fitted_values<-fitted(PM_fit[["fit"]])
+
+parsnip_fitted_values
+
+#can also get the values using the augment function
+parsnip_fitted_values <- augment(PM_fit[["fit"]], data = juiced_train) %>% 
+select(value, .fitted:.std.resid)
+
+parsnip_fitted_values
+
+##using the workflows version
+wf_fit <-PM_wflow_fit %>% 
+  pull_workflow_fit()
+
+#can grab the fitted values simply like this:
+wf_fitted_values<-fitted(wf_fit[["fit"]])
+
+wf_fitted_values
+
+#can also get the values using the augment function
+wf_fitted_values <-augment(wf_fit[["fit"]], data = juiced_train) %>% 
+select(value, .fitted:.std.resid)
+
+wf_fitted_values
+
+#gives us the same fitted values
+identical(parsnip_fitted_values, wf_fitted_values)
+
+## Let's make a plot of fitted and real values
+
+ggplot(wf_fitted_values, aes(x = .fitted, y = value)) + geom_point()
+```
+
+Ok, so our fitted range appears to be smaller than the real values. We could probably do a bit better.
+
 At this point we could take a look at the accuracy of our model performance, but we will only have one reference point: our testing dataset. And we haven't done any tuning of our model or cross validation... so generally speaking you <u>**should not**</u> do this. 
 
 However if you were short on time you could continue like this.
 
-need tune_*(), fit_resamples() or last_fit() to get any assessment of fit.
+Using the workflows method, you would need functions like this: `tune::tune_*()`, `tune::fit_resamples()` or `tune::last_fit()` from the `tune` package to get an assessment of fit.
 
+We could stop here and use the `yardstick` package to evaluate performance. First we would want to use the model to predict values for the monitors in the testing data.
 
-We could stop here and use the `yardstick` package to evaluate performance. First we would want to fit the model with hmmm not sure if I will do this or just skip and use tune even if we dont have any tuning??
+Using parsnip we need to use the baked data testing data.
 
-Using parsnip we need to use the baked data testing data... or not???
 ```{r}
-# lm_fit <-lm_PM_model %>%
-#   parsnip::fit(value ~.,data = juiced_rec)
-#yardstick::metrics(lm_fit, truth, predicted)
-
-# values_pred <- 
-#   predict(PM_wflow_fit, baked_rec) %>% 
-#   bind_cols(baked_rec %>% select(value, fips)) 
-# values_pred
-
-
-values_pred <- 
+ baked_test_pm_ready <-baked_test_pm %>%select( -"id", -"fips")
+ values_pred_parsnip <-predict(PM_fit, baked_test_pm_ready)
+ values_pred_parsnip
+ 
+# using the workflows version
+values_pred_wfs <- 
   predict(PM_wflow_fit, test_pm) %>% 
   bind_cols(test_pm %>% select(value, fips)) 
-values_pred
-#With Tune package:
-#overallfit <-tune::last_fit(PM_wflow, pm_split)
-#count(values_pred, .pred)
+values_pred_wfs
+
 ```
 
+Let's take a look at how well it did.
+
+When assessing the performance of a model, the metrics we use depend on if we are preforming a classifcation or prediction also known as regression analysis. In our case we are performing a regression or prediction analysis and the metrics often used are:
+1) mean absolute error (mae)  
+2) R squared error (rsq) 
+This is also known as the coefficient of determiniation which is the squared correlation between truth and estimate  
+3) root mean squared error (rmse)   
+
+
+We can use the `yardstick` package to quickly calculate estimates for all of these values using the `metrics()` function. Alternatively if you only wanted one metric you could use the `mae()`, `rsq()`, or `rmse()` functions respectively.
+
+```{r}
+
+yardstick::metrics(wf_fitted_values, truth = value, estimate = .fitted)
+yardstick::mae(wf_fitted_values, truth = value, estimate = .fitted)
+yardstick::mae(values_pred_wfs, truth = value, estimate = .pred)
+
+```
+
+Alternatively we can use the `mape()` function to get an estimate of the mean absolute percentage error.
+
+```{r}
+
+```
 
 Say we were done optimizing our parameters we could then use the `last_fit()` function of the `workflows` package.
 
 #### {.scrollable }
 ```{r}
-#overallfit <-tune::last_fit(PM_wflow, pm_split)
+overallfit <-tune::last_fit(PM_wflow, pm_split)
  # or
-#overallfit <-PM_wflow %>%
-#  tune::last_fit(pm_split)
+overallfit <-PM_wflow %>%
+  tune::last_fit(pm_split)
 
 ##overallfit
 ```
@@ -1683,14 +1774,14 @@ See [here](this(https://tidymodels.github.io/tune/articles/getting_started.html)
 
 ```{r}
 
-simple_rec %<>%
+novel_rec %<>%
   step_ns(lon, deg_free = tune("lon df")) %>%
   step_ns(lat,  deg_free = tune("lat df"))
-# simple_rec %<>%
+# novel_rec %<>%
 #   step_ns(lat,  deg_free = tune())
-# simple_rec
+# novel_rec
 
-pm_param <-dials::parameters(simple_rec)
+pm_param <-dials::parameters(novel_rec)
 pm_param
 ```
 Genearlly you could use the `grid_*()` functions of the `dials` package to create the different combinations of degrees of freedom to test for both variables to optimize the model. In our case we can visably see that if we add more than say 4 or 5 degrees of freedom we will likely overfit the data. So instead of using these functions we will create our own grid using the base `seq()` and `expand.grid()` functions.
@@ -1709,7 +1800,7 @@ Now we will tune this hyper-parameter (degrees of freedom) for both the `lat` an
 ```{r}
 
 df_tuning <-lm_PM_model %>% 
-  tune::tune_grid(simple_rec, resamples =vfold_pm, 
+  tune::tune_grid(novel_rec, resamples =vfold_pm, 
                   grid = spline_grid)
 
 #df_tuning <-PM_wflow %>% tune::tune_grid(resamples =vfold_pm, 
@@ -1752,8 +1843,8 @@ Let's take a look to see what the `step_pca` function does to our predictors. To
 
 ```{r}
 prepped_rec <- prep(lm_PCA_rec, verbose = TRUE, retain = TRUE )
-prepped_train<- juice(prepped_rec)
-glimpse(prepped_train)
+juiced_train<- juice(prepped_rec)
+glimpse(juiced_train)
 ```
 
 We still want to use the `lm` package for our regression so we can use the same model object:
@@ -1925,5 +2016,3 @@ guide for [preprocessing with recipes](http://www.rebeccabarter.com/blog/2019-06
 [tidyr](https://tidyr.tidyverse.org/){target="_blank"}      | to separate data within a column into multiple columns 
 [ggplot2](https://ggplot2.tidyverse.org/){target="_blank"}    | to make visualizations with multiple layers  
 
-
-Do I need to talk about machine learning in general more... classification vs prediction?
