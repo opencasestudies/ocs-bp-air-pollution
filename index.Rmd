@@ -964,8 +964,27 @@ We will be performing a prediction analysis (which is also refered to as regress
 
 Classification on the other hand aims to discern or predict group identity for a **categorical outcome** based on a number of predictors/explanatory variables/features/parameters.
 
-The overall process is the same in either case. 
+The overall process is the same in either case and involes the following steps (which will each be explained in detail): 
 
+1) Data exploration  
+
+We have already performed this step to get a sense of the data. It is important to know if we have `NA` values, to understand the class of variables, and if to determine if there are any redudant variables that might need to removed.
+
+2) Data splitting 
+
+The data needs to be split into two peices: a training set and a testing set. The training set will be used to optimize the model, while the testing set will be used to evaluate model performance. 
+
+3) Variable assignment and pre-processing  
+
+Both the training and testing data needs to be processed so that the data is compatible and optimized to be used with the model. This involves assigning variables to specific roles within the model and preprocessing like scaling variables and removing redudant variables.
+
+4) Model specification, fitting, tuning and performance evaluation using the training data
+
+The model needs to first be fit to the training data. First the method in which the model will be fit is specified (regression, decision tree etc.).  Then in both classification and prediction, the model is fit to the traing data and uses the explanatory variables to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. If the model fits well than these estimated values will be very similar to the true outcome variable values. If the model does not fit well, than these estimates will be more dissimal from the true outcome variable. In this case, aspects about the model may need to be modified to improve the similarity of the estimates with that ofthe true outcome values. One way to optimize model performance is a process called tuning in which model [parameters and hyperparameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"} are tested to determine the best option for model performance.
+
+5) Overall model performance evaluation
+
+Model performance is assessed as the similarity between the estimates of the outcome variable produced by the model and the true outcome variable values. This is done typically as an interative process with the training data along side modification of the model untill the performance using the training data is satisfactory. At this point, the final model performance is assessed using the testing data. This then gives an estimate about how well the model will predict or classify the outcome variable of interest with new independent data. Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources.
 
 ### The tidymodels ecosystem
 
