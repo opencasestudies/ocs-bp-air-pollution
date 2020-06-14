@@ -980,7 +980,7 @@ Both the training and testing data needs to be processed so that the data is com
 
 4) Model specification, fitting, tuning and performance evaluation using the training data
 
-The model needs to first be fit to the training data. First the method in which the model will be fit is specified (regression, decision tree etc.).  Then in both classification and prediction, the model is fit to the traing data and uses the explanatory variables to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. If the model fits well than these estimated values will be very similar to the true outcome variable values. If the model does not fit well, than these estimates will be more dissimal from the true outcome variable. In this case, aspects about the model may need to be modified to improve the similarity of the estimates with that ofthe true outcome values. One way to optimize model performance is a process called tuning in which model [parameters and hyperparameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"} are tested to determine the best option for model performance.
+The model needs to first be fit to the training data. First the method or algorithm in which the model will be fit is specified (regression, random forests etc.).  Then in both classification and prediction, the model is fit to the traing data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. If the model fits well than these estimated values will be very similar to the true outcome variable values. If the model does not fit well, than these estimates will be more dissimal from the true outcome variable. In this case, aspects about the model may need to be modified to improve the similarity of the estimates with that ofthe true outcome values. One way to optimize model performance is a process called tuning in which different model [hyperparameter](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"} options are tested to determine the best option for model performance.
 
 5) Overall model performance evaluation
 
@@ -1000,18 +1000,21 @@ knitr::include_graphics(here::here("img","simpletidymodels.png"))
 ```
 
 
-This is the overall process:
+This is a depiction of how these tools help perform the overall machine learning process:
 
 ```{r, echo=FALSE, out.width="800px"}
 knitr::include_graphics(here::here("img","MachineLearning.png"))
 ```
 
-### The major benefits of tidymodels
-1) standardized workflow/format/notation across different types of algorithms
-2) can easily modify preprocessing, algorithm choice, and hyper-parameter tuning making optimization easy
+### The major benefits of tidymodels  
 
+1) Standardized workflow/format/notation across different types of algorithms  
 
+Different notations are required for different algorithms as the algorithms have been developed by many different people. This would require the painstaking process of reformatting the data to be compatible with each algorithm if multiple algorithms were tested.
 
+2) Can easily modify preprocessing, algorithm choice, and hyper-parameter tuning making optimization easy  
+
+Modiying a piece of the overall process is now much easier than before because many of the steps are specified using the tidymodel packages in a convenient manner. Thus the entire process can be rerun after a simple change to preprocessing without much difficulty.
 
 ### Splitting the Data
 
@@ -1142,7 +1145,7 @@ simple_rec
 ```
 
 
-However, to deal with the id variable we could use the `update_role()` function of the `recipes` package:
+However, to deal with the id variable we could use the `update_role()` function of the `recipes` package. This option works well with the newer `workflows` package, however id variabels are often dropped from analyses that do not use this newer package as they can make the process difficult with using the `parsnip` package alone due to the fact that new levels (or possible values) may be introduced with the testing data.
 
 ```{r}
 
@@ -1259,7 +1262,7 @@ simple_rec
 
 
 
-### OPTIONAL(but recommended): Running the preprocessing (to see it)
+### Running the preprocessing
 
 The next major function of the `recipes` package is `prep()`.
 
@@ -1335,8 +1338,6 @@ Accroding to the tidymodels documentation:
 > `bake()` takes a trained recipe and applies the operations to a data set to create a design matrix.
  for example:  it applies the centering to new data sets using these means used to create the recipe
 
-
-NOTE this next section could be removed if it is confusing... and we would therefore update the orginal simple_rec recipe. But it shows what I had difficulty with - the new levels in testing data..
 
 If you wanted to look at the preprocessed testing data you would use the `bake()` function of the `recipes` package.
 (You generally want to leave your testing data alone, but it is good to look for issues like the introduction of NA values).
@@ -1488,7 +1489,6 @@ lm_PM_model
 
 ### Fitting the Model: two ways - `workflows` and `parsnip`
 
-There are two w
 To fit our model we can use the `parsnip` package and then assess our fit using the `yardstick` package.
 
 However a newer package called `workflows` allows us to keep track of both our preprocessing steps and our model specification. It also allows us to implement fancier optimizations in an automated way and it is currently being developed to also handle post-processing operations, so it is good to learn about it!
@@ -1519,7 +1519,7 @@ PM_wflow_fit
 
 Otherwise we could have done this without the `workflows` package. Notice here we will used the processed training data (`juiced_train`) as opposed to the raw training data that we used with the workflow we created with `workflows`.
 
-Remember that in this case, we need to write your model again! Recall that `id` and `fips` are ID variables and that `values` is our outcome of interest (the pm air pollution measure at each monitor). 
+In this case, we actually need to write your model again! Recall that `id` and `fips` are ID variables and that `values` is our outcome of interest (the pm air pollution measure at each monitor). 
 
 ```{r}
 juiced_train_ready <- juiced_train%>% select( -id, -fips)
@@ -1561,6 +1561,7 @@ OK, so we have fit our model on our training data, which means we have created a
 ### Model Performance
 
 Let's take a look at how well our model fit our training data:
+
 
 ```{r}
 ##using the parsnip version
@@ -1620,6 +1621,8 @@ yardstick::mae(wf_fitted_values, truth = value, estimate = .fitted)
 ```
 
 
+### Final Model Performance Evaluation
+
 
 If we were happy with our model performance with the training data, we could stop here and use the `yardstick` package to evaluate performance with our testing data. However, generally we would modify our model a bit until we were happy with the performance values that we achieved with our training data. This would likely involve tuning model hperparmaters which will talk about soon. However, let's pretend we were satisfied and wanted to look at our test data. 
 
@@ -1670,19 +1673,17 @@ Here you can see the predictions for the test set (the 292 rows with predicition
 #### {.scrollable }
 ```{r}
 test_predictions <- overallfit  %>%tune::collect_predictions()
-print(test_predictions, n=1e3)
+
 ```
-####
 
-
-
+Another powerful method for improving your confidence in the etimates of performance is called cross validation.
 
 ### Cross validation sample splitting
 
 We will use the `rsample` package again in order to further implement what are called [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} techniques. This is also called **resampling** or **repartioning**.
 Note: we are not actually getting new samples from the underlying distribution so the term resampling is a bit of a misnomer.
 
-[Cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} splits our training data into multiple training data sets to allow for an assessment of the accuracy of the model.
+[Cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} splits our training data into multiple training data sets to allow for a deeper assessment of the accuracy of the model.
 
 Here is a visualization of the concept for cross validation/resampling/repartitioning from [Max Kuhn](https://resources.rstudio.com/authors/max-kuhn){target="_blank"}:
 
@@ -1756,7 +1757,7 @@ tune::show_best(resample_fit, metric = "rmse", "rsq")
 
 Now let's try some tuning.
 
-Let's take a closer look at how the monitor values vary with latitude and longitude.
+Let's take a closer look at how the air pollution monitor values vary with the location latitude and longitude.
 
 ```{r}
 
@@ -1793,6 +1794,7 @@ novel_rec %<>%
 pm_param <-dials::parameters(novel_rec)
 pm_param
 ```
+
 Genearlly you could use the `grid_*()` functions of the `dials` package to create the different combinations of degrees of freedom to test for both variables to optimize the model. In our case we can visably see that if we add more than say 4 or 5 degrees of freedom we will likely overfit the data. So instead of using these functions we will create our own grid using the base `seq()` and `expand.grid()` functions.
 
 ```{r}
@@ -1856,15 +1858,19 @@ juiced_train<- juice(prepped_rec)
 glimpse(juiced_train)
 ```
 
-We still want to use the `lm` package for our regression so we can use the same model object:
+We still want to use the `lm` package for our regression so we can use the same model object as before:
 ```{r}
 lm_PM_model
 ```
+
+
 
 ```{r}
 pca_wflow <-workflows::workflow() %>%
             workflows::add_recipe(lm_PCA_rec) %>%
             workflows::add_model(lm_PM_model)
+
+
 pca_wflow
 ```
 
@@ -1896,11 +1902,69 @@ So we can see that our performance isn't quite as good - especially if we look a
 
 Now for one last recipe, we are going to predict using a decision tree method called random forests.
 
+A decision tree is a tool to partition options to help narrow down AVOCADO
 
 
-### 
+```{r}
+knitr::include_graphics("https://miro.medium.com/max/1400/0*f_qQPFpdofWGLQqc.png")
+```
 
 
+```{r}
+RF_rec <-recipe(train_pm) %>%
+    update_role(everything(), new_role = "predictor")%>%
+    update_role(value, new_role = "outcome")%>%
+    update_role(id, new_role = "id variable") %>%
+    update_role("fips", new_role = "county id") %>%
+    step_string2factor("state", "county", "city") %>%
+    step_rm("county") %>%
+    step_corr(all_numeric())%>%
+    step_nzv(all_numeric())
+```
+
+
+```{r}
+
+PMtree_model <- parsnip::rand_forest(mtry = 10, min_n = 3, mode = "regression")
+PMtree_model
+
+RF_PM_model <- 
+  PMtree_model  %>%
+  parsnip::set_engine("randomForest") %>%
+  set_mode("regression") %>%
+  translate()
+
+RF_PM_model
+
+
+RF_wflow <-workflows::workflow() %>%
+            workflows::add_recipe(RF_rec) %>%
+            workflows::add_model(RF_PM_model)
+RF_wflow
+```
+
+
+```{r,eval=FALSE}
+library(randomForest)
+
+resample_RF_fit <-tune::fit_resamples(RF_wflow, vfold_pm)
+collect_metrics(resample_RF_fit)
+
+RF_wflow_fit <- parsnip::fit(RF_wflow, data = train_pm)
+RF_wflow_fit
+
+
+
+
+
+RF_fit <- RF_PM_model %>% 
+parsnip::fit(value ~., data =juiced_train_ready)
+
+```
+
+```{r, eval = FALSE}
+tidypredict_fit(parsnip_model)[[1]]
+```
 
 ## Data Visualization
 
