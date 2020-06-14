@@ -1377,6 +1377,7 @@ train_pm[["state"]] <- if_else(
 test_pm[["state"]] <- if_else(
   test_pm[["state"]] == "California", 
   true = "California", false = "Not California")
+
   
 novel_rec <-recipe(train_pm) %>%
     update_role(everything(), new_role = "predictor")%>%
@@ -1582,17 +1583,35 @@ ggplot(wf_fitted_values, aes(x = .fitted, y = value)) + geom_point()
 
 Ok, so our fitted range appears to be smaller than the real values. We could probably do a bit better.
 
-At this point we could take a look at the accuracy of our model performance, but we will only have one reference point: our testing dataset. And we haven't done any tuning of our model or cross validation... so generally speaking you <u>**should not**</u> do this. 
 
-However if you were short on time you could continue like this.
+Let's take a look at how well our model seems to be preforming more formally:
 
-Using the workflows method, you would need functions like this: `tune::tune_*()`, `tune::fit_resamples()` or `tune::last_fit()` from the `tune` package to get an assessment of fit.
+When assessing the performance of a model, the metrics we use depend on if we are preforming a classifcation or prediction also known as regression analysis. In our case we are performing a regression or prediction analysis and the metrics often used are:
+1) mean absolute error (mae)  
+2) R squared error (rsq) 
+This is also known as the coefficient of determiniation which is the squared correlation between truth and estimate  
+3) root mean squared error (rmse)   
 
-We could stop here and use the `yardstick` package to evaluate performance. First we would want to use the model to predict values for the monitors in the testing data.
 
-Using parsnip we need to use the baked data testing data.
+We can use the `yardstick` package to quickly calculate estimates for all of these values using the `metrics()` function. Alternatively if you only wanted one metric you could use the `mae()`, `rsq()`, or `rmse()` functions respectively. This is helpful to examine with our fitted training set values to see how well our model is performing and if we need to make adjustments. 
 
 ```{r}
+
+yardstick::metrics(wf_fitted_values, truth = value, estimate = .fitted)
+yardstick::mae(wf_fitted_values, truth = value, estimate = .fitted)
+
+```
+
+
+
+If we were happy with our model performance with the training data, we could stop here and use the `yardstick` package to evaluate performance with our testing data. However, generally we would modify our model a bit until we were happy with the performance values that we achieved with our training data. This would likely involve tuning model hperparmaters which will talk about soon. However, let's pretend we were satisfied and wanted to look at our test data. 
+
+First we would want to use the model to predict values for the monitors in the testing data.
+
+Using `parsnip` we would need to use the baked data testing data. With the `workflows` package, we could use the raw testing data. Importantly, ID variables are not delt with as nicely as with the `workflows` package so we would need to remove them. We did this above when we used the `juiced_train` data as well.
+
+```{r}
+
  baked_test_pm_ready <-baked_test_pm %>%select( -"id", -"fips")
  values_pred_parsnip <-predict(PM_fit, baked_test_pm_ready)
  values_pred_parsnip
@@ -1603,30 +1622,8 @@ values_pred_wfs <-
   bind_cols(test_pm %>% select(value, fips)) 
 values_pred_wfs
 
-```
-
-Let's take a look at how well it did.
-
-When assessing the performance of a model, the metrics we use depend on if we are preforming a classifcation or prediction also known as regression analysis. In our case we are performing a regression or prediction analysis and the metrics often used are:
-1) mean absolute error (mae)  
-2) R squared error (rsq) 
-This is also known as the coefficient of determiniation which is the squared correlation between truth and estimate  
-3) root mean squared error (rmse)   
-
-
-We can use the `yardstick` package to quickly calculate estimates for all of these values using the `metrics()` function. Alternatively if you only wanted one metric you could use the `mae()`, `rsq()`, or `rmse()` functions respectively.
-
-```{r}
-
-yardstick::metrics(wf_fitted_values, truth = value, estimate = .fitted)
-yardstick::mae(wf_fitted_values, truth = value, estimate = .fitted)
+#model performance with test set
 yardstick::mae(values_pred_wfs, truth = value, estimate = .pred)
-
-```
-
-Alternatively we can use the `mape()` function to get an estimate of the mean absolute percentage error.
-
-```{r}
 
 ```
 
@@ -1634,12 +1631,12 @@ Say we were done optimizing our parameters we could then use the `last_fit()` fu
 
 #### {.scrollable }
 ```{r}
-overallfit <-tune::last_fit(PM_wflow, pm_split)
- # or
-overallfit <-PM_wflow %>%
-  tune::last_fit(pm_split)
-
-##overallfit
+# overallfit <-tune::last_fit(PM_wflow, pm_split)
+#  # or
+# overallfit <-PM_wflow %>%
+#   tune::last_fit(pm_split)
+# 
+# overallfit
 ```
 
 We could check out test performance using the `collect_metrics()` function of the `tune` package.
@@ -1647,8 +1644,8 @@ We could check out test performance using the `collect_metrics()` function of th
 model performance :https://medium.com/@limavallantin/metrics-to-measure-machine-learning-model-performance-e8c963665476
 
 ```{r}
-#test_performance <- overallfit  %>%tune::collect_metrics()
-#test_performance
+# test_performance <- overallfit  %>%tune::collect_metrics()
+# test_performance
 ```
 
 Here you can see the predictions for the test set (the 292 rows with predicitions out of the 876 original monitor values) also using the `tune` package with the `collect_predictions()` function.
