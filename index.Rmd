@@ -207,6 +207,7 @@ library(skimr)
 library(summarytools)
 library(magrittr)
 library(corrplot)
+library(RColorBrewer)
 library(ggcorrplot)
 library(GGally)
 library(tidymodels)# broom, dials, infer, parsnip, purrr, recipes, rsample, tibble, yardstick
@@ -214,6 +215,9 @@ library(workflows)
 library(vip)
 library(tune)
 library(randomForest)
+library(ggplot2)
+library(stringr)
+library(tidyr)
 
 
 
@@ -854,7 +858,7 @@ The `corrplot` package is another option to look at correlation among possible p
 First we need to create a correlation matrix using the `cor()` function of the `stats` package (which is loaded automatically).
 
 ```{r}
-library(RColorBrewer)
+#library(RColorBrewer) #need this package for the color
 PM_cor <- cor(pm %>% dplyr::select_if(is.numeric))
 corrplot::corrplot(PM_cor, tl.cex = 0.5)
 
@@ -958,10 +962,31 @@ Now that we have a sense of what our data is like we can get started with data a
 
 ### The machine learning process
 
+There are two major types of machine learning:  
+
+1) Unsupervised  
+2) Supervised  
+
+Unsupervised learning is used to learn about the structure of the data without knowing much about the data. We let the data reveal properties about itself. Examples include clustering the data into groups or reducing the dimensionality of the data using methods like [principal component analysis](https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007){target="_blank"} (which we will describe in more detail later) to capture patterns of varaince within the data.
+
+```{r, out.width = "4%", echo = FALSE, fig.align ="center"}
+include_graphics("https://miro.medium.com/max/1400/1*lhkCOodCMZ0-SSziEDpwpA.png")
+```
+
+#### [[source](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d)]
+
+In contrast, in supervised learning we have some knowlege about the data that we want to use to create a model to be able to generalize about other similar data.
+
 There are two distinct goals of supervised machine learning:  
 
 1) Prediction  
 2) Classification  
+
+```{r, out.width = "4%", echo = FALSE, fig.align ="center"}
+include_graphics("https://miro.medium.com/max/1400/1*ASYpFfDh7XnreU-ygqXonw.png")
+```
+
+#### [[source](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d)]
 
 We will be performing a prediction analysis (which is also refered to as regression), which aims to predict **continuous outcome** variables given a number of predictors/explanatory variables/features/parameters, as we have already described.
 
@@ -1239,11 +1264,13 @@ We might also want to remove variables that appear to be redundant and are highl
 
 It is also a good idea to remove variables with near-zero variance, which can be done with the `step_nzv()` function. Variables have low variance if all the values are very similar, the values are very sparse, or if they are highly imbalanced. 
 
-Examples where you might have near-zero variance variables include: ### I Struggled to find links for this... to back up my statements###
+Examples where you might have near-zero variance variables include: 
 
 1) **Similar Values** - If the population density was nearly the same for every zcta that contained a monitor, then knowing the population density near our monitorwould contribute little to our model in assisting us to predict monitor air pollution values. 
 2) **Sparse Data** - If all of the monitors were in locations where the populations did not attend graduate school, then these values would mostly be zero, again this would do very little to help us distinguish our air pollution monitors.When many of the values are zero this is also called sparse data.  
 3) **Imbalanced Data** If nearly all of the monitors were located in one particular state, and all the others only had one monitor each, then the real predictive value would simply be in knowing if a monitor is located in that particular state or not. In this case we don't want to remove our variable, we just want to simplify it.
+
+See this [blog post](https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/) about why removing near-zero varaince variables isn't always a good idea if we think that a variable might be especially informative.
 
 **It is important to add the steps to the recipe in an order that makes sense just like with a cooking recipe.**
 
@@ -1635,7 +1662,8 @@ yardstick::mae(wf_fitted_values, truth = value, estimate = .fitted)
 
 ### Cross validation sample splitting
 
-We will use the `rsample` package again in order to further implement what are called [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} techniques. This is also called **resampling** or **repartioning**.
+We will use the `rsample` package again in order to further implement what are called [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} techniques. This is also called **resampling** or **repartioning**.  
+
 Note: we are not actually getting new samples from the underlying distribution so the term resampling is a bit of a misnomer.
 
 [Cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} splits our training data into multiple training data sets to allow for a deeper assessment of the accuracy of the model.
@@ -1793,9 +1821,13 @@ show_best(df_tuning, metric = "rmse", n =1)
 
 ### Linear Regression Model with PCA
 
-We can create another workflow to see how model pefromance compares using a different model. In this case we are going to perform something called Principal Component Analysis or PCA. 
+We can create another workflow to see how model pefromance compares using a different model. In this case we are going to perform something called [Principal Component Analysis or PCA](https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007){target="_blank"}. 
 
 So what is PCA?
+
+PCA is a widely used dimensionality reduction method (a form of unspervised machine learning). It creates new variables that capture the most variation within the data, yet reduce the data down to just a number of principal components. It does so by transforiming the data using [orthogonal](https://en.wikipedia.org/wiki/Orthogonality#:~:text=In%20mathematics%2C%20orthogonality%20is%20the,u%2C%20v)%20%3D%200.){target="_blank"} linear transformation. In otherwords, it creates new variables that are [linear combinations](https://www.mathbootcamps.com/linear-combinations-vectors/){target="_blank"} of the variables within the data. Importantly these new variables are orthogonal, meaning that the new variables have zero covariance. In simpler terms, we are expessing unique types of variation within the data as new variables.
+
+Check out this [video](https://youtu.be/_UVHneBUBW0){target="_blank"} for more information.
 
 ```{r}
 lm_PCA_rec <-recipe(train_pm) %>%
@@ -1916,11 +1948,14 @@ RF_wflow <-workflows::workflow() %>%
 RF_wflow
 ```
 
-Fitting the data with just parsnip and with workflows:
+Fitting the data with just parsnip and with the workflow:
 ```{r}
+
+##just parsnip
 RF_fit <- RF_PM_model %>% 
 parsnip::fit(value ~., data =juiced_train_ready)
 
+## with workflow
 RF_wflow_fit <- parsnip::fit(RF_wflow, data = train_pm)
 RF_wflow_fit
 ```
@@ -1968,9 +2003,9 @@ However, our cross valided mean rmse value of 1.79 is quite good because our ran
 ### Final Model Performance Evaluation
 
 
-If we were happy with our model performance with the training data, we could stop here and use the `yardstick` package (and `tune` if using `workflows` to fit our model) to evaluate performance with our testing data. 
+Now that we have decided that we have resonable performance with the training data, we could stop here and use the `yardstick` package (and `tune` if using `workflows` to fit our model) to evaluate performance with our testing data. 
 
-First we would want to use the model to predict values for the monitors in the testing data.
+So now we will use our random forests model to predict values for the monitors in the testing data.
 
 Using `parsnip` we would need to use the baked data testing data. With the `workflows` package, we could use the raw testing data.
 
@@ -1994,7 +2029,7 @@ yardstick::metrics(values_pred_wfs, truth = value, estimate = .pred)
 ```
 Awesome! We can see that our rmse of 1.49 is quite similar with our testing data. We achieved quite good performance, which suggests that we would could predict other locations with more sparse monitoring based on our predictors with resonable accuracy.
 
-We could also use the `last_fit()` function of the `workflows` package to look at performance.
+We could also use the `last_fit()` function of the `tune` package to look at performance if we chose to create a workflow using the `workflows` package.
 
 ```{r}
 overallfit <-tune::last_fit(RF_wflow, pm_split)
@@ -2028,6 +2063,7 @@ Our main question for this case study was:
 
 1) Can we predict annual average air pollution concentrations at the granularity of zip code regional levels using predictors such as data about population density, urbanization, road density, as well as, satellite pollution data and chemical modeling data?
 
+We have indeed created a model that can predict fine particulate matter air pollution levels based on our predictor variables.
 
 Now let's make a plot of our predicted values and the true values.
 
@@ -2051,7 +2087,7 @@ We will start with getting an outline of the US with the `ne_countries()` functi
 
 library("sf")
 library("rnaturalearth")
-library("rnaturalearthdata")
+#library("rnaturalearthdata")
 library("rgeos")
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -2066,11 +2102,11 @@ ggplot(data = world) +
 
 Now let's add county lines.
 
-County data is available from the `maps` packag.
+County data is available from the `maps` package.
 
 ```{r}
 
-counties <- st_as_sf(map("county", plot = FALSE, fill = TRUE))
+counties <- st_as_sf(maps::map("county", plot = FALSE, fill = TRUE))
 
 monitors <-ggplot(data = world) +
    geom_sf(data = counties, fill = NA, color = gray(.5))+
@@ -2082,17 +2118,16 @@ monitors <-ggplot(data = world) +
 monitors
 ```
 
-Now let's add a fill for the county level values:
-
+Now let's add a fill at the county level for the true monitor values of air pollution:
 
 ```{r}
 library(lwgeom)
-counties <- st_as_sf(map("county", plot = FALSE, fill = TRUE))
-counties$area <- as.numeric(st_area(counties))
+library(stringr)
+
 head(counties)
 
 pm <-readr::read_csv(here("docs", "pm25_data.csv"))
-counties %<>% separate(ID, into = c("state", "county"), sep = ",")
+counties %<>% tidyr::separate(ID, into = c("state", "county"), sep = ",")
 
 counties[["county"]] <-str_to_title(counties[["county"]])
 
@@ -2111,10 +2146,10 @@ truth
 ```
 
 
-Now let's take a look at our predicted values.
+Now let's do the same with our predicted values.
 
 Let's grab both the testing and training fitted values so that we have as much data as possible. 
-In this case, the output structure for the training data fit is slightly different using `randomForest`. The fitted values are called `predicted` and the `broom` functions like `tidy()` and `augment()` will not work. So we will manual grab the fitted training data values.
+In this case, the output structure for the training data fit is slightly different using `randomForest`. The fitted values are called `predicted` and the `broom` functions like `tidy()` and `augment()` will not work. So we will manually grab the fitted training data values.
 
 ```{r}
 
@@ -2153,6 +2188,7 @@ pred
 library(cowplot)
 
 cowplot::plot_grid(monitors, truth, pred)
+cowplot::plot_grid( truth, pred)
 
 
 ```
@@ -2161,86 +2197,44 @@ cowplot::plot_grid(monitors, truth, pred)
 
 ## Summary
 
-
-
 Let's review everything:
 
 ```{r, echo=FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","tidymodels_ecosystem.png"))
+knitr::include_graphics(here::here("img","ecosystem.png"))
 ```
 
 
-We have explored gravametric fine particulate matter air pollution monitoring data. We have utilized the tidymodels ecosystem of packages to predict 
+We have explored gravametric fine particulate matter air pollution monitoring data. We have utilized the tidymodels ecosystem of packages to predict monitor values using a variety of predictors, also known as explanatory varaibles, including sattelite data, road density data, and population density, among others. Our model could be extended to be used to predict pollution levels in areas without monitoring, to help identify regions where populations maybe especially at risk for the health effects of air pollution.  
 
+We learned that there are two major types of what is called supervised machine learning: prediction and classification. We learned that prediction is used when the outcome variable is numeric and classifaction is performed when the outcome variable is categorical.  
 
+We performed the major steps of machine learning that we introduced in the beginning of the data analysis:  
 
+1) Data exploration  
 
+We used a packages like `skimr`, `summarytools`, `corrplot`, `ggcorrplot`, and `GGally` to better understand our data. These packages gave can tell us how many missing values each variable has (if any), the class of each variable, the distribution of values for each variable, the sparsity of each variable, and the level of correlation between variables.  
 
+2) Data splitting 
 
+We used the `rsample` package to first perform an initial split of our data into two peices: a training set and a testing set. The training set was used to optimize the model, while the testing set was used only to evaluate the performance of our final model. We also used the `rsample` package to create cross validation subsets of our training data. This allowed us to better assess the performance of our tested models using our training data.  
 
+3) Variable assignment and pre-processing   
 
+We used the `recipes` package to assign variable roles (such as outcome, predictor, and id variable). We also used this package to create a recipe for pre-processing our training and testing data. This involved steps such as: ` step_dummy` to create dummy numeric encodings of our categorical variables, `step_corr` to remove highly correlated variables, `step_nzv` to remove near zero variance variabels that would contibute little to our model and potentially add noise.  We learned that once our recipe was created and prepped using `prep()`we could extract the pre-processed training data using `juice()` or our pre-processed testing data using `bake()`. We also learned that if we used the newer workflows package that we did not need to the `prep()`, `juice()`, or `bake()` functions, but that it is still useful to know how to do so if we want to look at our data and how the recipe is influencing it more deeply.  
 
+4) Model specification, fitting, tuning and performance evaluation using the training data  
 
+We learned that the model needs to first be fit to the training data. We learned that in both classification and prediction, the model is fit to the traing data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. We learned that we specify the model and its specifications using the `parnsip` package and that we also use this packae to fit the model using the `fit()` function. We learned that we if just use `parsnip` to fit the model, then we need to use the pre-processed training data (output from `juice()`). We learned that we can use the raw training data if we use the `workflows` package to create a workflow that pre-processes our data for us.   
 
+We learned that if the model fits well than the estimated values will be very similar to the true outcome variable values in our training data. We learned that we can assess model peformance using the `yardstick` package and the `metrics()` function. We also learned that we can use subsets of our training data (which we created with the `rsample` package) to perform cross validation to get a better estimate about the performance of our model using our training data, as we want our results to be generalizable and to perform well with other data, not just our training data. We used the `fit_resamples()` function of the tune package to fit our model on our different training data subsets and the `collect_metrics()` function (also of the `tune` package) to evaluate model performance using these subsets.  We also learned that we can potentially improve model performance by tuning aspects about the model called [hyperparameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"} to determine the best option for model performance. We learned that we can do this using the `tune` and `dials` packages and evaluating the performance of our model with the different hyperparameter options and our training data subsets that we used for cross validation. After we tested several different methods to model our data, we compared them to choose the best performing model as our final model.  
 
+5) Overall model performance evaluation  
 
+Once we chose our final model, we evaluated the final model performance using the testing data. This gives us a better estimate about how well the model will predict or classify the outcome variable of interest with new independent data. Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources. 
 
+We first fit our model to our testing data using either just parsnip and the pre-processed testing data (using the `bake()` recipes function), or our raw testing data if we used a workflow. We used the same performance evaluation functions (`yardstick::metrics()`  and `tune::collect_metrics()`(when using cross validion)). We also learned how we can use the `last_fit()` function of the `tune` package if we used a workflow to get the test data performance using the initial data and the testing/training split information.
 
-
-
-
-We have evaluated average consumption estimates of 15 dietary factors with probably non-communicable disease (NCD) risk from 195 different countries around the world. To do so we imported data from a PDF using the `pdftools` package, as well as data from two CSV files using readr. We used `tidyverse` packages such as `dplyr`, `stringr`, and `tidy` to clean and join the data from the PDF with the CSV files. 
-
-We learned that Regression is a powerful and flexible statistical tool that simplifies or estimates the relationships between variables using a mathematical model. We learned about the utility of the regression to compare groups, look for associations between variables, and to predict outcomes based on multiple predictor or explanatory variables. We then compared this to other popular tests like the $t$-test and the ANOVA. We learned that these tests are actually equivalent to specialized types of regressions.
-
-Our statistical analysis focused on evaluating differences in the consumption of red meat around the world between females and males and across different age groups. First we looked at the assumptions of [$t$-tests](https://stattrek.com/statistics/dictionary.aspx?definition=two-sample%20$t$-test){target="_blank"} and regressions, and determined that the relative percentage data of red meat consumption to the optimal guideline suggested amount was right skewed. We learned that we could transform the data by taking the log of these values to achieve more normally distributed data. To compare males and females we used a $t$-test and learned that a $t$-test is a specialized form of a linear regression. To compare the 15 different age groups we used an ANOVA and learned that the ANOVA is also a specialized form of linear regression. We examined how we obtained the same results using either statistical test. This was also the case if we looked at the effect of gender and controlled for the paired country structure in the data by either including `location_name` in the model as another term or by using a mixed effects model to control for this structure as a random effect but not specifically test for the influence of `location_name` on red meat consumption estimates. We learned that fixed effects are those that we wish to evaluate, while random effects are those that may influence the relationships of our variables of interest but that we do not wish to actively evaluate. Using these tests and models, we determined that males consume more red meat than women on average around the world. 
-
-Our ANOVA analysis of age determined that indeed there at least one age group consumed a significantly different amount of red meat compared to the other age groups, and this was still the case when we controlled `location_name`. However, we learned that we could that the ANOVA does not provide information about which age groups are different. We learned how the regression however could provide some comparisons of different age groups relative to the reference age group. Furthermore, our data visualizations allowed us to determine that in general red met consumption appears to be higher in the younger age groups relative to the older age groups. 
-
-Finally, we also looked at differences in red meat consumption between the different countries and saw in our ANOVA analysis and our regression analysis that there were significant differences. We were able to use a regression that included `sex`, `age_group_name`, and `location_name` to evaluate the influence of each of the three demographic factors on consumption while controlling or accounting for the other two. Our results demonstrated that all three influenced or were associated with red meat consumption.
-
-In preforming our statistical analyses we learned about the assumptions of the $t$-test, the regression, and the ANOVA. We also learned about important methods to tests these assumptions.
-
-
-<u>If our data is not normally distributed, we can consider these options:</u>
-
-1) We can still perform a $t$-test if our n is large
-2) We can transform the data before performing a $t$-test
-3) We can use a nonparametric test (Wilcoxon signed rank test, the Wilcoxon rank sum test, and the Two-sample Kolmogorov-Smirnov (KS) test)
-4) We can perform a $t$-test with resampling methods (which should be especially considered when the groups are imbalanced)
-
-See this [case study](https://opencasestudies.github.io/ocs-bp-rural-and-urban-obesity){target="_blank"} for more information on $t$-test assumptions.
-
-We learned that we can test if 2 groups have equal variance using:  
-1) the F test with `var.test()`  
-2) Mood's test using [`mood.test()`](https://files.eric.ed.gov/fulltext/ED065559.pdf) (use if the data is not normally distributed)  
-
-#### Linear regression assumptions:
-
-L (linear) - There is a linear relationship between the variables.  
-I (independent) - The samples are independent from one another.  
-N (normal) - The residuals are normally distributed.  
-E (equal variances) - The variance of the residuals of the groups is similar.   
-It is also important that predictor variables are not correlated with one another.  
-
-#### ANOVA assumptions:
-
-1) Normality of the data for all tested groups (less of an issue if the number of observations is relatively large total n>30) 
-2) Equal variance between the groups - aka Homogeneity of variance (make sure you do the correct test if the data is not normal) 
-3) Balanced sample sizes of the groups 
-4) Independent observations (or independent paired observations) 
-
-We learned about three tests for examining the equality of variance of 3 or more groups:
-1) [Bartlett's test](https://www.itl.nist.gov/div898/handbook/eda/section3/eda357.htm){target="_blank"} (works well if the data appears to be normally distributed) 
-2) [Fligner-Killeen](http://wiki.stat.ucla.edu/socr/index.php/AP_Statistics_Curriculum_2007_NonParam_VarIndep){target="_blank"} test is nonparametric and does not assume normality 
-3) [Levene's test](https://www.itl.nist.gov/div898/handbook/eda/section3/eda35a.htm){target="_blank"}, is more robust to violations of normality than the Bartlett's test, but not as robust as the Fligner- Killeen test 
-
-
-Using the `ggplot2` package we were able to visualize trends in the data and to compare consumption of these dietary factors in the US with that of the other countries.
-We see that the populations in many countries are over-consuming foods that are associated with health risk when over-consumed. In particular processed meat and sugar-sweetened beverages appear to be the most over consumed. Importantly both of these appear to be consumed at higher quantities by males and younger adults. People in the US  appear to consume less sugar-sweetened beverages than other countries, however, people are still over-consuming. Processed meat however appears to be especially bad in the US. In terms of food that need to be consumed in adequate amounts to overcome health risk, nearly all countries for all factors are not reaching guideline levels. However, there are some countries consuming more than adequate amounts of legumes, vegetables, fruits and fiber. People in the US appear to eat more milk products and consume more omega-3 fatty acid and calcium rich foods than other countries. All countries including the US consume very low levels of polyunsaturated fatty acids. These [polyunsaturated fatty acids](https://en.wikipedia.org/wiki/Polyunsaturated_fat) are abundant in seeds, nuts, avocados, as well as fish. Likely the low level of consumption of nuts and seeds contributes to these low polyunsaturated fatty acid estimates. The supplementary table included in the article suggests that poor consumption of polyunsaturated fatty acids is associated with ischemic heart disease. The article takes this data further to evaluate the association of consumption levels of these foods with mortality.
-
-Analyses like the one in our case study are important for defining which groups could benefit the most from interventions, education, and policy changes when attempting to mitigate public health challenges. You can see in the [article](https://www.thelancet.com/action/showPdf?pii=S0140-6736%2819%2930041-8){target="_blank"} however that many additional considerations would be involved to perform a more thorough analysis to adequately understand the data enough to recommend policy changes.
-
+Analyses like the one in our case study are important for defining which groups could benefit the most from interventions, education, and policy changes when attempting to mitigate public health challenges. You can see in this [article](https://www.nejm.org/doi/full/10.1056/NEJMoa1702747){target="_blank"} that many additional considerations would be involved to adequately understand the data enough to recommend policy changes.
 
 ### Suggested Homework
 
@@ -2258,9 +2252,12 @@ Students can predict air pollution monitor values using a different algorithm an
 8) A great blog post about [cross validation](https://towardsdatascience.com/train-test-split-and-cross-validation-in-python-80b61beca4b6){target="_blank"}  
 9) A discussion about [evaluating model performance](https://medium.com/@limavallantin/metrics-to-measure-machine-learning-model-performance-e8c963665476){target="_blank"} for a deeper explanation about how to evaluate model performance  
 10) [RStudio cheatsheets](https://rstudio.com/resources/cheatsheets/){target="_blank"}
+11) An [explanation](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"} of supervised vs unsupervised machine learning and bias-variance tradeoff.
+12) A thorough [explanation](https://royalsocietypublishing.org/doi/10.1098/rsta.2015.0202#:~:text=Principal%20component%20analysis%20(PCA)%20is,variables%20that%20successively%20maximize%20variance.){target="_blank"} of principal component analysis.
+13) If you have access, this is a great [discussion](https://www.tandfonline.com/doi/abs/10.1080/00031305.1984.10483183){target="_blank"}  about the difference between independence, orthogonality, and lack of correlation.
+14) Great [video explanation](https://youtu.be/_UVHneBUBW0){target="_blank"} of PCA.  
 
 <u>Terms and concepts covered:</u>  
-
 [Tidyverse](https://www.tidyverse.org/){target="_blank"}  
 [parameters and hyperparameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"}  
 
