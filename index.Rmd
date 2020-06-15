@@ -1785,10 +1785,8 @@ df_tuning
 df_tuning %>%
   collect_metrics()
 
-collect_metrics(df_tuning)
 show_best(df_tuning, metric = "rmse", n =1)
 ```
-
 
 
 
@@ -1940,7 +1938,6 @@ Interesting, in the previous model the CMAQ values were also important, however 
 
 Now let's take a look at model performance by fitting the data using cross validation:
 ```{r}
-
 resample_RF_fit <-tune::fit_resamples(RF_wflow, vfold_pm)
 collect_metrics(resample_RF_fit)
 ```
@@ -1956,13 +1953,17 @@ show_best(df_tuning, metric = "rmse", n =1)
 collect_metrics(resample_pca_fit)
 
 ```
+Ok, so our first model had a mean rmse value of 2.18.
+The model with the lat/long degrees of freedom  tuning had a mean rmse value of 2.02, thus showing some improvement.
+The PCA model had a mean rmse value of 2.76.
 
-Looks like the model with the lowest rmse is the linear regression model with 5 degrees of freedom for latitude and longitude.
+It looks like the random forest model had the lowest rmse value of 1.79.
+
 
 If we tuned our random forest model based on the number of trees or the value for `mtry` (which is "The number of predictors that will be randomly sampled at each split when creating the tree models"), we might get a model with even better performance.
 
 
-However, our cross validet RMSE value of `r show_best(df_tuning, metric = "rmse", n =1)` is quite good because our range of true outcome values is much larger:`r range(test_pm$value)`.
+However, our cross valided mean rmse value of 1.79 is quite good because our range of true outcome values is much larger:`r range(test_pm$value)`.
 
 ### Final Model Performance Evaluation
 
@@ -1978,27 +1979,27 @@ Importantly, ID variables are not delt with as nicely as with the `workflows` pa
 ```{r}
 
  baked_test_pm_ready <-baked_test_pm %>%select( -"id", -"fips")
- values_pred_parsnip <-predict(PM_fit, baked_test_pm_ready)
+ values_pred_parsnip <-predict(RF_fit, baked_test_pm_ready)
  values_pred_parsnip
  
 # using the workflows version
 values_pred_wfs <- 
-  predict(PM_wflow_fit, test_pm) %>% 
-  bind_cols(test_pm %>% select(value, fips)) 
+  predict(RF_wflow_fit, test_pm) %>% 
+  bind_cols(test_pm %>% select(value, fips, county, id)) 
 values_pred_wfs
 
 #model performance with test set
 yardstick::metrics(values_pred_wfs, truth = value, estimate = .pred)
 
 ```
-We can see that our rmse is considerably larger with our test data, altough still not bad.
+Awesome! We can see that our rmse of 1.49 is quite similar with our testing data. We achieved quite good performance, which suggests that we would could predict other locations with more sparse monitoring based on our predictors with resonable accuracy.
 
-We could also use the `last_fit()` function of the `workflows` package. This function peforms 
+We could also use the `last_fit()` function of the `workflows` package to look at performance.
 
 ```{r}
-overallfit <-tune::last_fit(PM_wflow, pm_split)
+overallfit <-tune::last_fit(RF_wflow, pm_split)
  # or
-overallfit <-PM_wflow %>%
+overallfit <-RF_wflow %>%
   tune::last_fit(pm_split)
 
 overallfit$.metrics[[1]]
@@ -2006,7 +2007,6 @@ overallfit$.metrics[[1]]
 
 We could check out test performance using the `collect_metrics()` function of the `tune` package.
 
-model performance :https://medium.com/@limavallantin/metrics-to-measure-machine-learning-model-performance-e8c963665476
 
 ```{r}
 test_performance <- overallfit  %>%tune::collect_metrics()
@@ -2018,13 +2018,146 @@ Here you can see the predictions for the test set (the 292 rows with predicition
 #### {.scrollable }
 ```{r}
 test_predictions <- overallfit  %>%tune::collect_predictions()
-
+test_predictions
 ```
 
 
 ## Data Visualization
 
-Now let's
+Our main question for this case study was:  
+
+1) Can we predict annual average air pollution concentrations at the granularity of zip code regional levels using predictors such as data about population density, urbanization, road density, as well as, satellite pollution data and chemical modeling data?
+
+
+Now let's make a plot of our predicted values and the true values.
+
+First, let's start by making a plot of our monitors:
+
+We will use the following packages to create a map of the US:
+1)`sf`
+2)`rnaturalearth`
+3)`rnaturalearthdata`
+4)`rgeos`
+
+According to this [link on wikipedia](https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States#Westernmost), these are the latitude and longitude bounds of the contintental US.
+
+top = 49.3457868 # north lat
+left = -124.7844079 # west long
+right = -66.9513812 # east long
+bottom =  24.7433195 # south lat
+
+We will start with getting an outline of the US with the `ne_countries()` function of the `rnaturalearth` package.
+```{r}
+
+library("sf")
+library("rnaturalearth")
+library("rnaturalearthdata")
+library("rgeos")
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+class(world)
+
+ggplot(data = world) +
+    geom_sf() +
+    geom_point(data = pm, aes(x = lon, y = lat), size = 2, 
+        shape = 23, fill = "darkred") +
+    coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)
+```
+
+Now let's add county lines.
+
+County data is available from the `maps` packag.
+
+```{r}
+
+counties <- st_as_sf(map("county", plot = FALSE, fill = TRUE))
+
+monitors <-ggplot(data = world) +
+   geom_sf(data = counties, fill = NA, color = gray(.5))+
+    geom_point(data = pm, aes(x = lon, y = lat), size = 2, 
+        shape = 23, fill = "darkred") +
+    coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
+  ggtitle("Monitor Locations")
+
+monitors
+```
+
+Now let's add a fill for the county level values:
+
+
+```{r}
+library(lwgeom)
+counties <- st_as_sf(map("county", plot = FALSE, fill = TRUE))
+counties$area <- as.numeric(st_area(counties))
+head(counties)
+
+pm <-readr::read_csv(here("docs", "pm25_data.csv"))
+counties %<>% separate(ID, into = c("state", "county"), sep = ",")
+
+counties[["county"]] <-str_to_title(counties[["county"]])
+
+map_data <-inner_join(counties, pm, by = "county")
+
+truth<-ggplot(data = world) +
+    geom_sf() +
+    geom_sf(data = map_data, aes(fill = value)) +
+    #scale_fill_viridis_c(trans = "sqrt", alpha = .4) +
+      #geom_point(data = pm, aes(x = lon, y = lat), size = 1.5, alpha = 2,
+       # shape = 23, fill = "darkred") +
+        coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
+      ggtitle("Monitor PM2.5 levels")
+truth
+
+```
+
+
+Now let's take a look at our predicted values.
+
+Let's grab both the testing and training fitted values so that we have as much data as possible. 
+In this case, the output structure for the training data fit is slightly different using `randomForest`. The fitted values are called `predicted` and the `broom` functions like `tidy()` and `augment()` will not work. So we will manual grab the fitted training data values.
+
+```{r}
+
+#test data
+values_pred_wfs
+
+#training data
+training_RF_estimates <-RF_fit[["fit"]][["predicted"]]
+training_RF_estimates <-tibble(".pred" =training_RF_estimates,
+value= train_pm$value, fips = train_pm$fips,  county = train_pm$county, id =train_pm$id)
+
+all_pred <-bind_rows(values_pred_wfs, training_RF_estimates )
+
+
+```
+
+
+```{r}
+map_data <-inner_join(counties, all_pred, by = "county")
+
+pred <-ggplot(data = world) +
+    geom_sf() +
+    geom_sf(data = map_data, aes(fill = .pred)) +
+    #scale_fill_viridis_c(trans = "sqrt", alpha = .4) +
+      #geom_point(data = pm, aes(x = lon, y = lat), size = 1.5, alpha =2,
+      #  shape = 23, fill = "darkred") +
+        coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
+  ggtitle("Predicted PM2.5 levels")
+
+pred
+
+```
+
+
+```{r}
+library(cowplot)
+
+cowplot::plot_grid(monitors, truth, pred)
+
+
+```
+
+
 
 ## Summary
 
@@ -2037,28 +2170,23 @@ knitr::include_graphics(here::here("img","tidymodels_ecosystem.png"))
 ```
 
 
-
-
-> check_new_values: This check will break the bake function if any of the checked columns does contain values it did
-not contain when prep was called on the recipe. If the check passes, nothing is changed to the data
-
-> check_range creates a specification of a recipe check that will check if the range of a numeric
-variable changed in the new data.
-
-
-
-[parameter vs hyperparameter](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"}
-
-
-
-prepper for cross validation?
+We have explored gravametric fine particulate matter air pollution monitoring data. We have utilized the tidymodels ecosystem of packages to predict 
 
 
 
 
 
 
-great blog about cross validation etc https://towardsdatascience.com/train-test-split-and-cross-validation-in-python-80b61beca4b6
+
+
+
+
+
+
+
+
+
+
 
 
 We have evaluated average consumption estimates of 15 dietary factors with probably non-communicable disease (NCD) risk from 195 different countries around the world. To do so we imported data from a PDF using the `pdftools` package, as well as data from two CSV files using readr. We used `tidyverse` packages such as `dplyr`, `stringr`, and `tidy` to clean and join the data from the PDF with the CSV files. 
@@ -2073,14 +2201,6 @@ Finally, we also looked at differences in red meat consumption between the diffe
 
 In preforming our statistical analyses we learned about the assumptions of the $t$-test, the regression, and the ANOVA. We also learned about important methods to tests these assumptions.
 
-#### $t$-test assumptions:
-
-1) Normality of the data for both groups (this is not as much of an issue if the number of observations is relatively large total n>30 - can evaluate by plotting the distribution and by creating [Q-Q plots]([Q-Q Plots](http://onlinestatbook.com/2/advanced_graphs/q-q_plots.html){target="_blank"}))
-2) Equal variance between the two groups (make sure you do the correct test if the data is not normal)
-3) Balanced sample sizes of the two groups
-4) Independent observations (or independent paired observations)
-
-We can evaluate if our data is [normally distributed](https://www.physiology.org/doi/full/10.1152/advan.00064.2017){target="_blank"} by plotting the distribution and by creating [Q-Q plots]([Q-Q Plots](http://onlinestatbook.com/2/advanced_graphs/q-q_plots.html){target="_blank"} to compare the distribution of our data to the theoretical [normal distribution](https://www.physiology.org/doi/full/10.1152/advan.00064.2017){target="_blank"}.
 
 <u>If our data is not normally distributed, we can consider these options:</u>
 
@@ -2124,41 +2244,29 @@ Analyses like the one in our case study are important for defining which groups 
 
 ### Suggested Homework
 
-Students can evaluate consumption estimates of another dietary factor besides red meat.
+Students can predict air pollution monitor values using a different algorithm and provide an explanation for how that algorithm works and why it may be a good choice for modeling this data.
 
 ### Helpful Links
 
-review of [tidymodels](https://rviews.rstudio.com/2019/06/19/a-gentle-intro-to-tidymodels/){target="_blank"} 
-
-guide for [preprocessing with recipes](http://www.rebeccabarter.com/blog/2019-06-06_pre_processing/)
-
-[guide](https://briatte.github.io/ggcorr/) for using GGally to create correlation plots
-[guide](https://www.tidyverse.org/blog/2018/11/parsnip-0-0-1/) for using parsnip to try different algorithms or engines
-[recipe functions](https://tidymodels.github.io/recipes/reference/index.html)
+1) A review of [tidymodels](https://rviews.rstudio.com/2019/06/19/a-gentle-intro-to-tidymodels/){target="_blank"}  
+2) A [course on tidymodels](https://juliasilge.com/blog/tidymodels-ml-course/){target="_blank"} by Julia Silge  
+3) [More examples, explanations, and info about tidymodels development](https://www.tidymodels.org/learn/){target="_blank"} from the developers  
+4) A guide for [pre-processing with recipes](http://www.rebeccabarter.com/blog/2019-06-06_pre_processing/){target="_blank"}  
+5) A [guide](https://briatte.github.io/ggcorr/){target="_blank"} for using GGally to create correlation plots  
+6) A [guide](https://www.tidyverse.org/blog/2018/11/parsnip-0-0-1/){target="_blank"} for using parsnip to try different algorithms or engines  
+7) A [list of recipe functions](https://tidymodels.github.io/recipes/reference/index.html){target="_blank"}  
+8) A great blog post about [cross validation](https://towardsdatascience.com/train-test-split-and-cross-validation-in-python-80b61beca4b6){target="_blank"}  
+9) A discussion about [evaluating model performance](https://medium.com/@limavallantin/metrics-to-measure-machine-learning-model-performance-e8c963665476){target="_blank"} for a deeper explanation about how to evaluate model performance  
+10) [RStudio cheatsheets](https://rstudio.com/resources/cheatsheets/){target="_blank"}
 
 <u>Terms and concepts covered:</u>  
 
 [Tidyverse](https://www.tidyverse.org/){target="_blank"}  
-[RStudio cheatsheets](https://rstudio.com/resources/cheatsheets/){target="_blank"}  
-[Inference](https://www.britannica.com/science/inference-statistics){target="_blank"}  
-[Regression](https://lindeloev.github.io/tests-as-linear/){target="_blank"}  
-[Different types of regression](https://www.analyticsvidhya.com/blog/2015/08/comprehensive-guide-regression/){target="_blank"}  
-[Ordinary least squares method](http://setosa.io/ev/ordinary-least-squares-regression/){target="_blank"}  
-[Residual](https://www.statisticshowto.datasciencecentral.com/residual/){target="_blank"}  
+[parameters and hyperparameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"}  
 
 <u>Packages used in this case study: </u>
 
  Package   | Use                                                                         
 ---------- |-------------
-[here](https://github.com/jennybc/here_here){target="_blank"}       | to easily load and save data  
-[readr](https://readr.tidyverse.org/){target="_blank"}      | to import the CSV file data  
-[dplyr](https://dplyr.tidyverse.org/){target="_blank"}      | to arrange/filter/select/compare specific subsets of the data  
-[skimr](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data   
-[summarytools](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data in a different style   
-[pdftools](https://cran.r-project.org/web/packages/pdftools/pdftools.pdf){target="_blank"}   | to read a PDF into R   
-[magrittr](https://magrittr.tidyverse.org/articles/magrittr.html){target="_blank"}   | to use the `%<>%` pipping operator  
-[purrr](https://purrr.tidyverse.org/){target="_blank"}      | to perform functions on all columns of a tibble   
-[tibble](https://tibble.tidyverse.org/){target="_blank"}     | to create data objects that we can manipulate with  dplyr/stringr/tidyr/purrr  
-[tidyr](https://tidyr.tidyverse.org/){target="_blank"}      | to separate data within a column into multiple columns 
-[ggplot2](https://ggplot2.tidyverse.org/){target="_blank"}    | to make visualizations with multiple layers  
+
 
