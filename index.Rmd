@@ -1383,21 +1383,20 @@ We need to create a new recipe to move forward, as the levels of our variables a
 
 ```{r}
 
-train_pm[["city"]] <- if_else(
-  train_pm[["city"]] == "Not in a city", 
+pm[["city"]]<-if_else(
+  pm[["city"]] == "Not in a city", 
   true = "Not in a city", false = "In a city")
 
-test_pm[["city"]] <- if_else(
-  test_pm[["city"]] == "Not in a city", 
-  true = "Not in a city", false = "In a city")
-
-train_pm[["state"]] <- if_else(
-  train_pm[["state"]] == "California", 
+pm[["state"]] <- if_else(
+  pm[["state"]] == "California", 
   true = "California", false = "Not California")
 
-test_pm[["state"]] <- if_else(
-  test_pm[["state"]] == "California", 
-  true = "California", false = "Not California")
+set.seed(1234) # same seed as before
+
+pm_split <-rsample::initial_split(data = pm, prop = 2/3)
+pm_split
+ train_pm <-rsample::training(pm_split)
+ test_pm <-rsample::testing(pm_split)
 
   
 novel_rec <-recipe(train_pm) %>%
@@ -1569,7 +1568,6 @@ Let's take a look at the top 10 contributing variables:
 PM_wflow_fit %>% 
   pull_workflow_fit() %>% 
   vip(num_features = 10)
-
 ```
 
 ### Model Performance
@@ -1634,63 +1632,6 @@ yardstick::mae(wf_fitted_values, truth = value, estimate = .fitted)
 
 ```
 
-
-### Final Model Performance Evaluation
-
-
-If we were happy with our model performance with the training data, we could stop here and use the `yardstick` package to evaluate performance with our testing data. However, generally we would modify our model a bit until we were happy with the performance values that we achieved with our training data. This would likely involve tuning model hperparmaters which will talk about soon. However, let's pretend we were satisfied and wanted to look at our test data. 
-
-First we would want to use the model to predict values for the monitors in the testing data.
-
-Using `parsnip` we would need to use the baked data testing data. With the `workflows` package, we could use the raw testing data. Importantly, ID variables are not delt with as nicely as with the `workflows` package so we would need to remove them. We did this above when we used the `juiced_train` data as well.
-
-```{r}
-
- baked_test_pm_ready <-baked_test_pm %>%select( -"id", -"fips")
- values_pred_parsnip <-predict(PM_fit, baked_test_pm_ready)
- values_pred_parsnip
- 
-# using the workflows version
-values_pred_wfs <- 
-  predict(PM_wflow_fit, test_pm) %>% 
-  bind_cols(test_pm %>% select(value, fips)) 
-values_pred_wfs
-
-#model performance with test set
-yardstick::mae(values_pred_wfs, truth = value, estimate = .pred)
-
-```
-
-Say we were done optimizing our parameters we could then use the `last_fit()` function of the `workflows` package.
-
-
-```{r}
-overallfit <-tune::last_fit(PM_wflow, pm_split)
- # or
-overallfit <-PM_wflow %>%
-  tune::last_fit(pm_split)
-
-overallfit
-```
-
-We could check out test performance using the `collect_metrics()` function of the `tune` package.
-
-model performance :https://medium.com/@limavallantin/metrics-to-measure-machine-learning-model-performance-e8c963665476
-
-```{r}
-test_performance <- overallfit  %>%tune::collect_metrics()
-test_performance
-```
-
-Here you can see the predictions for the test set (the 292 rows with predicitions out of the 876 original monitor values) also using the `tune` package with the `collect_predictions()` function.
-
-#### {.scrollable }
-```{r}
-test_predictions <- overallfit  %>%tune::collect_predictions()
-
-```
-
-Another powerful method for improving your confidence in the etimates of performance is called cross validation.
 
 ### Cross validation sample splitting
 
@@ -1761,11 +1702,12 @@ resample_fit <-tune::fit_resamples(PM_wflow, vfold_pm)
 
 ```
 
-We can now take a look at various metrics of performance based on the fit of our 10 cross validation "resamples". To do this we will use the `show_best()` function of the `tune` package.
+We can now take a look at various metrics of performance based on the fit of our cross validation "resamples". To do this we will use the `show_best()` function of the `tune` package.
 
 ```{r}
 tune::show_best(resample_fit, metric = "rmse", "rsq")
 ```
+
 
 ### Tuning
 
@@ -1848,6 +1790,9 @@ show_best(df_tuning, metric = "rmse", n =1)
 ```
 
 
+
+
+
 ### Linear Regression Model with PCA
 
 We can create another workflow to see how model pefromance compares using a different model. In this case we are going to perform something called Principal Component Analysis or PCA. 
@@ -1887,6 +1832,10 @@ pca_wflow <-workflows::workflow() %>%
 
 pca_wflow
 ```
+
+
+
+
 
 Remember that using `workflows` we dont actually need to prep our recipe, we can just fit our model directly. 
 
@@ -1931,12 +1880,9 @@ knitr::include_graphics("https://miro.medium.com/max/1400/0*f_qQPFpdofWGLQqc.png
 ```
 
 
-```{r}
+In our case, the random forest algorithm that we are working with does not work well when there are categorical variabels with more than 53 levels, so we will need to remove the `zcta` variable.
 
-# train_pm[["state"]]<- as.factor(train_pm[["state"]])
-# train_pm[["county"]]<- as.factor(train_pm[["county"]])
-# train_pm[["city"]]<- as.factor(train_pm[["city"]])
-#train_2 <-train_pm %>% select(-fips, -id)
+```{r}
 
 RF_rec <-recipe(train_pm) %>%
     update_role(everything(), new_role = "predictor")%>%
@@ -1982,14 +1928,24 @@ RF_wflow_fit
 ```
 
 
-Fitting the data using cross validation:
+Let's take a look at the top 10 contributing variables:
+
+```{r}
+RF_wflow_fit%>% 
+  pull_workflow_fit() %>% 
+  vip(num_features = 10)
+```
+
+Interesting, in the previous model the CMAQ values were also important, however the variable about if the monitor was located in California or not was also very predictive. 
+
+Now let's take a look at model performance by fitting the data using cross validation:
 ```{r}
 
 resample_RF_fit <-tune::fit_resamples(RF_wflow, vfold_pm)
 collect_metrics(resample_RF_fit)
 ```
 
-Again for comparison sake:
+Now let's compare the performance of this model with the others:
 
 ```{r}
 # our initial linear regression model:
@@ -2006,11 +1962,69 @@ Looks like the model with the lowest rmse is the linear regression model with 5 
 If we tuned our random forest model based on the number of trees or the value for `mtry` (which is "The number of predictors that will be randomly sampled at each split when creating the tree models"), we might get a model with even better performance.
 
 
-```{r, eval = FALSE}
-tidypredict_fit(parsnip_model)[[1]]
+However, our cross validet RMSE value of `r show_best(df_tuning, metric = "rmse", n =1)` is quite good because our range of true outcome values is much larger:`r range(test_pm$value)`.
+
+### Final Model Performance Evaluation
+
+
+If we were happy with our model performance with the training data, we could stop here and use the `yardstick` package (and `tune` if using `workflows` to fit our model) to evaluate performance with our testing data. 
+
+First we would want to use the model to predict values for the monitors in the testing data.
+
+Using `parsnip` we would need to use the baked data testing data. With the `workflows` package, we could use the raw testing data.
+
+Importantly, ID variables are not delt with as nicely as with the `workflows` package so we would need to remove them. We did this above when created the processed training data for this model, the `juiced_train` data as well.
+
+```{r}
+
+ baked_test_pm_ready <-baked_test_pm %>%select( -"id", -"fips")
+ values_pred_parsnip <-predict(PM_fit, baked_test_pm_ready)
+ values_pred_parsnip
+ 
+# using the workflows version
+values_pred_wfs <- 
+  predict(PM_wflow_fit, test_pm) %>% 
+  bind_cols(test_pm %>% select(value, fips)) 
+values_pred_wfs
+
+#model performance with test set
+yardstick::metrics(values_pred_wfs, truth = value, estimate = .pred)
+
+```
+We can see that our rmse is considerably larger with our test data, altough still not bad.
+
+We could also use the `last_fit()` function of the `workflows` package. This function peforms 
+
+```{r}
+overallfit <-tune::last_fit(PM_wflow, pm_split)
+ # or
+overallfit <-PM_wflow %>%
+  tune::last_fit(pm_split)
+
+overallfit$.metrics[[1]]
 ```
 
+We could check out test performance using the `collect_metrics()` function of the `tune` package.
+
+model performance :https://medium.com/@limavallantin/metrics-to-measure-machine-learning-model-performance-e8c963665476
+
+```{r}
+test_performance <- overallfit  %>%tune::collect_metrics()
+test_performance
+```
+
+Here you can see the predictions for the test set (the 292 rows with predicitions out of the 876 original monitor values) also using the `tune` package with the `collect_predictions()` function.
+
+#### {.scrollable }
+```{r}
+test_predictions <- overallfit  %>%tune::collect_predictions()
+
+```
+
+
 ## Data Visualization
+
+Now let's
 
 ## Summary
 
