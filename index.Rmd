@@ -56,7 +56,7 @@ Some sources are natural while others are anthropogenic (human derived):
   <img width="600" src="https://www.nps.gov/subjects/air/images/Sources_Graphic_Huge.jpg?maxwidth=1200&maxheight=1200&autorotate=false">
 </p>
 
-##### [[source](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.nps.gov%2Fsubjects%2Fair%2Fsources.htm&psig=AOvVaw2v7AVxSF8ZSAPEhNudVtbN&ust=1585770966217000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCPDN66q_xegCFQAAAAAdAAAAABAD)]{target="_blank"}
+##### [[source]](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.nps.gov%2Fsubjects%2Fair%2Fsources.htm&psig=AOvVaw2v7AVxSF8ZSAPEhNudVtbN&ust=1585770966217000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCPDN66q_xegCFQAAAAAdAAAAABAD){target="_blank"}
 
 #### Major types of air pollutants
 
@@ -88,7 +88,7 @@ Here you can see how these sizes compare with a human hair:
 knitr::include_graphics(here::here("img", "pm2.5_scale_graphic-color_2.jpg"))
 ```
 
-##### [[source](https://www.epa.gov/pm-pollution/particulate-matter-pm-basics)]{target="_blank"}
+##### [[source]](https://www.epa.gov/pm-pollution/particulate-matter-pm-basics){target="_blank"}
 
 <!-- <p align="center"> -->
 <!--   <img width="500" src="https://www.sensirion.com/images/sensirion-specialist-article-figure-1-cdd70.jpg"> -->
@@ -101,14 +101,14 @@ knitr::include_graphics(here::here("img", "pm2.5_scale_graphic-color_2.jpg"))
   <img width="600" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Airborne-particulate-size-chart.svg/800px-Airborne-particulate-size-chart.svg.png">
 </p>
 
-##### [[source](https://en.wikipedia.org/wiki/Particulates)]{target="_blank"}
+##### [[source]](https://en.wikipedia.org/wiki/Particulates){target="_blank"}
 
 
 <p align="center">
   <img width="500" src="https://www.frontiersin.org/files/Articles/505570/fpubh-08-00014-HTML/image_m/fpubh-08-00014-t002.jpg">
 </p>
 
-##### [[source](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full)]{target="_blank"}
+##### [[source]](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full){target="_blank"}
 
 
 <u>This table shows how deeply some of the smaller fine particles can penetrate within the human body:</u>
@@ -117,7 +117,7 @@ knitr::include_graphics(here::here("img", "pm2.5_scale_graphic-color_2.jpg"))
   <img width="500" src="https://www.frontiersin.org/files/Articles/505570/fpubh-08-00014-HTML/image_m/fpubh-08-00014-t001.jpg">
 </p>
 
-##### [[source](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full)]{target="_blank"}
+##### [[source]](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full){target="_blank"}
 
 
 #### Negative Impact of Particulate Exposure on Health 
@@ -140,7 +140,7 @@ Historically epidemiological studies would assess the influence of air pollution
   <img width="400" src="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4137272/bin/1476-069X-13-63-1.jpg">
 </p>
 
-##### [[source](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63)]{target="_blank"}
+##### [[source]](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63){target="_blank"}
 
 This lack of granularity in air pollution monitoring has hindered our ability to discern the full impact of air pollution on health and to identify at-risk locations. 
 
@@ -236,7 +236,7 @@ library(cowplot)
 [summarytools](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data in a different style
 [magrittr](https://magrittr.tidyverse.org/articles/magrittr.html){target="_blank"}   | to use the `%<>%` pipping operator 
 [corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
-[ggcorrplot](http://www.sthda.com/english/wiki/ggcorrplot-visualization-of-a-correlation-matrix-using-ggplot2)| also to make large correlation plots
+[ggcorrplot](http://www.sthda.com/english/wiki/ggcorrplot-visualization-of-a-correlation-matrix-using-ggplot2){target="_blank"} | also to make large correlation plots
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
 [rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets and to split the training set for cross-validation  
 [recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `juice()` - extracts final preprocessed training data and `bake()` - applies recipe steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
@@ -248,7 +248,7 @@ library(cowplot)
 [tune](https://tune.tidymodels.org/){target="_blank"} | to perform cross validation, tune hyper-parameters, and get performance metrics
 [workflows](https://www.rdocumentation.org/packages/workflows/versions/0.1.1){target="_blank"}| to create modeling workflow to streamline the modeling process
 [vip](https://cran.r-project.org/web/packages/vip/vip.pdf){target="_blank"} | to create variable importance plots
-[randomForest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf)| to perform the random forest analysis
+[randomForest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf){target="_blank"} | to perform the random forest analysis
 [stringr](https://stringr.tidyverse.org/articles/stringr.html){target="_blank"}    | to manipulate the text the map data
 [tidyr](https://tidyr.tidyverse.org/){target="_blank"}      | to separate data within a column into multiple columns
 [rnaturalearth](https://cran.r-project.org/web/packages/rnaturalearth/README.html){target="_blank"} | to get the geometry data for the earth to plot the US
@@ -258,7 +258,6 @@ library(cowplot)
 [rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
 [cowplot](https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html){target="_blank"} | to allow plots to be combined
 ___
-
 
 
 The first time we use a function, we will use the `::` to indicate which package we are using. Unless we have overlapping function names, this is not necessary, but we will include it here to be informative about where the functions we will use come from.
@@ -376,7 +375,7 @@ The monitor data that we will be using comes from **[gravimetric monitors](https
 knitr::include_graphics(here::here("img","filter.png"))
 ```
 
-##### [[source](https://publiclab.org/wiki/filter-pm)]{target="_blank"}
+##### [[source]](https://publiclab.org/wiki/filter-pm){target="_blank"}
 
 Here is an image of what the gravimetric monitors look like:
 
@@ -459,7 +458,7 @@ Many of these predictor variables have to do with the circular area around the m
 knitr::include_graphics(here::here("img", "regression.png"))
 ```
 
-##### [[source](https://www.ncbi.nlm.nih.gov/pubmed/15292906)]{target="_blank"}
+##### [[source]](https://www.ncbi.nlm.nih.gov/pubmed/15292906){target="_blank"}
 
 
 
@@ -871,22 +870,23 @@ The `corrplot` package is another option to look at correlation among possible p
 First we need to create a correlation matrix using the `cor()` function of the `stats` package (which is loaded automatically).
 
 ```{r}
-#library(RColorBrewer) #need this package for the color
+
 PM_cor <- cor(pm %>% dplyr::select_if(is.numeric))
+
 corrplot::corrplot(PM_cor, tl.cex = 0.5)
 
+## here we can see absolute values
 corrplot(abs(PM_cor), order = "AOE", tl.cex = 0.5,  cl.lim = c(0, 1))
 
-
+#library(RColorBrewer) #need this package for the color
 corrplot(PM_cor, diag = FALSE, order = "FPC",
          tl.pos = "td", tl.cex = 0.5, method = "color", type = "upper", col = brewer.pal(n = 8, name = "PuOr"))
 
-corrplot(PM_cor, diag = FALSE,
-         tl.pos = "td", tl.cex = 0.5, method = "color", type = "upper")
-
 ```
 
- Using `ggcorplot` package
+Also notice that none of the predictors are highly correlated with our outcome variable(`value`).
+
+The `ggcorrplot` package is also very useful.
 ```{r}
 ggcorrplot(PM_cor, hc.order = TRUE, type = "lower", tl.cex = 5)
 ```
@@ -982,7 +982,7 @@ Unsupervised learning is used to learn about the structure of the data without k
 include_graphics("https://miro.medium.com/max/1400/1*lhkCOodCMZ0-SSziEDpwpA.png")
 ```
 
-#### [[source](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d)]{target="_blank"}
+#### [[source]](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}
 
 In contrast, in supervised learning we have some knowledge about the data that we want to use to create a model to be able to generalize about other similar data.
 
@@ -995,7 +995,7 @@ There are two distinct goals of supervised machine learning:
 include_graphics("https://miro.medium.com/max/1400/1*ASYpFfDh7XnreU-ygqXonw.png")
 ```
 
-#### [[source](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d)]{target="_blank"}
+#### [[source]](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}
 
 We will be performing a prediction analysis (which is also referred to as regression), which aims to predict **continuous outcome** variables given a number of predictors/explanatory variables/features/parameters, as we have already described.
 
@@ -1070,7 +1070,7 @@ Overfitting happens when we end up modeling not only the major relationships in 
 knitr::include_graphics("https://miro.medium.com/max/1110/1*tBErXYVvTw2jSUYK7thU2A.png")
 ```
 
-##### [[source](https://miro.medium.com/max/1110/1*tBErXYVvTw2jSUYK7thU2A.png)]{target="_blank"}
+##### [[source]](https://miro.medium.com/max/1110/1*tBErXYVvTw2jSUYK7thU2A.png){target="_blank"}
 
 If we get fairly good prediction with our testing set then we will know that our model can be applied to other data and will perform fairly well. We will discuss this more later.
 
@@ -1193,7 +1193,7 @@ simple_rec <-train_pm %>%
 simple_rec
 ```
 
-We could also specify the outcome and predictors in the same way as the id variable. Please see [here](https://tidymodels.github.io/recipes/reference/recipe.html) for examples of other roles for variables. The role can be actually be any value. 
+We could also specify the outcome and predictors in the same way as the id variable. Please see [here](https://tidymodels.github.io/recipes/reference/recipe.html){target="_blank"}  for examples of other roles for variables. The role can be actually be any value. 
 
 The order is important here, as we first make all variables predictors and then override this role for the outcome and id variable. We will use the `everything()` function of the `dplyr` package to start with all of the variables in `train_pm`.
 
@@ -1235,15 +1235,15 @@ knitr::include_graphics(here::here("img","Making_a_recipe_recipes2.png"))
 
 1) [**Imputation**](https://en.wikipedia.org/wiki/Imputation_(statistics)){target="_blank"}  -- which means filling in missing values based on the existing data 
 2) [**Transformation**](https://en.wikipedia.org/wiki/Data_transformation_(statistics)){target="_blank"}  -- which means changing all values of a variable in the same way, typically to make it more normal or easier to interpret)  
-3) [**Discretization**](https://en.wikipedia.org/wiki/Discretization_of_continuous_features) -- which means converting continuous values into discrete or nominal values - binning for example to reduce the number of possible levels)  (However this is generally not advisable!)
-4) [**Encoding / Creating Dummy Variables**](https://en.wikipedia.org/wiki/Dummy_variable_(statistics)) -- which means creating a numeric code for categorical variables
-[**More on Dummy Variables and one hot encoding**](https://medium.com/p/b5840be3c41a/responses/show)
-5) [**Data type conversions**](https://cran.r-project.org/web/packages/hablar/vignettes/convert.html) -- which means changing from integer to factor or numeric to date etc.
-6) [**Interaction**](https://statisticsbyjim.com/regression/interaction-effects/) term addition to the model -- which means that we would be modeling for predictors that would influence the capacity of each other to predict the outcome
-7) [**Normalization**](https://en.wikipedia.org/wiki/Normalization_(statistics)) -- which means centering and scaling the data to a similar range of values
-8) [**Dimensionality Reduction/ Signal Extraction**](https://en.wikipedia.org/wiki/Dimensionality_reduction) -- which means mathematically obtaining a new smaller set of variables that capture the variation or signal in the original variables (ex. Principal Component Analysis and Independent Component Analysis)
+3) [**Discretization**](https://en.wikipedia.org/wiki/Discretization_of_continuous_features){target="_blank"}  -- which means converting continuous values into discrete or nominal values - binning for example to reduce the number of possible levels)  (However this is generally not advisable!)
+4) [**Encoding / Creating Dummy Variables**](https://en.wikipedia.org/wiki/Dummy_variable_(statistics)){target="_blank"}  -- which means creating a numeric code for categorical variables
+[**More on Dummy Variables and one hot encoding**](https://medium.com/p/b5840be3c41a/responses/show){target="_blank"} 
+5) [**Data type conversions**](https://cran.r-project.org/web/packages/hablar/vignettes/convert.html){target="_blank"}  -- which means changing from integer to factor or numeric to date etc.
+6) [**Interaction**](https://statisticsbyjim.com/regression/interaction-effects/){target="_blank"}  term addition to the model -- which means that we would be modeling for predictors that would influence the capacity of each other to predict the outcome
+7) [**Normalization**](https://en.wikipedia.org/wiki/Normalization_(statistics)){target="_blank"}  -- which means centering and scaling the data to a similar range of values
+8) [**Dimensionality Reduction/ Signal Extraction**](https://en.wikipedia.org/wiki/Dimensionality_reduction){target="_blank"}  -- which means mathematically obtaining a new smaller set of variables that capture the variation or signal in the original variables (ex. Principal Component Analysis and Independent Component Analysis)
 9) **Filtering** -- Filtering options for removing variables (ex. remove variables that are highly correlated to others or remove variables with very little variance and therefore likely little predictive capacity)
-10) [**Row operations**](https://tartarus.org/gareth/maths/Linear_Algebra/row_operations.pdf) -- which means performing functions on the values within the rows  (ex. rearranging, filtering, imputing)
+10) [**Row operations**](https://tartarus.org/gareth/maths/Linear_Algebra/row_operations.pdf){target="_blank"}  -- which means performing functions on the values within the rows  (ex. rearranging, filtering, imputing)
 11) **Checking functions** -- Sanity checks to look for missing values, to look at the variable classes etc.
 
 All of the step functions look like `step_*` except for the check functions which look like `check_*`.
@@ -1265,7 +1265,7 @@ pm %>%
 ```
 We can see that the range for each of these variables is quite large, we can log transform this data using the `step_log()` function of the `recipes` package.
 
-We would also want to potentially [one hot encode](https://machinelearningmastery.com/why-one-hot-encode-data-in-machine-learning/) some of our categorical variables so that they can be used with certain algorithms. We can do this with the `step_dummy()` function and the `one_hot = TRUE` argument. one hot encoding means that we don't just simply encode our categorical variables numerically, as our numeric assignments can be interpreted by algorithms as having a particular rank or order. Instead, binary variables made of 1s and 0s are used to arbitrarily assign a numeric value that has no apparent order.
+We would also want to potentially [one hot encode](https://machinelearningmastery.com/why-one-hot-encode-data-in-machine-learning/){target="_blank"} some of our categorical variables so that they can be used with certain algorithms. We can do this with the `step_dummy()` function and the `one_hot = TRUE` argument. one hot encoding means that we don't just simply encode our categorical variables numerically, as our numeric assignments can be interpreted by algorithms as having a particular rank or order. Instead, binary variables made of 1s and 0s are used to arbitrarily assign a numeric value that has no apparent order.
 
 Our fips variable includes a numeric code for state and county - and therefore is essentially a proxy for county.  Since we already have county, we will just use it and keep the fips id as another ID variable.
 
@@ -1281,7 +1281,7 @@ Examples where you might have near-zero variance variables include:
 2) **Sparse Data** - If all of the monitors were in locations where the populations did not attend graduate school, then these values would mostly be zero, again this would do very little to help us distinguish our air pollution monitors.When many of the values are zero this is also called sparse data.  
 3) **Imbalanced Data** If nearly all of the monitors were located in one particular state, and all the others only had one monitor each, then the real predictive value would simply be in knowing if a monitor is located in that particular state or not. In this case we don't want to remove our variable, we just want to simplify it.
 
-See this [blog post](https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/) about why removing near-zero variance variables isn't always a good idea if we think that a variable might be especially informative.
+See this [blog post](https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/){target="_blank"} about why removing near-zero variance variables isn't always a good idea if we think that a variable might be especially informative.
 
 **It is important to add the steps to the recipe in an order that makes sense just like with a cooking recipe.**
 
@@ -1411,7 +1411,7 @@ Notice that our `city_Not.in.a.city` variable seems to be NA values. Why might t
 
 Ah! Perhaps it is because some of our levels were not previously seen in the training set!
 
-Let's take a look using the [set operations](https://www.probabilitycourse.com/chapter1/1_2_2_set_operations.php) of the `dplyr` package. We can take a look at cities that were different between the test and training set.
+Let's take a look using the [set operations](https://www.probabilitycourse.com/chapter1/1_2_2_set_operations.php){target="_blank"}  of the `dplyr` package. We can take a look at cities that were different between the test and training set.
 
 ```{r}
 traincities <- train_pm %>% distinct(city)
@@ -1429,7 +1429,7 @@ Indeed, there are lots of different cities in our test data that are not in our 
 Maybe remove this?: Thus we need to update our original recipe to include a very important step function called `step_novel()` this helps in cases like this were there are new factors in our testing set that were not in our training set. It is a good idea to include this in most of your recipes where you have a categorical variables with many distinct values. This step needs to come before we create dummy variables. However, we are also creating a dummy variable from this, which still results in a problem. 
 
 
-Let's modify the city variable to be values of `in a city` or `not in a city` using the `if_else()` function of `dplyr`. Alternatively you could create a [custom step function](https://recipes.tidymodels.org/articles/Custom_Steps.html) to do this and add the step function to your recipe, but that is beyond the scope of this case study. 
+Let's modify the city variable to be values of `in a city` or `not in a city` using the `if_else()` function of `dplyr`. Alternatively you could create a [custom step function](https://recipes.tidymodels.org/articles/Custom_Steps.html){target="_blank"}  to do this and add the step function to your recipe, but that is beyond the scope of this case study. 
 
 We need to create a new recipe to move forward, as the levels of our variables are established then. We would also potentially have this issue for state and county. So let's also do a similar thing for `state`. The `county` variables appears to get dropped due to either correlation or near zero variance. It is likely due to near zero variance because this is the more granular of these geographic categorical variables and likely sparse.
 
@@ -1524,7 +1524,7 @@ PM_model
 
 OK. So far all we have told `parsnip` is we want to use a linear regression...  Let's tell `parsnip` more about what we want.
 
-We would like to use the ordinary least squares method to fit our linear regression. So we will tell `parsnip` that we want to use the `lm` package to implement our linear regression (there are many options actually- such as [`rstan`](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html) [`glmnet`](https://cran.r-project.org/web/packages/glmnet/index.html), [`keras`](https://keras.rstudio.com/), and [`sparklyr`](https://therinspark.com/starting.html#starting-sparklyr-hello-world)). We will do so by using the `set_engine()` function of the `parsnip` package.
+We would like to use the ordinary least squares method to fit our linear regression. So we will tell `parsnip` that we want to use the `lm` package to implement our linear regression (there are many options actually- such as [`rstan`](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html){target="_blank"}  [`glmnet`](https://cran.r-project.org/web/packages/glmnet/index.html){target="_blank"} , [`keras`](https://keras.rstudio.com/){target="_blank"} , and [`sparklyr`](https://therinspark.com/starting.html#starting-sparklyr-hello-world)){target="_blank"}. We will do so by using the `set_engine()` function of the `parsnip` package.
 
 ```{r}
 lm_PM_model <- 
@@ -1753,7 +1753,7 @@ knitr::include_graphics(here::here("img","cross_validation.png"))
 ```
 
 
-We can fit the model to our cross validation folds using the `fit_resamples()` function of the `tune` package, by specifying our workflow object and the cross validation fold object we just created. See [here](https://tidymodels.github.io/tune/reference/fit_resamples.html) for more information.
+We can fit the model to our cross validation folds using the `fit_resamples()` function of the `tune` package, by specifying our workflow object and the cross validation fold object we just created. See [here](https://tidymodels.github.io/tune/reference/fit_resamples.html){target="_blank"}  for more information.
 
 ```{r}
 control <- control_resamples(save_pred = TRUE)
@@ -1787,7 +1787,7 @@ train_pm %>%
   facet_wrap(~ predictor, scales = "free_x")
 ```
 
-We can see that there does not appear to be a single linear relationship for either of these predictors. Thus we might want to think about using  [splines](https://www.math.uh.edu/~jingqiu/math4364/spline.pdf) or this(https://towardsdatascience.com/numerical-interpolation-natural-cubic-spline-52c1157b98ac) or just this(https://tidymodels.github.io/tune/articles/getting_started.html) or this(https://www.psych.mcgill.ca/misc/fda/ex-basis-b1.html) to model the relationship in our training data more closely. For example for the latitude plot (left) if we had 2 lines and one break-point called a knot around 40, with the first line having a positive slope and the second with a negative slope this would fit the data more similarly to the blue line shown in the figure.
+We can see that there does not appear to be a single linear relationship for either of these predictors. Thus we might want to think about using  [splines](https://www.math.uh.edu/~jingqiu/math4364/spline.pdf){target="_blank"}  or this(https://towardsdatascience.com/numerical-interpolation-natural-cubic-spline-52c1157b98ac){target="_blank"}  or just this(https://tidymodels.github.io/tune/articles/getting_started.html){target="_blank"}  or this(https://www.psych.mcgill.ca/misc/fda/ex-basis-b1.html){target="_blank"}  to model the relationship in our training data more closely. For example for the latitude plot (left) if we had 2 lines and one break-point called a knot around 40, with the first line having a positive slope and the second with a negative slope this would fit the data more similarly to the blue line shown in the figure.
 
 We can tune for the number of knots by using a step function in the `recipes` package called `step_ns()` where ns stands for natural splines. In order to tune for the number of knots or degrees of freedom, we can set the `deg_free` argument to `tune()`. This is helpful, becuase we aren't exactly sure how closely we should be following the relationship with the value and our longitude and latitude data in our training data to achieve good accuracy yet keep our model generalizable for other data. 
 
@@ -1795,7 +1795,7 @@ This is when our cross validation methods become really handy. We can test out d
 
 We will update our recipe to add these steps. It is a good idea to do this for individual predictors because you can name each with the `tune` argument so that you can keep track of it later. We can see what we intend to tune with the `parameters()` function of the `dials` package. 
 
-See [here](this(https://tidymodels.github.io/tune/articles/getting_started.html)) for more information about implementing this in tidymodels.
+See [here](this(https://tidymodels.github.io/tune/articles/getting_started.html)){target="_blank"}  for more information about implementing this in tidymodels.
 
 ```{r}
 
@@ -1935,9 +1935,9 @@ knitr::include_graphics("https://miro.medium.com/max/1000/1*LMoJmXCsQlciGTEyoSN3
 
 ```
 
-#### [[source](https://towardsdatascience.com/understanding-random-forest-58381e0602d2)]{target="_blank"}
+##### [[source]](https://towardsdatascience.com/understanding-random-forest-58381e0602d2){target="_blank"}
 
-In the case of [random forest](https://towardsdatascience.com/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9), multiple decision trees are created - hence the name forest, and each tree is built using a random subset of the training data (with replacement) - hence the full name random forest. This random aspect helps to keep the algorithm from overfitting the data.
+In the case of [random forest](https://towardsdatascience.com/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9){target="_blank"} , multiple decision trees are created - hence the name forest, and each tree is built using a random subset of the training data (with replacement) - hence the full name random forest. This random aspect helps to keep the algorithm from overfitting the data.
 
 The mean of the predictions from each of the trees is used in the final output.
 
@@ -2122,7 +2122,7 @@ We will use the following packages to create a map of the US:
 2)`rnaturalearth`
 3)`rgeos`
 
-According to this [link on wikipedia](https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States#Westernmost), these are the latitude and longitude bounds of the continental US.
+According to this [link on wikipedia](https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States#Westernmost){target="_blank"} , these are the latitude and longitude bounds of the continental US.
 
 top = 49.3457868 # north lat
 left = -124.7844079 # west long
@@ -2166,7 +2166,9 @@ monitors <-ggplot(data = world) +
 monitors
 ```
 
-Now let's add a fill at the county level for the true monitor values of air pollution:
+Now let's add a fill at the county level for the true monitor values of air pollution.
+
+First, we need to get the data for county to look the same for both our data and the county map data.
 
 ```{r}
 
@@ -2179,29 +2181,16 @@ counties[["county"]] <-stringr::str_to_title(counties[["county"]])
 
 map_data <-inner_join(counties, pm, by = "county")
 
-truth<-ggplot(data = world) +
-    geom_sf() +
-    geom_sf(data = map_data, aes(fill = value)) +
-    scale_fill_viridis_c(trans = "sqrt", alpha = .4) +
-      #geom_point(data = pm, aes(x = lon, y = lat), size = 1.5, alpha = 2,
-       # shape = 23, fill = "darkred") +
-        coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
-      ggtitle("Monitor PM~2.5~ levels")
-truth
-
-
 
 truth <-ggplot(data = world) +
     geom_sf() +
     geom_sf(data = map_data, aes(fill = value)) +
     #scale_fill_viridis_c(trans = "sqrt", alpha = .4) +
-      #geom_point(data = pm, aes(x = lon, y = lat), size = 1.5, alpha =2,
-      #  shape = 23, fill = "darkred") +
         coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
   scale_fill_gradientn(colours=topo.colors(7),na.value = "transparent",
                            breaks=c(0,10,20),labels=c(0,10,20),
                            limits=c(0,23.5), name = "PM ug/m3")+
-  ggtitle("True PM"~2.5~" levels")+
+  ggtitle("True PM 2.5 levels")+
     theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
@@ -2241,14 +2230,12 @@ map_data <-inner_join(counties, all_pred, by = "county")
 pred <-ggplot(data = world) +
     geom_sf() +
     geom_sf(data = map_data, aes(fill = .pred)) +
-    #scale_fill_viridis_c(trans = "sqrt", alpha = .4) +
-      #geom_point(data = pm, aes(x = lon, y = lat), size = 1.5, alpha =2,
-      #  shape = 23, fill = "darkred") +
+    # scale_fill_viridis_c(trans = "sqrt", alpha = .4) +
         coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
   scale_fill_gradientn(colours=topo.colors(7),na.value = "transparent",
                            breaks=c(0,10,20),labels=c(0,10,20),
                            limits=c(0,23.5), name = "PM ug/m3")+
-  ggtitle("Predicted PM"~2.5~" levels")+
+  ggtitle("Predicted PM 2.5 levels")+
     theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
@@ -2345,8 +2332,27 @@ Students can predict air pollution monitor values using a different algorithm an
 14) Great [video explanation](https://youtu.be/_UVHneBUBW0){target="_blank"} of PCA.  
 
 <u>Terms and concepts covered:</u>  
+
 [Tidyverse](https://www.tidyverse.org/){target="_blank"}  
-[parameters and hyper-parameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"}  
+[Imputation](https://en.wikipedia.org/wiki/Imputation_(statistics)){target="_blank"}  
+[Transformation](https://en.wikipedia.org/wiki/Data_transformation_(statistics)){target="_blank"}  
+[Discretization](https://en.wikipedia.org/wiki/Discretization_of_continuous_features){target="_blank"}  
+[Dummy Variables](https://en.wikipedia.org/wiki/Dummy_variable_(statistics)){target="_blank"}  
+[One Hot Encoding](https://machinelearningmastery.com/why-one-hot-encode-data-in-machine-learning/){target="_blank"}  
+[Data Type Conversions](https://cran.r-project.org/web/packages/hablar/vignettes/convert.html){target="_blank"}  
+[Interaction](https://statisticsbyjim.com/regression/interaction-effects/){target="_blank"}  
+[Normalization](https://en.wikipedia.org/wiki/Normalization_(statistics)){target="_blank"}  
+[Dimensionality Reduction/Signal Extraction](https://en.wikipedia.org/wiki/Dimensionality_reduction){target="_blank"}  
+[Row Operations](https://tartarus.org/gareth/maths/Linear_Algebra/row_operations.pdf){target="_blank"}  
+[Near Zero Varaince](https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/){target="_blank"}  
+[Parameters and Hyper-parameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"}   
+[Supervised and Unspervised Learning](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}  
+[Principal Component Analysis](https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007){target="_blank"}  
+[Orthogonal](https://en.wikipedia.org/wiki/Orthogonality#:~:text=In%20mathematics%2C%20orthogonality%20is%20the,u%2C%20v)%20%3D%200.){target="_blank"}  
+[Linear Combinations](https://www.mathbootcamps.com/linear-combinations-vectors/){target="_blank"}  
+[Decision Tree](https://medium.com/greyatom/decision-trees-a-simple-way-to-visualize-a-decision-dc506a403aeb){target="_blank"}  
+[Random Forest](https://towardsdatascience.com/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9){target="_blank"}  
+
 
 <u>Packages used in this case study: </u>
 
@@ -2376,7 +2382,7 @@ Students can predict air pollution monitor values using a different algorithm an
 [tidyr](https://tidyr.tidyverse.org/){target="_blank"}      | to separate data within a column into multiple columns
 [rnaturalearth](https://cran.r-project.org/web/packages/rnaturalearth/README.html){target="_blank"} | to get the geometry data for the earth to plot the US
 [maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get map database data about counties to draw them on our US map
-[sf](https://r-spatial.github.io/sf/) | to convert the map data into a data frame
+[sf](https://r-spatial.github.io/sf/){target="_blank"}  | to convert the map data into a data frame
 [lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert the map geographical data
 [rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
 [cowplot](https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html){target="_blank"} | to allow plots to be combined
