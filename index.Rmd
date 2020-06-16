@@ -39,7 +39,7 @@ library(knitr)
 
 #### {.outline }
 ```{r, echo = FALSE, out.width = "800 px"}
-knitr::include_graphics(here::here("img", "mainplot.png"))
+knitr::include_graphics(here::here("img", "main_plot_maps.png"))
 ```
 
 ####
@@ -56,7 +56,7 @@ Some sources are natural while others are anthropogenic (human derived):
   <img width="600" src="https://www.nps.gov/subjects/air/images/Sources_Graphic_Huge.jpg?maxwidth=1200&maxheight=1200&autorotate=false">
 </p>
 
-##### [[source](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.nps.gov%2Fsubjects%2Fair%2Fsources.htm&psig=AOvVaw2v7AVxSF8ZSAPEhNudVtbN&ust=1585770966217000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCPDN66q_xegCFQAAAAAdAAAAABAD)]
+##### [[source](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.nps.gov%2Fsubjects%2Fair%2Fsources.htm&psig=AOvVaw2v7AVxSF8ZSAPEhNudVtbN&ust=1585770966217000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCPDN66q_xegCFQAAAAAdAAAAABAD)]{target="_blank"}
 
 #### Major types of air pollutants
 
@@ -88,7 +88,7 @@ Here you can see how these sizes compare with a human hair:
 knitr::include_graphics(here::here("img", "pm2.5_scale_graphic-color_2.jpg"))
 ```
 
-##### [[source](https://www.epa.gov/pm-pollution/particulate-matter-pm-basics)]
+##### [[source](https://www.epa.gov/pm-pollution/particulate-matter-pm-basics)]{target="_blank"}
 
 <!-- <p align="center"> -->
 <!--   <img width="500" src="https://www.sensirion.com/images/sensirion-specialist-article-figure-1-cdd70.jpg"> -->
@@ -101,14 +101,14 @@ knitr::include_graphics(here::here("img", "pm2.5_scale_graphic-color_2.jpg"))
   <img width="600" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Airborne-particulate-size-chart.svg/800px-Airborne-particulate-size-chart.svg.png">
 </p>
 
-##### [[source](https://en.wikipedia.org/wiki/Particulates)]
+##### [[source](https://en.wikipedia.org/wiki/Particulates)]{target="_blank"}
 
 
 <p align="center">
   <img width="500" src="https://www.frontiersin.org/files/Articles/505570/fpubh-08-00014-HTML/image_m/fpubh-08-00014-t002.jpg">
 </p>
 
-##### [[source](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full)]
+##### [[source](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full)]{target="_blank"}
 
 
 <u>This table shows how deeply some of the smaller fine particles can penetrate within the human body:</u>
@@ -117,7 +117,7 @@ knitr::include_graphics(here::here("img", "pm2.5_scale_graphic-color_2.jpg"))
   <img width="500" src="https://www.frontiersin.org/files/Articles/505570/fpubh-08-00014-HTML/image_m/fpubh-08-00014-t001.jpg">
 </p>
 
-##### [[source](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full)]
+##### [[source](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full)]{target="_blank"}
 
 
 #### Negative Impact of Particulate Exposure on Health 
@@ -140,7 +140,7 @@ Historically epidemiological studies would assess the influence of air pollution
   <img width="400" src="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4137272/bin/1476-069X-13-63-1.jpg">
 </p>
 
-##### [[source](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63)]
+##### [[source](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63)]{target="_blank"}
 
 This lack of granularity in air pollution monitoring has hindered our ability to discern the full impact of air pollution on health and to identify at-risk locations. 
 
@@ -218,22 +218,12 @@ library(randomForest)
 library(ggplot2)
 library(stringr)
 library(tidyr)
-
-
-
-# library(stringr)
-# library(purrr)
-# library(tibble)
-# library(tidyr)
-# library(ggplot2)
-# library(ggpubr)
-# library(forcats)
-# library(lmerTest)
-# library(car)
-# library(ggiraph)
-# library(ggforce)
-# library(viridis)
-# library(cowplot)
+library(lwgeom) # allows 1263
+library(sf)
+library(maps)
+library(rnaturalearth)
+library(rgeos)
+library(cowplot)
 ```
 
 
@@ -252,22 +242,20 @@ library(tidyr)
 [recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `juice()` - extracts final preprocessed training data and `bake()` - applies recipe steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
 [parsnip](https://tidymodels.github.io/parsnip/){target="_blank"}   | an interface to create models (major functions are  `fit()`, `set_engine()`)
 [yardstick](https://tidymodels.github.io/yardstick/){target="_blank"}   | to evaluate the performance of models
- 
-
-
-[stringr](https://stringr.tidyverse.org/articles/stringr.html){target="_blank"}    | to manipulate the text within the PDF of the data
-
-[purrr](https://purrr.tidyverse.org/){target="_blank"}      | to perform functions on all columns of a tibble
-[tibble](https://tibble.tidyverse.org/){target="_blank"}     | to create data objects that we can manipulate with dplyr/stringr/tidyr/purrr
-[tidyr](https://tidyr.tidyverse.org/){target="_blank"}      | to separate data within a column into multiple columns
+[broom](https://www.tidyverse.org/blog/2018/07/broom-0-5-0/){target="_blank"} | to get tidy output for our model fit and performance
 [ggplot2](https://ggplot2.tidyverse.org/){target="_blank"}    | to make visualizations with multiple layers
-[ggpubr](https://cran.r-project.org/web/packages/ggpubr/index.html){target="_blank"}    | to easily add regression line equations to plots
-[forcats](https://forcats.tidyverse.org/){target="_blank"}    | to change details about factors (categorical variables)
-[lmerTest](https://cran.r-project.org/web/packages/lmerTest/lmerTest.pdf)| to perform linear mixed model testing
-[car](https://cran.r-project.org/web/packages/car/car.pdf)| to perform Levene's Test of Homogeneity of Variances
-[ggiraph](https://cran.r-project.org/web/packages/ggiraph/index.html)| to make plots interactive
-[ggforce](https://cran.r-project.org/web/packages/ggforce/ggforce.pdf)| to modify facets in plots
-[viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)| to plot in color palette that is easily interpreted by colorblind individuals
+[dials](https://www.tidyverse.org/blog/2019/10/dials-0-0-3/){target="_blank"} | to specify hyper-parameter tuning
+[tune](https://tune.tidymodels.org/){target="_blank"} | to perform cross validation, tune hyper-parameters, and get performance metrics
+[workflows](https://www.rdocumentation.org/packages/workflows/versions/0.1.1){target="_blank"}| to create modeling workflow to streamline the modeling process
+[vip](https://cran.r-project.org/web/packages/vip/vip.pdf){target="_blank"} | to create variable importance plots
+[randomForest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf)| to perform the random forest analysis
+[stringr](https://stringr.tidyverse.org/articles/stringr.html){target="_blank"}    | to manipulate the text the map data
+[tidyr](https://tidyr.tidyverse.org/){target="_blank"}      | to separate data within a column into multiple columns
+[rnaturalearth](https://cran.r-project.org/web/packages/rnaturalearth/README.html){target="_blank"} | to get the geometry data for the earth to plot the US
+[maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get map database data about counties to draw them on our US map
+[sf](https://r-spatial.github.io/sf/){target="_blank"} | to convert the map data into a data frame
+[lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert the map geographical data
+[rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
 [cowplot](https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html){target="_blank"} | to allow plots to be combined
 ___
 
@@ -299,7 +287,7 @@ deaths globally — nearly **1 in every 10 deaths**.
 ```{r, echo = FALSE, out.width="800px"}
 knitr::include_graphics(here::here("img","2017deaths.png"))
 ```
-##### [[source]](https://www.stateofglobalair.org/sites/default/files/soga_2019_fact_sheet.pdf)
+##### [[source]](https://www.stateofglobalair.org/sites/default/files/soga_2019_fact_sheet.pdf){target="_blank"}
 
 The [State of Global Air 2018 report](https://www.stateofglobalair.org/sites/default/files/soga-2018-report.pdf){target="_blank"}  using data from 2016 which separated different types of air pollution, found that **particulate pollution was particularly associated with mortality**.
 
@@ -321,7 +309,7 @@ Looking at the US specifically, air pollution levels are generally improving. Th
 knitr::include_graphics(here::here("img", "US.png"))
 ```
 
-##### [[source]](https://gispub.epa.gov/air/trendsreport/2019/documentation/AirTrends_Flyer.pdf)
+##### [[source]](https://gispub.epa.gov/air/trendsreport/2019/documentation/AirTrends_Flyer.pdf){target="_blank"}
 
 However, air pollution **continues to contribute to health risk for Americans**, in particular in **regions with higher than national average rates** of pollution that actually at time exceed the world health organization's recommended level. Thus it is necessary to obtain high spatial granularity in estimates of air pollution in order to identify locations where populations are experiencing harmful levels of exposure.
 
@@ -347,7 +335,7 @@ Indeed, machine learning methods are in fact used to be able to estimate air pol
 </p>
 
 
-##### [[source]](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.washingtonpost.com%2Fbusiness%2F2019%2F10%2F23%2Fair-pollution-is-getting-worse-data-show-more-people-are-dying%2F&psig=AOvVaw3v-ZDTBPnLP2MYtKf3Undj&ust=1585784479068000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCPCyn9fxxegCFQAAAAAdAAAAABAd)
+##### [[source]](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.washingtonpost.com%2Fbusiness%2F2019%2F10%2F23%2Fair-pollution-is-getting-worse-data-show-more-people-are-dying%2F&psig=AOvVaw3v-ZDTBPnLP2MYtKf3Undj&ust=1585784479068000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCPCyn9fxxegCFQAAAAAdAAAAABAd){target="_blank"}
 
 This is what we aim to achieve in this case study.
 
@@ -388,7 +376,7 @@ The monitor data that we will be using comes from **[gravimetric monitors](https
 knitr::include_graphics(here::here("img","filter.png"))
 ```
 
-##### [[source](https://publiclab.org/wiki/filter-pm)]
+##### [[source](https://publiclab.org/wiki/filter-pm)]{target="_blank"}
 
 Here is an image of what the gravimetric monitors look like:
 
@@ -406,6 +394,9 @@ In our csv, the **value** column indicates the PM~2.5~ monitor average for 2008 
 ### Our predictor variables
 
 There are 48 predictor variables with values for each of the 876 monitors included in our outcome variable. The data comes from the US [Enivornmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}, the [National Aeronautics and Space Administration (NASA)](https://www.nasa.gov/){target="_blank"}, the US [Census](https://www.census.gov/about/what/census-at-a-glance.html){target="_blank"}, and the [National Center for Health Statistics (NCHS)](https://www.cdc.gov/nchs/about/index.htm){target="_blank"}.
+
+<details><summary> Click here to see a table about the variables </summary>
+
 
 Variable   | Details                                                                        
 ---------- |-------------
@@ -457,7 +448,10 @@ Variable   | Details
 **hs_orless** |  Percentage of people in zcta area where the monitor whose highest formal educational attainment was a **high school degree or less** (sum of nohs, somehs, and hs)  
 **urc2013** | [2013 Urban-rural classification](https://www.cdc.gov/nchs/data/series/sr_02/sr02_166.pdf){target="_blank"} of the county where the monitor is located <br> -- 6 category variable - 1 is totally urban 6 is completely rural <br>  -- Data from the National Center for Health Statistics](https://www.cdc.gov/nchs/index.htm){target="_blank"}     
 **urc2006** | [2006 Urban-rural classification](https://www.cdc.gov/nchs/data/series/sr_02/sr02_154.pdf){target="_blank"} of the county where the monitor is located <br> -- 6 category variable - 1 is totally urban 6 is completely rural <br> -- Data from the [National Center for Health Statistics](https://www.cdc.gov/nchs/index.htm){target="_blank"}     
-**aod** | Aerosol Optical Depth measurement from a NASA satellite <br> -- based on the defraction of a laser <br> -- used as a proxy of particulate pollution <br> -- unit-less - higher value indicates more pollution <br> -- Data from NASA  
+**aod** | Aerosol Optical Depth measurement from a NASA satellite <br> -- based on the diffraction of a laser <br> -- used as a proxy of particulate pollution <br> -- unit-less - higher value indicates more pollution <br> -- Data from NASA  
+
+</details>
+
 
 Many of these predictor variables have to do with the circular area around the monitor called the "buffer". These are illustrated in the following figure:
 
@@ -465,7 +459,7 @@ Many of these predictor variables have to do with the circular area around the m
 knitr::include_graphics(here::here("img", "regression.png"))
 ```
 
-##### [[source](https://www.ncbi.nlm.nih.gov/pubmed/15292906)]
+##### [[source](https://www.ncbi.nlm.nih.gov/pubmed/15292906)]{target="_blank"}
 
 
 
@@ -489,11 +483,15 @@ We will also use the `%>%` pipe which can be used to define the input for later 
 
 For example here we will first grab the `pm` data object, then we use the `glimpse()` function on it based on the pipe notation.
 
+#### {.scrollable }
 
 ```{r}
+# Scroll through the output!
 pm %>%
   dplyr::glimpse()
 ```
+
+####
 
 We can see that there are 876 monitors and that we have 50 total variables - one of which is the outcome. In this case our outcome variable is called `value`. 
 
@@ -503,12 +501,18 @@ Let's convert these variables into factors. We can do this using the `mutate_at(
 
 In this case we are also using the magrittr assignment pipe or double pipe that looks like this `%<>%` of the `magrittr` package. This allows us use the `pm` data as input but also reassign the output to the same data object name.
 
+
+#### {.scrollable }
+
 ```{r}
+# Scroll through the output!
 pm %<>%
   dplyr::mutate_at(vars(id, fips, zcta), as.factor) 
 
 glimpse(pm)
 ```
+
+####
 
 Great! Now we can see that these variables are now factors as indicated by `<fct>` after the variable name.
 
@@ -516,10 +520,15 @@ Great! Now we can see that these variables are now factors as indicated by `<fct
 
 The `skim()` function of the `skimr` package is also really helpful for getting a general sense of your data.
 
+
+#### {.scrollable }
+
 ```{r}
+# Scroll through the output!
 skim(pm)
 ```
 
+####
 Notice how there is a column called `n_missing` about the number of values that are missing. It looks like our data is very complete and we do not have any missing data. This is also indicated by the `complete_rate` variable, which shows the ratio of completeness, in our case all variables have a value of 1 indicating they are fully complete.
 
 The `n_unqiue` column shows us the number of unique values for each of our columns. We can see that there are 49 states represented in the data, and we know that the data should be of the contiguous states. Let's take a look to see which states are included:
@@ -541,6 +550,9 @@ Here is another method of looking at the data using the `dfSummary()` function o
 dfSummary(pm, plain.ascii = FALSE, style = "grid", 
           graph.magnif = 0.45,  tmp.img.dir = "tmp")
 ```
+
+<details><summary> Click here to see the dfSummary table </summary>
+
 
 **Dimensions:** 876 x 50  
 **Duplicates:** 0  
@@ -845,6 +857,7 @@ dfSummary(pm, plain.ascii = FALSE, style = "grid",
 |    |                              | IQR (CV) : 18 (0.4)                      |                     |                     |        |         |
 +----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
 
+</details>
 
 We can see that for many variables there are many low values as the distribution shows two peaks, one near zero and another with a higher value. This is true for the imp variables (measures of development), the nei variables (measures of emission sources) and the road density variables. We can also see that the range of some of the variables is very large, in particular the area and population related variables.
 
@@ -873,11 +886,9 @@ corrplot(PM_cor, diag = FALSE,
 
 ```
 
- Using `ggcorplot`
+ Using `ggcorplot` package
 ```{r}
-library(ggcorrplot)
 ggcorrplot(PM_cor, hc.order = TRUE, type = "lower", tl.cex = 5)
-
 ```
 
 We can see that the the development variables (imp) variables are correlated with each other as we might expect. We also see that the road density variables seem to be correlated with each other, and the emission variables seem to be correlated with each other. We can take a closer look  using the `ggcorr()` function and the `ggpairs()` function of the `GGally` package. To select our variables of interest we can use the `select()` function with the `contains()` function of the `tidyr` package. 
@@ -902,11 +913,9 @@ select(pm, contains("pri")) %>%
   ggcorr(palette = "RdBu",  hjust = .85, size = 3,
        layout.exp=2, label = TRUE)
 
-select(pm, contains("pri")) %>%
-  ggpairs()
 ```
 
-We can see that while some of the road density variables are highly correlated with one another (or anti-correlated), there arr some variables that are less correlated with one another.
+We can see that many of the road density variables are highly correlated with one another, while others are less so.
 
 Finally let's look at the emission variables.
 
@@ -967,52 +976,52 @@ There are two major types of machine learning:
 1) Unsupervised  
 2) Supervised  
 
-Unsupervised learning is used to learn about the structure of the data without knowing much about the data. We let the data reveal properties about itself. Examples include clustering the data into groups or reducing the dimensionality of the data using methods like [principal component analysis](https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007){target="_blank"} (which we will describe in more detail later) to capture patterns of varaince within the data.
+Unsupervised learning is used to learn about the structure of the data without knowing much about the data. We let the data reveal properties about itself. Examples include clustering the data into groups or reducing the dimensionality of the data using methods like [principal component analysis](https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007){target="_blank"} (which we will describe in more detail later) to capture patterns of variance within the data.
 
-```{r, out.width = "4%", echo = FALSE, fig.align ="center"}
+```{r, out.width = "80%", echo = FALSE, fig.align ="center"}
 include_graphics("https://miro.medium.com/max/1400/1*lhkCOodCMZ0-SSziEDpwpA.png")
 ```
 
-#### [[source](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d)]
+#### [[source](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d)]{target="_blank"}
 
-In contrast, in supervised learning we have some knowlege about the data that we want to use to create a model to be able to generalize about other similar data.
+In contrast, in supervised learning we have some knowledge about the data that we want to use to create a model to be able to generalize about other similar data.
 
 There are two distinct goals of supervised machine learning:  
 
 1) Prediction  
 2) Classification  
 
-```{r, out.width = "4%", echo = FALSE, fig.align ="center"}
+```{r, out.width = "80%", echo = FALSE, fig.align ="center"}
 include_graphics("https://miro.medium.com/max/1400/1*ASYpFfDh7XnreU-ygqXonw.png")
 ```
 
-#### [[source](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d)]
+#### [[source](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d)]{target="_blank"}
 
-We will be performing a prediction analysis (which is also refered to as regression), which aims to predict **continuous outcome** variables given a number of predictors/explanatory variables/features/parameters, as we have already described.
+We will be performing a prediction analysis (which is also referred to as regression), which aims to predict **continuous outcome** variables given a number of predictors/explanatory variables/features/parameters, as we have already described.
 
 Classification on the other hand aims to discern or predict group identity for a **categorical outcome** based on a number of predictors/explanatory variables/features/parameters.
 
-The overall process is the same in either case and involes the following steps (which will each be explained in detail): 
+The overall process is the same in either case and involves the following steps (which will each be explained in detail): 
 
 1) Data exploration  
 
-We have already performed this step to get a sense of the data. It is important to know if we have `NA` values, to understand the class of variables, and if to determine if there are any redudant variables that might need to removed.
+We have already performed this step to get a sense of the data. It is important to know if we have `NA` values, to understand the class of variables, and if to determine if there are any redundant variables that might need to removed.
 
 2) Data splitting 
 
-The data needs to be split into two peices: a training set and a testing set. The training set will be used to optimize the model, while the testing set will be used to evaluate model performance. 
+The data needs to be split into two pieces: a training set and a testing set. The training set will be used to optimize the model, while the testing set will be used to evaluate model performance. 
 
-3) Variable assignment and pre-processing  
+3) Variable assignment and preprocessing  
 
-Both the training and testing data needs to be processed so that the data is compatible and optimized to be used with the model. This involves assigning variables to specific roles within the model and preprocessing like scaling variables and removing redudant variables.
+Both the training and testing data needs to be processed so that the data is compatible and optimized to be used with the model. This involves assigning variables to specific roles within the model and preprocessing like scaling variables and removing redundant variables. This process is also called feature engineering.
 
 4) Model specification, fitting, tuning and performance evaluation using the training data
 
-The model needs to first be fit to the training data. First the method or algorithm in which the model will be fit is specified (regression, random forests etc.).  Then in both classification and prediction, the model is fit to the traing data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. If the model fits well than these estimated values will be very similar to the true outcome variable values. If the model does not fit well, than these estimates will be more dissimal from the true outcome variable. In this case, aspects about the model may need to be modified to improve the similarity of the estimates with that ofthe true outcome values. One way to optimize model performance is a process called tuning in which different model [hyperparameter](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"} options are tested to determine the best option for model performance.
+The model needs to first be fit to the training data. First the method or algorithm in which the model will be fit is specified (regression, random forest etc.).  Then in both classification and prediction, the model is fit to the training data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. If the model fits well than these estimated values will be very similar to the true outcome variable values. If the model does not fit well, than these estimates will be more disimilar from the true outcome variable. In this case, aspects about the model may need to be modified to improve the similarity of the estimates with that of the true outcome values. One way to optimize model performance is a process called tuning in which different model [hyper-parameter](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"} options are tested to determine the best option for model performance.
 
 5) Overall model performance evaluation
 
-Model performance is assessed as the similarity between the estimates of the outcome variable produced by the model and the true outcome variable values. This is done typically as an interative process with the training data along side modification of the model untill the performance using the training data is satisfactory. At this point, the final model performance is assessed using the testing data. This then gives an estimate about how well the model will predict or classify the outcome variable of interest with new independent data. Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources.
+Model performance is assessed as the similarity between the estimates of the outcome variable produced by the model and the true outcome variable values. This is done typically as an iterative process with the training data along side modification of the model until the performance using the training data is satisfactory. At this point, the final model performance is assessed using the testing data. This then gives an estimate about how well the model will predict or classify the outcome variable of interest with new independent data. Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources.
 
 ### The tidymodels ecosystem
 
@@ -1042,7 +1051,7 @@ Different notations are required for different algorithms as the algorithms have
 
 2) Can easily modify preprocessing, algorithm choice, and hyper-parameter tuning making optimization easy  
 
-Modiying a piece of the overall process is now much easier than before because many of the steps are specified using the tidymodel packages in a convenient manner. Thus the entire process can be rerun after a simple change to preprocessing without much difficulty.
+Modifying a piece of the overall process is now much easier than before because many of the steps are specified using the tidymodel packages in a convenient manner. Thus the entire process can be rerun after a simple change to preprocessing without much difficulty.
 
 ### Splitting the Data
 
@@ -1061,7 +1070,7 @@ Overfitting happens when we end up modeling not only the major relationships in 
 knitr::include_graphics("https://miro.medium.com/max/1110/1*tBErXYVvTw2jSUYK7thU2A.png")
 ```
 
-##### [[source](https://miro.medium.com/max/1110/1*tBErXYVvTw2jSUYK7thU2A.png)]
+##### [[source](https://miro.medium.com/max/1110/1*tBErXYVvTw2jSUYK7thU2A.png)]{target="_blank"}
 
 If we get fairly good prediction with our testing set then we will know that our model can be applied to other data and will perform fairly well. We will discuss this more later.
 
@@ -1126,9 +1135,9 @@ count(test_pm, state)
 
 In tidymodels we will create a recipe, which is a standardized format for a sequence of steps for processing the data.
 
-This can be very useful because it makes testing out different pre-processing steps or different algorithms with the same pre-processing very easy and reproducible.
+This can be very useful because it makes testing out different preprocessing steps or different algorithms with the same preprocessing very easy and reproducible.
 
-**Creating a recipe specifies how a dataframe of predictors should be created  - it specifies what  variables to be used  and the  preprocessing steps  but it does not execute these steps or create the dataframe of predictors.**
+**Creating a recipe specifies how a data frame of predictors should be created  - it specifies what  variables to be used  and the  preprocessing steps  but it does not execute these steps or create the data frame of predictors.**
 
 #### List the ingredients / specify the variables with the `recipe()` function
 
@@ -1173,7 +1182,7 @@ simple_rec
 ```
 
 
-However, to deal with the id variable we could use the `update_role()` function of the `recipes` package. This option works well with the newer `workflows` package, however id variabels are often dropped from analyses that do not use this newer package as they can make the process difficult with using the `parsnip` package alone due to the fact that new levels (or possible values) may be introduced with the testing data.
+However, to deal with the id variable we could use the `update_role()` function of the `recipes` package. This option works well with the newer `workflows` package, however id variables are often dropped from analyses that do not use this newer package as they can make the process difficult with using the `parsnip` package alone due to the fact that new levels (or possible values) may be introduced with the testing data.
 
 ```{r}
 
@@ -1213,7 +1222,7 @@ summary(simple_rec)
 
 #### List the preprocessing steps using the step functions of the `recipe` package
 
-The other thing the recipes package allows for is specifying pre-processing steps using a variety of `step*()` functions.
+The other thing the recipes package allows for is specifying preprocessing steps using a variety of `step*()` functions.
 
 ```{r, echo=FALSE, out.width="400px"}
 knitr::include_graphics(here::here("img","Making_a_recipe_recipes2.png"))
@@ -1249,14 +1258,16 @@ There are several ways to select what variables to apply steps to:
 Let's try adding some steps to our recipe.
 
 We might consider log transforming our population and area variables (that aren't densities) - let's take a look at the range of these variables.
-```{r}
+```{r, eval = FALSE}
 pm %>%
   select(matches("_pop|_area")) %>%
   map(range)
 ```
 We can see that the range for each of these variables is quite large, we can log transform this data using the `step_log()` function of the `recipes` package.
 
-We would also want to potentially one hot encode some of our categorical variables so that they can be used with certain algorithms. We can do this with the `step_dummy()` function and the `one_hot = TRUE` argument. Our fips variable includes a numeric code for state and county - and therefore is essentially a proxy for county.  Since we already have county, we will just use it and keep the fips id as another ID variable.
+We would also want to potentially [one hot encode](https://machinelearningmastery.com/why-one-hot-encode-data-in-machine-learning/) some of our categorical variables so that they can be used with certain algorithms. We can do this with the `step_dummy()` function and the `one_hot = TRUE` argument. one hot encoding means that we don't just simply encode our categorical variables numerically, as our numeric assignments can be interpreted by algorithms as having a particular rank or order. Instead, binary variables made of 1s and 0s are used to arbitrarily assign a numeric value that has no apparent order.
+
+Our fips variable includes a numeric code for state and county - and therefore is essentially a proxy for county.  Since we already have county, we will just use it and keep the fips id as another ID variable.
 
 We can remove the `fips` variable from the predictors using `update_role()` to make sure that the role is no longer `"predictor"`. We can make the role anything we want actually, so we will keep it something identifiable.
 
@@ -1266,11 +1277,11 @@ It is also a good idea to remove variables with near-zero variance, which can be
 
 Examples where you might have near-zero variance variables include: 
 
-1) **Similar Values** - If the population density was nearly the same for every zcta that contained a monitor, then knowing the population density near our monitorwould contribute little to our model in assisting us to predict monitor air pollution values. 
+1) **Similar Values** - If the population density was nearly the same for every zcta that contained a monitor, then knowing the population density near our monitor would contribute little to our model in assisting us to predict monitor air pollution values. 
 2) **Sparse Data** - If all of the monitors were in locations where the populations did not attend graduate school, then these values would mostly be zero, again this would do very little to help us distinguish our air pollution monitors.When many of the values are zero this is also called sparse data.  
 3) **Imbalanced Data** If nearly all of the monitors were located in one particular state, and all the others only had one monitor each, then the real predictive value would simply be in knowing if a monitor is located in that particular state or not. In this case we don't want to remove our variable, we just want to simplify it.
 
-See this [blog post](https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/) about why removing near-zero varaince variables isn't always a good idea if we think that a variable might be especially informative.
+See this [blog post](https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/) about why removing near-zero variance variables isn't always a good idea if we think that a variable might be especially informative.
 
 **It is important to add the steps to the recipe in an order that makes sense just like with a cooking recipe.**
 
@@ -1281,8 +1292,8 @@ simple_rec %<>%
   update_role("fips", new_role = "county id") %>%
 # create numeric dummy variables to encode for categorical variables
   step_dummy(state, county, city, zcta, one_hot = TRUE) %>%
-  # identify and reomve all correlated predictors (now that they are numeric)
-   step_corr(all_predictors(), - CMAQ, - aod)%>%
+  # identify and remove all correlated predictors (now that they are numeric)
+  step_corr(all_predictors(), - CMAQ, - aod)%>%
   # identify variables with near zero variance and remove
   step_nzv(all_predictors(), - CMAQ, - aod)
   
@@ -1339,7 +1350,9 @@ glimpse(juiced_train)
 
 
 For easy comparison sake - here is our original data:
+
 #### {.scrollable }
+
 ```{r}
 # Scroll therough the output!
 glimpse(pm)
@@ -1349,10 +1362,23 @@ glimpse(pm)
 Notice how we only have 36 variables now instead of 50! Two of these are our ID variables (`fips` and the actual monitor ID (`id`)) and one is our outcome (`value`). Thus we only have 33 predictors now. We can also see that variables that we no longer have any categorical variables. Variables like `state` are gone and only `state_California` remains as it was the only state identity to have nonzero variance.  We can see that California had the largest number of monitors compared to the other states. We can also see that there were more monitors listed as `"Not in a city"` than any city. 
 
 #### {.scrollable }
+
 ```{r}
-pm %>% count(state)
-pm %>% count(city)
+#Scroll through the output!
+pm %>% count(state)  %>%
+  print(n = 1e3)
 ```
+
+####
+
+#### {.scrollable }
+
+```{r}
+#Scroll through the output!
+pm %>% count(city) %>%
+  print(n = 1e3)
+```
+
 ####
 
 **Note**:  Recall that you must specify `retain = TRUE` argument of the `prep()` function to use `juice()`.
@@ -1363,7 +1389,7 @@ pm %>% count(city)
 knitr::include_graphics(here::here("img","testing_preprocessing_recipes4.png"))
 ```
 
-Accroding to the tidymodels documentation:
+According to the tidymodels documentation:
 
 > `bake()` takes a trained recipe and applies the operations to a data set to create a design matrix.
  for example:  it applies the centering to new data sets using these means used to create the recipe
@@ -1383,7 +1409,7 @@ glimpse(baked_test_pm )
 
 Notice that our `city_Not.in.a.city` variable seems to be NA values. Why might that be?
 
-Ah! Perphas it is because some of our levels were not previously seen in the training set!
+Ah! Perhaps it is because some of our levels were not previously seen in the training set!
 
 Let's take a look using the [set operations](https://www.probabilitycourse.com/chapter1/1_2_2_set_operations.php) of the `dplyr` package. We can take a look at cities that were different between the test and training set.
 
@@ -1405,7 +1431,7 @@ Maybe remove this?: Thus we need to update our original recipe to include a very
 
 Let's modify the city variable to be values of `in a city` or `not in a city` using the `if_else()` function of `dplyr`. Alternatively you could create a [custom step function](https://recipes.tidymodels.org/articles/Custom_Steps.html) to do this and add the step function to your recipe, but that is beyond the scope of this case study. 
 
-We need to create a new recipe to move forward, as the levels of our variables are established then. We would also potentially have this issue for state and county. So let's also do a similar thing for `state`. The `county` variables appears to get dropped due to either correlation or near zero variance. It is likely due to near zero variance becuase this is the more granular of these geographic categorical variables and likely sparse.
+We need to create a new recipe to move forward, as the levels of our variables are established then. We would also potentially have this issue for state and county. So let's also do a similar thing for `state`. The `county` variables appears to get dropped due to either correlation or near zero variance. It is likely due to near zero variance because this is the more granular of these geographic categorical variables and likely sparse.
 
 
 ```{r}
@@ -1458,10 +1484,15 @@ glimpse(juiced_train)
 
 Notice, it looks like we gained the `log_prisec_length_25000` back with this recipe using the data with our changes to `state` and `city`.
 
+#### {.scrollable }
+
 ```{r}
+# Scroll therough the output!
 baked_test_pm<- recipes::bake(prepped_rec, new_data = test_pm)
 glimpse(baked_test_pm)
 ```
+
+####
 
 Great now we no longer have NA values! :)
 
@@ -1476,7 +1507,7 @@ So far we have used `rsample` to split the data and `recipes` to assign variable
 We will now use the `parsnip` package (which is similar to the previous `caret` package - and hence why it is named after the vegetable) to specify our model.
 
 There are four aspects to define about our model:  
-1) the **type** of model (using specific funtions in parsnip like `rand_forest()`, `logistic_reg()` etc.)  
+1) the **type** of model (using specific functions in parsnip like `rand_forest()`, `logistic_reg()` etc.)  
 2) the **mode** of learning - classification or regression (using the `set_mode()` function)  
 3) the package or **engine** that we will use to implement the type of model selected (using the `set_engine()` function)  
 4) any **arguments** necessary for the model/package selected (using the `set_args()`function -  for example the `mtry =` argument for random forest which is the number of variables to be used as options for splitting at each tree node)  
@@ -1607,13 +1638,13 @@ Let's take a look at how well our model fit our training data:
 #can grab the fitted values simply like this:
 parsnip_fitted_values<-fitted(PM_fit[["fit"]])
 
-parsnip_fitted_values
+head(parsnip_fitted_values)
 
 #can also get the values using the augment function
 parsnip_fitted_values <- augment(PM_fit[["fit"]], data = juiced_train) %>% 
 select(value, .fitted:.std.resid)
 
-parsnip_fitted_values
+head(parsnip_fitted_values)
 
 ##using the workflows version
 wf_fit <-PM_wflow_fit %>% 
@@ -1622,13 +1653,13 @@ wf_fit <-PM_wflow_fit %>%
 #can grab the fitted values simply like this:
 wf_fitted_values<-fitted(wf_fit[["fit"]])
 
-wf_fitted_values
+head(wf_fitted_values)
 
 #can also get the values using the augment function
 wf_fitted_values <-augment(wf_fit[["fit"]], data = juiced_train) %>% 
 select(value, .fitted:.std.resid)
 
-wf_fitted_values
+head(wf_fitted_values)
 
 #gives us the same fitted values
 identical(parsnip_fitted_values, wf_fitted_values)
@@ -1638,15 +1669,15 @@ identical(parsnip_fitted_values, wf_fitted_values)
 ggplot(wf_fitted_values, aes(x = .fitted, y = value)) + geom_point()
 ```
 
-Ok, so our fitted range appears to be smaller than the real values. We could probably do a bit better.
+OK, so our fitted range appears to be smaller than the real values. We could probably do a bit better.
 
 
 Let's take a look at how well our model seems to be preforming more formally:
 
-When assessing the performance of a model, the metrics we use depend on if we are preforming a classifcation or prediction also known as regression analysis. In our case we are performing a regression or prediction analysis and the metrics often used are:
+When assessing the performance of a model, the metrics we use depend on if we are preforming a classification or prediction also known as regression analysis. In our case we are performing a regression or prediction analysis and the metrics often used are:
 1) mean absolute error (mae)  
 2) R squared error (rsq) 
-This is also known as the coefficient of determiniation which is the squared correlation between truth and estimate  
+This is also known as the coefficient of determination which is the squared correlation between truth and estimate  
 3) root mean squared error (rmse)   
 
 
@@ -1682,7 +1713,7 @@ This method involves essentially preforming the hold out method iteratively with
 
 First the training set is divided into k or v equally sized smaller pieces. 
 
-Then the model is trained on the model on k-1 or v-1 subsets of the data iteratively (removing a different v or k untill all possible k-1 or v-1 sets have been evaluated) to get a sense of the performance of the model. This is really useful for fine tuning specific aspects of the model in a process called model tuning.
+Then the model is trained on the model on k-1 or v-1 subsets of the data iteratively (removing a different v or k until all possible k-1 or v-1 sets have been evaluated) to get a sense of the performance of the model. This is really useful for fine tuning specific aspects of the model in a process called model tuning.
 
 
 Here is a visualization of how the folds are created:
@@ -1697,7 +1728,7 @@ Note: People typically ignore spatial dependence with cross validation of air po
 The [`vfold_cv()`](https://tidymodels.github.io/rsample/reference/vfold_cv.html){target="_blank"} function of the `rsample` package can be used to parse the training data into folds for k-fold/v-fold cross validation.
 
 The `v` argument specifies the number of folds to create.
-The `repeats` argument specifies if any samples should be repeated across folds - defualt is `FALSE`
+The `repeats` argument specifies if any samples should be repeated across folds - default is `FALSE`
 The `strata` argument specifies a variable to stratify samples across folds (just like in `initial_split()`).
 
 Again because these are created at random, we need to use the base `set.seed()` function in order to obtain the same results each time we knit this document. Generally speaking using 10 folds is good practice, but this depends on the variablity within your data. We are going to use 4 for the sake of expediency. 
@@ -1714,7 +1745,7 @@ vfold_pm$splits$`1`
 vfold_pm$splits$`2`
 ```
 
-Once the folds are created they can be used to evaluate peformance by fitting the model to each of the resamples that we created:
+Once the folds are created they can be used to evaluate performance by fitting the model to each of the resamples that we created:
 
 
 ```{r, echo=FALSE, out.width="800px"}
@@ -1756,7 +1787,7 @@ train_pm %>%
   facet_wrap(~ predictor, scales = "free_x")
 ```
 
-We can see that there does not appear to be a single linear relationship for either of these predictors. Thus we might want to think about using  [splines](https://www.math.uh.edu/~jingqiu/math4364/spline.pdf) or this(https://towardsdatascience.com/numerical-interpolation-natural-cubic-spline-52c1157b98ac) or just this(https://tidymodels.github.io/tune/articles/getting_started.html) or this(https://www.psych.mcgill.ca/misc/fda/ex-basis-b1.html) to model the relationship in our training data more closely. For example for the latitude plot (left) if we had 2 lines and one breakpoint called a knot around 40, with the first line having a positive slope and the second with a negative slope this would fit the data more similarly to the blue line shown in the figure.
+We can see that there does not appear to be a single linear relationship for either of these predictors. Thus we might want to think about using  [splines](https://www.math.uh.edu/~jingqiu/math4364/spline.pdf) or this(https://towardsdatascience.com/numerical-interpolation-natural-cubic-spline-52c1157b98ac) or just this(https://tidymodels.github.io/tune/articles/getting_started.html) or this(https://www.psych.mcgill.ca/misc/fda/ex-basis-b1.html) to model the relationship in our training data more closely. For example for the latitude plot (left) if we had 2 lines and one break-point called a knot around 40, with the first line having a positive slope and the second with a negative slope this would fit the data more similarly to the blue line shown in the figure.
 
 We can tune for the number of knots by using a step function in the `recipes` package called `step_ns()` where ns stands for natural splines. In order to tune for the number of knots or degrees of freedom, we can set the `deg_free` argument to `tune()`. This is helpful, becuase we aren't exactly sure how closely we should be following the relationship with the value and our longitude and latitude data in our training data to achieve good accuracy yet keep our model generalizable for other data. 
 
@@ -1779,7 +1810,7 @@ pm_param <-dials::parameters(novel_rec)
 pm_param
 ```
 
-Genearlly you could use the `grid_*()` functions of the `dials` package to create the different combinations of degrees of freedom to test for both variables to optimize the model. In our case we can visably see that if we add more than say 4 or 5 degrees of freedom we will likely overfit the data. So instead of using these functions we will create our own grid using the base `seq()` and `expand.grid()` functions.
+Generally you could use the `grid_*()` functions of the `dials` package to create the different combinations of degrees of freedom to test for both variables to optimize the model. In our case we can visibly see that if we add more than say 4 or 5 degrees of freedom we will likely over-fit the data. So instead of using these functions we will create our own grid using the base `seq()` and `expand.grid()` functions.
 
 ```{r}
 #an example of what you could do:
@@ -1821,11 +1852,11 @@ show_best(df_tuning, metric = "rmse", n =1)
 
 ### Linear Regression Model with PCA
 
-We can create another workflow to see how model pefromance compares using a different model. In this case we are going to perform something called [Principal Component Analysis or PCA](https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007){target="_blank"}. 
+We can create another workflow to see how model performance compares using a different model. In this case we are going to perform something called [Principal Component Analysis or PCA](https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007){target="_blank"}. 
 
 So what is PCA?
 
-PCA is a widely used dimensionality reduction method (a form of unspervised machine learning). It creates new variables that capture the most variation within the data, yet reduce the data down to just a number of principal components. It does so by transforiming the data using [orthogonal](https://en.wikipedia.org/wiki/Orthogonality#:~:text=In%20mathematics%2C%20orthogonality%20is%20the,u%2C%20v)%20%3D%200.){target="_blank"} linear transformation. In otherwords, it creates new variables that are [linear combinations](https://www.mathbootcamps.com/linear-combinations-vectors/){target="_blank"} of the variables within the data. Importantly these new variables are orthogonal, meaning that the new variables have zero covariance. In simpler terms, we are expessing unique types of variation within the data as new variables.
+PCA is a widely used dimensionality reduction method (a form of unsupervised machine learning). It creates new variables that capture the most variation within the data, yet reduce the data down to just a number of principal components. It does so by transforming the data using [orthogonal](https://en.wikipedia.org/wiki/Orthogonality#:~:text=In%20mathematics%2C%20orthogonality%20is%20the,u%2C%20v)%20%3D%200.){target="_blank"} linear transformation. In other words, it creates new variables that are [linear combinations](https://www.mathbootcamps.com/linear-combinations-vectors/){target="_blank"} of the variables within the data. Importantly these new variables are orthogonal, meaning that the new variables have zero covariance. In simpler terms, we are expressing unique types of variation within the data as new variables.
 
 Check out this [video](https://youtu.be/_UVHneBUBW0){target="_blank"} for more information.
 
@@ -1867,7 +1898,7 @@ pca_wflow
 
 
 
-Remember that using `workflows` we dont actually need to prep our recipe, we can just fit our model directly. 
+Remember that using `workflows` we don't actually need to prep our recipe, we can just fit our model directly. 
 
 Fit the cross validation samples:
 
@@ -1893,24 +1924,29 @@ So we can see that our performance isn't quite as good - especially if we look a
 ### Random Forest
 
 
-Now for one last recipe, we are going to predict using a decision tree method called random forests.
+Now for one last recipe, we are going to predict using a decision tree method called [random forest](https://en.wikipedia.org/wiki/Random_forest){target="_blank"}.
 
-A decision tree is a tool to partition data based on a series of sequential binary decisions.
+A [decision tree](https://medium.com/greyatom/decision-trees-a-simple-way-to-visualize-a-decision-dc506a403aeb){target="_blank"} is a tool to partition data or anything really, based on a series of sequential (often binary) decisions, where the decisions are chosen  based on their ability to optimally split the data.
+
+Here you can see a simple example:
 
 ```{r}
 knitr::include_graphics("https://miro.medium.com/max/1000/1*LMoJmXCsQlciGTEyoSN39g.jpeg")
 
 ```
 
-#### [[source](https://towardsdatascience.com/understanding-random-forest-58381e0602d2)]
+#### [[source](https://towardsdatascience.com/understanding-random-forest-58381e0602d2)]{target="_blank"}
 
+In the case of [random forest](https://towardsdatascience.com/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9), multiple decision trees are created - hence the name forest, and each tree is built using a random subset of the training data (with replacement) - hence the full name random forest. This random aspect helps to keep the algorithm from overfitting the data.
+
+The mean of the predictions from each of the trees is used in the final output.
 
 ```{r}
 knitr::include_graphics("https://miro.medium.com/max/1400/0*f_qQPFpdofWGLQqc.png")
 ```
 
 
-In our case, the random forest algorithm that we are working with does not work well when there are categorical variabels with more than 53 levels, so we will need to remove the `zcta` variable.
+In our case, the random forest algorithm that we are working with does not work well when there are categorical variables with more than 53 levels, so we will need to remove the `zcta` variable.
 
 ```{r}
 
@@ -1928,6 +1964,15 @@ RF_rec <-recipe(train_pm) %>%
     step_nzv(all_numeric())
 ```
 
+The `rand_forest()` function of the `parsnip` package has three important arguments that act as an interface for the different possible engines to perform a random forest analysis:
+
+1) mtry
+The number of predictor or explanatory variables that will be randomly sampled as options at each split when creating the tree models. The default number for regression analyses is the number of predictors divided by 3. 
+
+2) min_n - The minimum number of data points in a node that are required for the node to be split further.
+
+3) trees - the number of trees in the ensemble
+10 and 3
 
 ```{r}
 
@@ -1988,7 +2033,7 @@ show_best(df_tuning, metric = "rmse", n =1)
 collect_metrics(resample_pca_fit)
 
 ```
-Ok, so our first model had a mean rmse value of 2.18.
+OK, so our first model had a mean rmse value of 2.18.
 The model with the lat/long degrees of freedom  tuning had a mean rmse value of 2.02, thus showing some improvement.
 The PCA model had a mean rmse value of 2.76.
 
@@ -1998,18 +2043,18 @@ It looks like the random forest model had the lowest rmse value of 1.79.
 If we tuned our random forest model based on the number of trees or the value for `mtry` (which is "The number of predictors that will be randomly sampled at each split when creating the tree models"), we might get a model with even better performance.
 
 
-However, our cross valided mean rmse value of 1.79 is quite good because our range of true outcome values is much larger:`r range(test_pm$value)`.
+However, our cross validated mean rmse value of 1.79 is quite good because our range of true outcome values is much larger:`r range(test_pm$value)`.
 
 ### Final Model Performance Evaluation
 
 
-Now that we have decided that we have resonable performance with the training data, we could stop here and use the `yardstick` package (and `tune` if using `workflows` to fit our model) to evaluate performance with our testing data. 
+Now that we have decided that we have reasonable performance with the training data, we could stop here and use the `yardstick` package (and `tune` if using `workflows` to fit our model) to evaluate performance with our testing data. 
 
-So now we will use our random forests model to predict values for the monitors in the testing data.
+So now we will use our random forest model to predict values for the monitors in the testing data.
 
 Using `parsnip` we would need to use the baked data testing data. With the `workflows` package, we could use the raw testing data.
 
-Importantly, ID variables are not delt with as nicely as with the `workflows` package so we would need to remove them. We did this above when created the processed training data for this model, the `juiced_train` data as well.
+Importantly, ID variables are not dealt with as nicely as with the `workflows` package so we would need to remove them. We did this above when created the processed training data for this model, the `juiced_train` data as well.
 
 ```{r}
 
@@ -2027,7 +2072,7 @@ values_pred_wfs
 yardstick::metrics(values_pred_wfs, truth = value, estimate = .pred)
 
 ```
-Awesome! We can see that our rmse of 1.49 is quite similar with our testing data. We achieved quite good performance, which suggests that we would could predict other locations with more sparse monitoring based on our predictors with resonable accuracy.
+Awesome! We can see that our rmse of 1.49 is quite similar with our testing data. We achieved quite good performance, which suggests that we would could predict other locations with more sparse monitoring based on our predictors with reasonable accuracy.
 
 We could also use the `last_fit()` function of the `tune` package to look at performance if we chose to create a workflow using the `workflows` package.
 
@@ -2048,14 +2093,16 @@ test_performance <- overallfit  %>%tune::collect_metrics()
 test_performance
 ```
 
-Here you can see the predictions for the test set (the 292 rows with predicitions out of the 876 original monitor values) also using the `tune` package with the `collect_predictions()` function.
+Here you can see the predictions for the test set (the 292 rows with predictions out of the 876 original monitor values) also using the `tune` package with the `collect_predictions()` function.
 
 #### {.scrollable }
 ```{r}
 test_predictions <- overallfit  %>%tune::collect_predictions()
-test_predictions
+test_predictions %>%
+  print(n = 1e3)
 ```
 
+####
 
 ## Data Visualization
 
@@ -2071,11 +2118,11 @@ First, let's start by making a plot of our monitors:
 
 We will use the following packages to create a map of the US:
 1)`sf`
+2)`maps`
 2)`rnaturalearth`
-3)`rnaturalearthdata`
-4)`rgeos`
+3)`rgeos`
 
-According to this [link on wikipedia](https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States#Westernmost), these are the latitude and longitude bounds of the contintental US.
+According to this [link on wikipedia](https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States#Westernmost), these are the latitude and longitude bounds of the continental US.
 
 top = 49.3457868 # north lat
 left = -124.7844079 # west long
@@ -2084,14 +2131,9 @@ bottom =  24.7433195 # south lat
 
 We will start with getting an outline of the US with the `ne_countries()` function of the `rnaturalearth` package.
 ```{r}
-
-library("sf")
-library("rnaturalearth")
-#library("rnaturalearthdata")
 library("rgeos")
 
-world <- ne_countries(scale = "medium", returnclass = "sf")
-class(world)
+world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
 
 ggplot(data = world) +
     geom_sf() +
@@ -2102,18 +2144,24 @@ ggplot(data = world) +
 
 Now let's add county lines.
 
-County data is available from the `maps` package.
+County graphical data is available from the `maps` package. The `sf` package which is short for simple features creates a data frame about this graphical data so that we can work with it.
 
 ```{r}
 
-counties <- st_as_sf(maps::map("county", plot = FALSE, fill = TRUE))
+counties <- sf::st_as_sf(maps::map("county", plot = FALSE, fill = TRUE))
 
 monitors <-ggplot(data = world) +
-   geom_sf(data = counties, fill = NA, color = gray(.5))+
+    geom_sf(data = counties, fill = NA, color = gray(.5))+
     geom_point(data = pm, aes(x = lon, y = lat), size = 2, 
         shape = 23, fill = "darkred") +
     coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
-  ggtitle("Monitor Locations")
+    ggtitle("Monitor Locations")+
+    theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
 
 monitors
 ```
@@ -2121,26 +2169,46 @@ monitors
 Now let's add a fill at the county level for the true monitor values of air pollution:
 
 ```{r}
-library(lwgeom)
-library(stringr)
 
 head(counties)
 
 pm <-readr::read_csv(here("docs", "pm25_data.csv"))
 counties %<>% tidyr::separate(ID, into = c("state", "county"), sep = ",")
 
-counties[["county"]] <-str_to_title(counties[["county"]])
+counties[["county"]] <-stringr::str_to_title(counties[["county"]])
 
 map_data <-inner_join(counties, pm, by = "county")
 
 truth<-ggplot(data = world) +
     geom_sf() +
     geom_sf(data = map_data, aes(fill = value)) +
-    #scale_fill_viridis_c(trans = "sqrt", alpha = .4) +
+    scale_fill_viridis_c(trans = "sqrt", alpha = .4) +
       #geom_point(data = pm, aes(x = lon, y = lat), size = 1.5, alpha = 2,
        # shape = 23, fill = "darkred") +
         coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
-      ggtitle("Monitor PM2.5 levels")
+      ggtitle("Monitor PM~2.5~ levels")
+truth
+
+
+
+truth <-ggplot(data = world) +
+    geom_sf() +
+    geom_sf(data = map_data, aes(fill = value)) +
+    #scale_fill_viridis_c(trans = "sqrt", alpha = .4) +
+      #geom_point(data = pm, aes(x = lon, y = lat), size = 1.5, alpha =2,
+      #  shape = 23, fill = "darkred") +
+        coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
+  scale_fill_gradientn(colours=topo.colors(7),na.value = "transparent",
+                           breaks=c(0,10,20),labels=c(0,10,20),
+                           limits=c(0,23.5), name = "PM ug/m3")+
+  ggtitle("True PM"~2.5~" levels")+
+    theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+
 truth
 
 ```
@@ -2177,23 +2245,42 @@ pred <-ggplot(data = world) +
       #geom_point(data = pm, aes(x = lon, y = lat), size = 1.5, alpha =2,
       #  shape = 23, fill = "darkred") +
         coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
-  ggtitle("Predicted PM2.5 levels")
+  scale_fill_gradientn(colours=topo.colors(7),na.value = "transparent",
+                           breaks=c(0,10,20),labels=c(0,10,20),
+                           limits=c(0,23.5), name = "PM ug/m3")+
+  ggtitle("Predicted PM"~2.5~" levels")+
+    theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
 
 pred
 
 ```
 
 
+
 ```{r}
-library(cowplot)
-
 cowplot::plot_grid(monitors, truth, pred)
-cowplot::plot_grid( truth, pred)
+```
 
+
+```{r}
+cowplot::plot_grid(truth, pred,nrow = 2 )
 
 ```
 
 
+```{r, echo = FALSE, message=FALSE}
+
+png(here::here("img", "main_plot_maps.png"), height = 1500, width = 2000, res = 300)
+cowplot::plot_grid(truth, pred,nrow = 2 )
+
+dev.off()
+
+```
 
 ## Summary
 
@@ -2204,9 +2291,9 @@ knitr::include_graphics(here::here("img","ecosystem.png"))
 ```
 
 
-We have explored gravametric fine particulate matter air pollution monitoring data. We have utilized the tidymodels ecosystem of packages to predict monitor values using a variety of predictors, also known as explanatory varaibles, including sattelite data, road density data, and population density, among others. Our model could be extended to be used to predict pollution levels in areas without monitoring, to help identify regions where populations maybe especially at risk for the health effects of air pollution.  
+We have explored gravimetric monitoring data of fine particulate matter air pollution. We have utilized the tidymodels ecosystem of packages to predict monitor values using a variety of predictors, also known as explanatory variables, including satellite data, road density data, and population density, among others. Our model could now be extended to be used to predict pollution levels in areas poor  monitoring, to help identify regions where populations maybe especially at risk for the health effects of air pollution.  
 
-We learned that there are two major types of what is called supervised machine learning: prediction and classification. We learned that prediction is used when the outcome variable is numeric and classifaction is performed when the outcome variable is categorical.  
+We learned that there are two major types of what is called supervised machine learning: prediction and classification. We learned that prediction is used when the outcome variable is numeric and classification is performed when the outcome variable is categorical.  
 
 We performed the major steps of machine learning that we introduced in the beginning of the data analysis:  
 
@@ -2216,23 +2303,23 @@ We used a packages like `skimr`, `summarytools`, `corrplot`, `ggcorrplot`, and `
 
 2) Data splitting 
 
-We used the `rsample` package to first perform an initial split of our data into two peices: a training set and a testing set. The training set was used to optimize the model, while the testing set was used only to evaluate the performance of our final model. We also used the `rsample` package to create cross validation subsets of our training data. This allowed us to better assess the performance of our tested models using our training data.  
+We used the `rsample` package to first perform an initial split of our data into two pieces: a training set and a testing set. The training set was used to optimize the model, while the testing set was used only to evaluate the performance of our final model. We also used the `rsample` package to create cross validation subsets of our training data. This allowed us to better assess the performance of our tested models using our training data.  
 
-3) Variable assignment and pre-processing   
+3) Variable assignment and preprocessing   
 
-We used the `recipes` package to assign variable roles (such as outcome, predictor, and id variable). We also used this package to create a recipe for pre-processing our training and testing data. This involved steps such as: ` step_dummy` to create dummy numeric encodings of our categorical variables, `step_corr` to remove highly correlated variables, `step_nzv` to remove near zero variance variabels that would contibute little to our model and potentially add noise.  We learned that once our recipe was created and prepped using `prep()`we could extract the pre-processed training data using `juice()` or our pre-processed testing data using `bake()`. We also learned that if we used the newer workflows package that we did not need to the `prep()`, `juice()`, or `bake()` functions, but that it is still useful to know how to do so if we want to look at our data and how the recipe is influencing it more deeply.  
+We used the `recipes` package to assign variable roles (such as outcome, predictor, and id variable). We also used this package to create a recipe for preprocessing our training and testing data. This involved steps such as: ` step_dummy` to create dummy numeric encodings of our categorical variables, `step_corr` to remove highly correlated variables, `step_nzv` to remove near zero variance variables that would contribute little to our model and potentially add noise.  We learned that once our recipe was created and prepped using `prep()`we could extract the pre-processed training data using `juice()` or our pre-processed testing data using `bake()`. We also learned that if we used the newer workflows package that we did not need to the `prep()`, `juice()`, or `bake()` functions, but that it is still useful to know how to do so if we want to look at our data and how the recipe is influencing it more deeply.  
 
 4) Model specification, fitting, tuning and performance evaluation using the training data  
 
-We learned that the model needs to first be fit to the training data. We learned that in both classification and prediction, the model is fit to the traing data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. We learned that we specify the model and its specifications using the `parnsip` package and that we also use this packae to fit the model using the `fit()` function. We learned that we if just use `parsnip` to fit the model, then we need to use the pre-processed training data (output from `juice()`). We learned that we can use the raw training data if we use the `workflows` package to create a workflow that pre-processes our data for us.   
+We learned that the model needs to first be fit to the training data. We learned that in both classification and prediction, the model is fit to the training data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. We learned that we specify the model and its specifications using the `parnsip` package and that we also use this package to fit the model using the `fit()` function. We learned that we if just use `parsnip` to fit the model, then we need to use the pre-processed training data (output from `juice()`). We learned that we can use the raw training data if we use the `workflows` package to create a workflow that pre-processes our data for us.   
 
-We learned that if the model fits well than the estimated values will be very similar to the true outcome variable values in our training data. We learned that we can assess model peformance using the `yardstick` package and the `metrics()` function. We also learned that we can use subsets of our training data (which we created with the `rsample` package) to perform cross validation to get a better estimate about the performance of our model using our training data, as we want our results to be generalizable and to perform well with other data, not just our training data. We used the `fit_resamples()` function of the tune package to fit our model on our different training data subsets and the `collect_metrics()` function (also of the `tune` package) to evaluate model performance using these subsets.  We also learned that we can potentially improve model performance by tuning aspects about the model called [hyperparameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"} to determine the best option for model performance. We learned that we can do this using the `tune` and `dials` packages and evaluating the performance of our model with the different hyperparameter options and our training data subsets that we used for cross validation. After we tested several different methods to model our data, we compared them to choose the best performing model as our final model.  
+We learned that if the model fits well than the estimated values will be very similar to the true outcome variable values in our training data. We learned that we can assess model performance using the `yardstick` package and the `metrics()` function. We also learned that we can use subsets of our training data (which we created with the `rsample` package) to perform cross validation to get a better estimate about the performance of our model using our training data, as we want our results to be generalizable and to perform well with other data, not just our training data. We used the `fit_resamples()` function of the tune package to fit our model on our different training data subsets and the `collect_metrics()` function (also of the `tune` package) to evaluate model performance using these subsets.  We also learned that we can potentially improve model performance by tuning aspects about the model called [hyper-parameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"} to determine the best option for model performance. We learned that we can do this using the `tune` and `dials` packages and evaluating the performance of our model with the different hyper-parameter options and our training data subsets that we used for cross validation. After we tested several different methods to model our data, we compared them to choose the best performing model as our final model.  
 
 5) Overall model performance evaluation  
 
 Once we chose our final model, we evaluated the final model performance using the testing data. This gives us a better estimate about how well the model will predict or classify the outcome variable of interest with new independent data. Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources. 
 
-We first fit our model to our testing data using either just parsnip and the pre-processed testing data (using the `bake()` recipes function), or our raw testing data if we used a workflow. We used the same performance evaluation functions (`yardstick::metrics()`  and `tune::collect_metrics()`(when using cross validion)). We also learned how we can use the `last_fit()` function of the `tune` package if we used a workflow to get the test data performance using the initial data and the testing/training split information.
+We first fit our model to our testing data using either just parsnip and the pre-processed testing data (using the `bake()` recipes function), or our raw testing data if we used a workflow. We used the same performance evaluation functions (`yardstick::metrics()`  and `tune::collect_metrics()`(when using cross validation)). We also learned how we can use the `last_fit()` function of the `tune` package if we used a workflow to get the test data performance using the initial data and the testing/training split information.
 
 Analyses like the one in our case study are important for defining which groups could benefit the most from interventions, education, and policy changes when attempting to mitigate public health challenges. You can see in this [article](https://www.nejm.org/doi/full/10.1056/NEJMoa1702747){target="_blank"} that many additional considerations would be involved to adequately understand the data enough to recommend policy changes.
 
@@ -2245,25 +2332,60 @@ Students can predict air pollution monitor values using a different algorithm an
 1) A review of [tidymodels](https://rviews.rstudio.com/2019/06/19/a-gentle-intro-to-tidymodels/){target="_blank"}  
 2) A [course on tidymodels](https://juliasilge.com/blog/tidymodels-ml-course/){target="_blank"} by Julia Silge  
 3) [More examples, explanations, and info about tidymodels development](https://www.tidymodels.org/learn/){target="_blank"} from the developers  
-4) A guide for [pre-processing with recipes](http://www.rebeccabarter.com/blog/2019-06-06_pre_processing/){target="_blank"}  
+4) A guide for [preprocessing with recipes](http://www.rebeccabarter.com/blog/2019-06-06_pre_processing/){target="_blank"}  
 5) A [guide](https://briatte.github.io/ggcorr/){target="_blank"} for using GGally to create correlation plots  
 6) A [guide](https://www.tidyverse.org/blog/2018/11/parsnip-0-0-1/){target="_blank"} for using parsnip to try different algorithms or engines  
 7) A [list of recipe functions](https://tidymodels.github.io/recipes/reference/index.html){target="_blank"}  
 8) A great blog post about [cross validation](https://towardsdatascience.com/train-test-split-and-cross-validation-in-python-80b61beca4b6){target="_blank"}  
 9) A discussion about [evaluating model performance](https://medium.com/@limavallantin/metrics-to-measure-machine-learning-model-performance-e8c963665476){target="_blank"} for a deeper explanation about how to evaluate model performance  
 10) [RStudio cheatsheets](https://rstudio.com/resources/cheatsheets/){target="_blank"}
-11) An [explanation](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"} of supervised vs unsupervised machine learning and bias-variance tradeoff.
+11) An [explanation](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"} of supervised vs unsupervised machine learning and bias-variance trade-off.
 12) A thorough [explanation](https://royalsocietypublishing.org/doi/10.1098/rsta.2015.0202#:~:text=Principal%20component%20analysis%20(PCA)%20is,variables%20that%20successively%20maximize%20variance.){target="_blank"} of principal component analysis.
 13) If you have access, this is a great [discussion](https://www.tandfonline.com/doi/abs/10.1080/00031305.1984.10483183){target="_blank"}  about the difference between independence, orthogonality, and lack of correlation.
 14) Great [video explanation](https://youtu.be/_UVHneBUBW0){target="_blank"} of PCA.  
 
 <u>Terms and concepts covered:</u>  
 [Tidyverse](https://www.tidyverse.org/){target="_blank"}  
-[parameters and hyperparameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"}  
+[parameters and hyper-parameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"}  
 
 <u>Packages used in this case study: </u>
 
  Package   | Use                                                                         
 ---------- |-------------
+[here](https://github.com/jennybc/here_here){target="_blank"}       | to easily load and save data
+[readr](https://readr.tidyverse.org/){target="_blank"}      | to import the CSV file data
+[dplyr](https://dplyr.tidyverse.org/){target="_blank"}      | to view/arrange/filter/select/compare specific subsets of the data 
+[skimr](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data
+[summarytools](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data in a different style
+[magrittr](https://magrittr.tidyverse.org/articles/magrittr.html){target="_blank"}   | to use the `%<>%` pipping operator 
+[corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
+[ggcorrplot](http://www.sthda.com/english/wiki/ggcorrplot-visualization-of-a-correlation-matrix-using-ggplot2){target="_blank"}| also to make large correlation plots
+[GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
+[rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets and to split the training set for cross-validation  
+[recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `juice()` - extracts final preprocessed training data and `bake()` - applies recipe steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
+[parsnip](https://tidymodels.github.io/parsnip/){target="_blank"}   | an interface to create models (major functions are  `fit()`, `set_engine()`)
+[yardstick](https://tidymodels.github.io/yardstick/){target="_blank"}   | to evaluate the performance of models
+[broom](https://www.tidyverse.org/blog/2018/07/broom-0-5-0/){target="_blank"} | to get tidy output for our model fit and performance
+[ggplot2](https://ggplot2.tidyverse.org/){target="_blank"}    | to make visualizations with multiple layers
+[dials](https://www.tidyverse.org/blog/2019/10/dials-0-0-3/){target="_blank"} | to specify hyper-parameter tuning
+[tune](https://tune.tidymodels.org/){target="_blank"} | to perform cross validation, tune hyper-parameters, and get performance metrics
+[workflows](https://www.rdocumentation.org/packages/workflows/versions/0.1.1){target="_blank"} | to create modeling workflow to streamline the modeling process
+[vip](https://cran.r-project.org/web/packages/vip/vip.pdf){target="_blank"} | to create variable importance plots
+[randomForest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf){target="_blank"} | to perform the random forest analysis
+[stringr](https://stringr.tidyverse.org/articles/stringr.html){target="_blank"}    | to manipulate the text the map data
+[tidyr](https://tidyr.tidyverse.org/){target="_blank"}      | to separate data within a column into multiple columns
+[rnaturalearth](https://cran.r-project.org/web/packages/rnaturalearth/README.html){target="_blank"} | to get the geometry data for the earth to plot the US
+[maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get map database data about counties to draw them on our US map
+[sf](https://r-spatial.github.io/sf/) | to convert the map data into a data frame
+[lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert the map geographical data
+[rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
+[cowplot](https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html){target="_blank"} | to allow plots to be combined
+
+## Session info
+***
+
+```{r}
+sessionInfo()
+```
 
 
