@@ -366,16 +366,20 @@ We do not have the sales data yet for this year, but we do know the characterist
 We can build a model of the characteristics that explained sales last year to estimate what cars might sell well this year. 
 In this case, our outcome variable is the sales of cars, while the different characteristics of the cars make up our predictor variables.
 
-In this case study, we will evaluate air pollution monitor data of fine particulate mater (PM~2.5~) in the contiguous US from 2008, as well as data about population density, road density, urbanization levels, and NASA satellite data to develop models to predict localized air pollution levels. 
-
-The monitor data will be our **outcome variable**.  We want to determine if we can **predict** air pollution levels based on other types of data, like road density and population density to see if we can use these data to predict air pollution in areas where there are no monitors. 
-
+In this case study, we want to **predict** air pollution levels. 
+To build this machine learningmodel, our **outcome variable** is fine particulate mater (PM~2.5~) captured from air pollution monitors in the contiguous US from 2008. 
+Our **predictor variables* include data about population density, road density, urbanization levels, and NASA satellite data. 
+Using this model, we predict air pollution in new areas where there are no monitors. 
 
 ### Our outcome variable
 
-The monitor data that we will be using comes from **[gravimetric monitors](https://publiclab.org/wiki/filter-pm){target="_blank"}** operated by the US [Enivornmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}. These monitors use a filtration system to specifically capture fine particulate matter. The weight of this matter is manually measured daily or weekly. See [here](https://www3.epa.gov/ttnamti1/files/ambient/pm25/spec/RTIGravMassSOPFINAL.pdf){target="_blank"} for the EPA standard operating procedure for PM gravimetric analysis in 2008.
+The monitor data that we will be using comes from **[gravimetric monitors](https://publiclab.org/wiki/filter-pm){target="_blank"}** (see picture below) operated by the US [Enivornmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}.
 
+```{r, echo = FALSE, out.width="100px"}
+knitr::include_graphics(here::here("img","monitor.png"))
+```
 
+These monitors use a filtration system to specifically capture fine particulate matter. 
 
 ```{r, echo = FALSE, out.width="150px"}
 knitr::include_graphics(here::here("img","filter.png"))
@@ -383,18 +387,20 @@ knitr::include_graphics(here::here("img","filter.png"))
 
 ##### [[source]](https://publiclab.org/wiki/filter-pm){target="_blank"}
 
-Here is an image of what the gravimetric monitors look like:
+The weight of this matter is manually measured daily or weekly. 
+For the EPA standard operating procedure for PM gravimetric analysis in 2008, we refer the reader to [here](https://www3.epa.gov/ttnamti1/files/ambient/pm25/spec/RTIGravMassSOPFINAL.pdf){target="_blank"}.
 
-```{r, echo = FALSE, out.width="100px"}
-knitr::include_graphics(here::here("img","monitor.png"))
-```
+For more on Gravimetric analysis, you can expand here. 
 
+Gravimetric analysis is also used for [emission testing](https://www.mt.com/us/en/home/applications/Laboratory_weighing/emissions-testing-particulate-matter.html){target="_blank"}. 
+The same idea applies: a fresh filter is applied and the desired amount of time passes, then the filter is removed and weighed. 
 
-Gravimetric analysis is also used for [emission testing](https://www.mt.com/us/en/home/applications/Laboratory_weighing/emissions-testing-particulate-matter.html){target="_blank"}. The same idea applies: a fresh filter is applied and the desired amount of time passes, then the filter is removed and weighed. 
+There are [other monitoring systems](https://www.sensirion.com/en/about-us/newsroom/sensirion-specialist-articles/particulate-matter-sensing-for-air-quality-measurements/){target="_blank"} that can provide hourly measurements, but we will not be using data from these monitors in our analysis. 
+Gravimetric analysis is considered to be among the most accurate methods.
 
-There are [other monitoring systems](https://www.sensirion.com/en/about-us/newsroom/sensirion-specialist-articles/particulate-matter-sensing-for-air-quality-measurements/){target="_blank"} that can provide hourly measurements, but we will not be using data from these monitors in our analysis. Gravimetric analysis is considered to be among the most accurate methods.
-
-In our csv, the **value** column indicates the PM~2.5~ monitor average for 2008 in mass of fine particles/volume of air for 876 gravimetric monitors. The units are micro grams of fine particulate mater (PM) that is less than 2.5 micrometers in diameter per cubic meter of air - mass concentration (ug/m^3^).  Recall the WHO exposure  guideline is < 10 ug/m^3^ on average annually for PM~2.5~.
+In our dataset, the `value` column indicates the PM~2.5~ monitor average for 2008 in mass of fine particles/volume of air for 876 gravimetric monitors. 
+The units are micro grams of fine particulate mater (PM) that is less than 2.5 micrometers in diameter per cubic meter of air - mass concentration (ug/m^3^).
+Recall the WHO exposure  guideline is < 10 ug/m^3^ on average annually for PM~2.5~.
 
 ### Our predictor variables
 
