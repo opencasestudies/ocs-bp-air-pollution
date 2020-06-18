@@ -1,5 +1,5 @@
 ---
-title: "Open Case Studies : Predicting Annual Air Pollution "
+title: "Open Case Studies: Predicting Annual Air Pollution "
 css: style.css
 output:
   html_document:
@@ -25,15 +25,12 @@ output:
 }
 </style>
 
-
-
-
 ```{r setup, include=FALSE}
+library(knitr)
+library(here)
 knitr::opts_chunk$set(include = TRUE, comment = NA, echo = TRUE,
                       message = FALSE, warning = FALSE, cache = FALSE,
                       fig.align = "center", out.width = '90%')
-library(here)
-library(knitr)
 ```
 
 
@@ -53,7 +50,7 @@ A variety of different sources contribute different types of pollutants to what 
 Some sources are natural while others are anthropogenic (human derived):
 
 <p align="center">
-  <img width="600" src="https://www.nps.gov/subjects/air/images/Sources_Graphic_Huge.jpg?maxwidth=1200&maxheight=1200&autorotate=false">
+<img width="600" src="https://www.nps.gov/subjects/air/images/Sources_Graphic_Huge.jpg?maxwidth=1200&maxheight=1200&autorotate=false">
 </p>
 
 ##### [[source]](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.nps.gov%2Fsubjects%2Fair%2Fsources.htm&psig=AOvVaw2v7AVxSF8ZSAPEhNudVtbN&ust=1585770966217000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCPDN66q_xegCFQAAAAAdAAAAABAD){target="_blank"}
@@ -230,17 +227,17 @@ library(cowplot)
  Package   | Use                                                                         
 ---------- |-------------
 [here](https://github.com/jennybc/here_here){target="_blank"}       | to easily load and save data
-[readr](https://readr.tidyverse.org/){target="_blank"}      | to import the CSV file data
-[dplyr](https://dplyr.tidyverse.org/){target="_blank"}      | to view/arrange/filter/select/compare specific subsets of the data 
+[readr](https://readr.tidyverse.org/){target="_blank"}      | to import CSV files
+[dplyr](https://dplyr.tidyverse.org/){target="_blank"}      | to view/arrange/filter/select/compare specific subsets of data 
 [skimr](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data
 [summarytools](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data in a different style
 [magrittr](https://magrittr.tidyverse.org/articles/magrittr.html){target="_blank"}   | to use the `%<>%` pipping operator 
 [corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
 [ggcorrplot](http://www.sthda.com/english/wiki/ggcorrplot-visualization-of-a-correlation-matrix-using-ggplot2){target="_blank"} | also to make large correlation plots
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
-[rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets and to split the training set for cross-validation  
+[rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets; to split the training set for cross-validation  
 [recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `juice()` - extracts final preprocessed training data and `bake()` - applies recipe steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
-[parsnip](https://tidymodels.github.io/parsnip/){target="_blank"}   | an interface to create models (major functions are  `fit()`, `set_engine()`)
+[parsnip](https://tidymodels.github.io/parsnip/){target="_blank"}   | an interface to create models (major functions are `fit()`, `set_engine()`)
 [yardstick](https://tidymodels.github.io/yardstick/){target="_blank"}   | to evaluate the performance of models
 [broom](https://www.tidyverse.org/blog/2018/07/broom-0-5-0/){target="_blank"} | to get tidy output for our model fit and performance
 [ggplot2](https://ggplot2.tidyverse.org/){target="_blank"}    | to make visualizations with multiple layers
@@ -254,7 +251,7 @@ library(cowplot)
 [rnaturalearth](https://cran.r-project.org/web/packages/rnaturalearth/README.html){target="_blank"} | to get the geometry data for the earth to plot the US
 [maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get map database data about counties to draw them on our US map
 [sf](https://r-spatial.github.io/sf/){target="_blank"} | to convert the map data into a data frame
-[lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert the map geographical data
+[lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert map geographical data
 [rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
 [cowplot](https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html){target="_blank"} | to allow plots to be combined
 ___
@@ -275,12 +272,12 @@ deaths than many better-known risk factors such as malnutrition, alcohol use, an
 Each year, **more** people die from air pollution–related disease than from road **traffic injuries** or **malaria**.
 
 <p align="center">
-  <img width="600" src="https://www.healtheffects.org/sites/default/files/SoGA-Figures-01.jpg">
+<img width="600" src="https://www.healtheffects.org/sites/default/files/SoGA-Figures-01.jpg">
 </p>
 
 The report also stated that:
 
->In 2017, air pollution is estimated to have contributed to close to 5 million
+> In 2017, air pollution is estimated to have contributed to close to 5 million
 deaths globally — nearly **1 in every 10 deaths**.
 
 ```{r, echo = FALSE, out.width="800px"}
@@ -288,7 +285,7 @@ knitr::include_graphics(here::here("img","2017deaths.png"))
 ```
 ##### [[source]](https://www.stateofglobalair.org/sites/default/files/soga_2019_fact_sheet.pdf){target="_blank"}
 
-The [State of Global Air 2018 report](https://www.stateofglobalair.org/sites/default/files/soga-2018-report.pdf){target="_blank"}  using data from 2016 which separated different types of air pollution, found that **particulate pollution was particularly associated with mortality**.
+The [State of Global Air 2018 report](https://www.stateofglobalair.org/sites/default/files/soga-2018-report.pdf){target="_blank"} using data from 2016 which separated different types of air pollution, found that **particulate pollution was particularly associated with mortality**.
 
 ```{r, echo = FALSE, out.width="800px"}
 knitr::include_graphics(here::here("img","2017mortality.png"))
@@ -296,13 +293,13 @@ knitr::include_graphics(here::here("img","2017mortality.png"))
 
 The 2019 report shows that the highest levels of fine particulate pollution occurs in Africa and Asia and that:
 
-> More than **90%** of people worldwide live in areas **exceeding** the World Health Organization (WHO) **Guideline** for healthy air. More than half live in areas that do not even meet WHO’s least-stringent air quality target.
+> More than **90%** of people worldwide live in areas **exceeding** the World Health Organization (WHO) **Guideline** for healthy air. More than half live in areas that do not even meet WHO's least-stringent air quality target.
 
 ```{r, echo = FALSE, out.width="800px"}
 knitr::include_graphics(here::here("img","PMworld.png"))
 ```
 
-Looking at the US specifically, air pollution levels are generally improving. The US Environmental Protection Agency (EPA) also releases a report about air pollution levels called [*Our Nation's Air*](https://gispub.epa.gov/air/trendsreport/2019/#home){target="_blank"}.
+Looking at the US specifically, air pollution levels are generally improving, with declining national air pollutant concentration averages as shown from the 2019 [*Our Nation's Air*](https://gispub.epa.gov/air/trendsreport/2019/#home){target="_blank"} report from the US Environmental Protection Agency (EPA): 
 
 ```{r, echo = FALSE}
 knitr::include_graphics(here::here("img", "US.png"))
@@ -310,29 +307,32 @@ knitr::include_graphics(here::here("img", "US.png"))
 
 ##### [[source]](https://gispub.epa.gov/air/trendsreport/2019/documentation/AirTrends_Flyer.pdf){target="_blank"}
 
-However, air pollution **continues to contribute to health risk for Americans**, in particular in **regions with higher than national average rates** of pollution that actually at time exceed the world health organization's recommended level. Thus it is necessary to obtain high spatial granularity in estimates of air pollution in order to identify locations where populations are experiencing harmful levels of exposure.
-
+However, air pollution **continues to contribute to health risk for Americans**, in particular in **regions with higher than national average rates** of pollution that actually at time exceed the WHO's recommended level. 
+Thus, it is important to obtain high spatial granularity in estimates of air pollution in order to identify locations where populations are experiencing harmful levels of exposure.
 
 You can see that current air quality conditions at this [website](https://aqicn.org/city/usa/){target="_blank"} and you will notice variation across different cities.
-
-Here were the conditions in Topeka Kansas when this was written:
+For example, here are the conditions in Topeka Kansas at the time this case study was created:
 
 ```{r, echo = FALSE}
 knitr::include_graphics(here::here("img", "Kansas.png"))
 ```
 
-It reports particulate values using what is called the [Air Quality Index](https://www.airnow.gov/index.cfm?action=aqibasics.aqi){target="_blank"} scale (AQI), this [calculator](https://airnow.gov/index.cfm?action=airnow.calculator){target="_blank"} indicates that 114 AQI is equivalent to 40.7 ug/m^3^ and is considered unhealthy for sensitive individuals. Thus some areas very much exceed the World Health Organization (WHO)  annual exposure guideline (10 ug/m^3^) at certain times and this may adversely affect the health of people living in these locations.
+It reports particulate values using what is called the [Air Quality Index](https://www.airnow.gov/index.cfm?action=aqibasics.aqi){target="_blank"} scale (AQI).
+This [calculator](https://airnow.gov/index.cfm?action=airnow.calculator){target="_blank"} indicates that 114 AQI is equivalent to 40.7 ug/m^3^ and is considered unhealthy for sensitive individuals.
+Thus, some areas exceed the WHO annual exposure guideline (10 ug/m^3^) at certain times and this may adversely affect the health of people living in these locations.
 
-Furthermore, adverse health effects have been associated with populations experiencing higher pollution exposure despite the levels being below suggested guidelines. Secondly, it appears that the composition of the particulate mater and the influence of other demographic factors may make specific populations more at risk for adverse health effects due to air pollution. See this [article](https://www.nejm.org/doi/full/10.1056/NEJMoa1702747){target="_blank"} for more details.
+Adverse health effects have been associated with populations experiencing higher pollution exposure despite the levels being below suggested guidelines. 
+Also, it appears that the composition of the particulate mater and the influence of other demographic factors may make specific populations more at risk for adverse health effects due to air pollution. 
+For example, see this [article](https://www.nejm.org/doi/full/10.1056/NEJMoa1702747){target="_blank"} for more details.
 
-The monitor data that we will use in this case study comes from a system of monitors in which roughly 90% are located within cities. Thus there is an **equity issue** in terms of capturing the air pollution levels of more rural areas. Therefore, to get a better sense of the pollution exposures for the individuals living in these areas, methods like machine learning can be very useful to estimate air pollution levels in **areas with little to no monitoring**.
-
-Indeed, machine learning methods are in fact used to be able to estimate air pollution in these low monitoring areas so that we can make a map like this where we have annual estimates for all of the contiguous US:
+The monitor data that we will use in this case study come from a system of monitors in which roughly 90% are located within cities. 
+Hence, there is an **equity issue** in terms of capturing the air pollution levels of more rural areas. 
+To get a better sense of the pollution exposures for the individuals living in these areas, methods like machine learning can be very useful to estimate air pollution levels in **areas with little to no monitoring**. 
+Specifically, these methods can be used to estimate air pollution in these low monitoring areas so that we can make a map like this where we have annual estimates for all of the contiguous US:
 
 <p align="center">
   <img width="600" src="https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/SAWOEGBXMVGQ7AS5PZ6UUOX6FY.png">
 </p>
-
 
 ##### [[source]](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.washingtonpost.com%2Fbusiness%2F2019%2F10%2F23%2Fair-pollution-is-getting-worse-data-show-more-people-are-dying%2F&psig=AOvVaw3v-ZDTBPnLP2MYtKf3Undj&ust=1585784479068000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCPCyn9fxxegCFQAAAAAdAAAAABAd){target="_blank"}
 
@@ -340,25 +340,31 @@ This is what we aim to achieve in this case study.
 
 ### Limitations
 
-There are some important considerations regarding this data analysis to keep in mind: 
+There are some important considerations regarding the data analysis in this case study to keep in mind: 
 
-1) The data in our analysis does not include information about the composition of particulate mater. Different types of particulates may be more benign or deleterious for health outcomes.
+1. The data do not include information about the composition of particulate mater. Different types of particulates may be more benign or deleterious for health outcomes.
 
-2) Outdoor pollution levels are not necessarily an indication of of individual exposures. People spend differing amounts of time indoors and outdoors and are exposed to different pollution levels indoors. People are now developing personal monitoring systems to track air pollution levels on the personal level.
+2. Outdoor pollution levels are not necessarily an indication of individual exposures. People spend differing amounts of time indoors and outdoors and are exposed to different pollution levels indoors. Researchers are now developing personal monitoring systems to track air pollution levels on the personal level.
 
-Our analysis will use annual mean estimates, however pollution levels can vary greatly by season, day and even hour. There are data sources that have finer levels of temporal data, however we are interested in long term exposures, as these appear to be the most influential for health outcomes, so we chose to use annual level data. 
+3. Our analysis will use annual mean estimates of pollution levels, but these can vary greatly by season, day and even hour. There are data sources that have finer levels of temporal data, however we are interested in long term exposures, as these appear to be the most influential for health outcomes, so we chose to use annual level data. 
 
 
 ## What are the data?
 
-In Machine Learning for prediction, there are two main types of variables:
+When using machine learning for prediction, there are two main types of variables of interest:
 
-1) Outcome variable
-2) Predictor variables
+1) An outcome variable
+2) A set of predictor (or explanatory) variable(s)
 
-The **outcome variable** is what are trying to **predict**. In building our model we actually have the outcome variable data, but we want to see how well our predictor variables can explain the variation in our outcome data. This gives us a sense of how well we can use the predictor variable data to predict our outcome variable levels when we in fact do not have data about the outcome.
+The **outcome variable** is what are trying to **predict**. 
+To build our model, we use both the outcome and predictor variable(s).
+The goal is to identify informative predictor variable(s) that can explain a large amount of variation in our outcome variable. 
+Using this model, we can then predict the outcome from new observations with the same predictor variable(s) where have not actually observed the outcome. 
 
-As a simpler example, imagine that we have data about the sales and characteristics of cars from last year and we want to predict which cars might sell well this year. We do not have the sales data yet for this year, but we do know the characteristics of our cars for this year. We can use a model of the characteristics that explained sales last year to estimate what cars might sell well this year. In this case, our outcome variable is the sale performance of the cars, while the different characteristics of the cars make up our predictor or explanatory variables.
+As a simple example, imagine that we have data about the sales and characteristics of cars from last year and we want to predict which cars might sell well this year. 
+We do not have the sales data yet for this year, but we do know the characteristics of our cars for this year. 
+We can build a model of the characteristics that explained sales last year to estimate what cars might sell well this year. 
+In this case, our outcome variable is the sales of cars, while the different characteristics of the cars make up our predictor variables.
 
 In this case study, we will evaluate air pollution monitor data of fine particulate mater (PM~2.5~) in the contiguous US from 2008, as well as data about population density, road density, urbanization levels, and NASA satellite data to develop models to predict localized air pollution levels. 
 
@@ -388,7 +394,7 @@ Gravimetric analysis is also used for [emission testing](https://www.mt.com/us/e
 
 There are [other monitoring systems](https://www.sensirion.com/en/about-us/newsroom/sensirion-specialist-articles/particulate-matter-sensing-for-air-quality-measurements/){target="_blank"} that can provide hourly measurements, but we will not be using data from these monitors in our analysis. Gravimetric analysis is considered to be among the most accurate methods.
 
-In our csv, the **value** column indicates the PM~2.5~ monitor average for 2008 in mass of fine particles/volume of air for 876 gravimetric monitors. The units are micro grams of fine particulate mater (PM) that is less than 2.5 micrometers in diameter per cubic meter of air - mass concentration (ug/m^3^).  Recall the the WHO exposure  guideline is < 10 ug/m^3^ on average annually for PM~2.5~.
+In our csv, the **value** column indicates the PM~2.5~ monitor average for 2008 in mass of fine particles/volume of air for 876 gravimetric monitors. The units are micro grams of fine particulate mater (PM) that is less than 2.5 micrometers in diameter per cubic meter of air - mass concentration (ug/m^3^).  Recall the WHO exposure  guideline is < 10 ug/m^3^ on average annually for PM~2.5~.
 
 ### Our predictor variables
 
@@ -891,7 +897,7 @@ The `ggcorrplot` package is also very useful.
 ggcorrplot(PM_cor, hc.order = TRUE, type = "lower", tl.cex = 5)
 ```
 
-We can see that the the development variables (imp) variables are correlated with each other as we might expect. We also see that the road density variables seem to be correlated with each other, and the emission variables seem to be correlated with each other. We can take a closer look  using the `ggcorr()` function and the `ggpairs()` function of the `GGally` package. To select our variables of interest we can use the `select()` function with the `contains()` function of the `tidyr` package. 
+We can see that the development variables (imp) variables are correlated with each other as we might expect. We also see that the road density variables seem to be correlated with each other, and the emission variables seem to be correlated with each other. We can take a closer look  using the `ggcorr()` function and the `ggpairs()` function of the `GGally` package. To select our variables of interest we can use the `select()` function with the `contains()` function of the `tidyr` package. 
 
 First let's look at the imp/development variables. 
 ```{r, out.width = "400px"}
