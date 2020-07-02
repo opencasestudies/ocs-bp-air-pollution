@@ -43,7 +43,8 @@ knitr::include_graphics(here::here("img", "main_plot_maps.png"))
 
 ## {.disclaimer_block}
 
-**Disclaimer**: The purpose of the [Open Case Studies](https://opencasestudies.github.io){target="_blank"} project is **to demonstrate the use of various data science methods, tools, and software in the context of messy, real-world data**. A given case study does not cover all aspects of the research process, is not claiming to be the most appropriate way to analyze a given data set, and should not be used in the context of making policy decisions without external consultation from scientific experts. 
+**Disclaimer**: The purpose of the [Open Case Studies](https://opencasestudies.github.io){target="_blank"} project is **to demonstrate the use of various data science methods, tools, and software in the context of messy, real-world data**. 
+A given case study does not cover all aspects of the research process, is not claiming to be the most appropriate way to analyze a given data set, and should not be used in the context of making policy decisions without external consultation from scientific experts. 
 
 ## Motivation
 A variety of different sources contribute different types of pollutants to what we call air pollution. 
@@ -62,7 +63,7 @@ Some sources are natural while others are anthropogenic (human derived):
 3) **Dust** - small solids (larger than particulates) that can be suspended in the air for some time but eventually settle
 4) **Biological** - pollen, bacteria, viruses, mold spores
 
-See [here])http://www.redlogenv.com/worker-safety/part-1-dust-and-particulate-matter) for more detail on the types of pollutants in the air.
+See [here](http://www.redlogenv.com/worker-safety/part-1-dust-and-particulate-matter) for more detail on the types of pollutants in the air.
 
 
 #### Particulate pollution 
@@ -92,7 +93,7 @@ knitr::include_graphics(here::here("img", "pm2.5_scale_graphic-color_2.jpg"))
 <!-- </p> -->
 
 
-<u>The following plot and table show the relative sizes of these different pollutants in micrometers(µm):</u>
+<u>The following plot and table show the relative sizes of these different pollutants in micrometers (µm):</u>
 
 <p align="center">
   <img width="600" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Airborne-particulate-size-chart.svg/800px-Airborne-particulate-size-chart.svg.png">
@@ -117,21 +118,23 @@ knitr::include_graphics(here::here("img", "pm2.5_scale_graphic-color_2.jpg"))
 ##### [[source]](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full){target="_blank"}
 
 
-#### Negative Impact of Particulate Exposure on Health 
+#### Negative impact of particulate exposure on health 
 
 Exposure to air pollution is associated with higher rates of [mortality](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5783186/){target="_blank"} in older adults and is known to be a risk factor for many diseases and conditions including but not limited to:
 
 1) [Asthma](https://www.ncbi.nlm.nih.gov/pubmed/29243937){target="_blank"} - fine particle exposure (**PM~2.5~**) was found to be associated with higher rates of asthma in children
-2) [Inflammation in type 1 diabetes](https://www.ncbi.nlm.nih.gov/pubmed/31419765){target="_blank"} - fine particle exposure (**PM~2.5~**) from traffic-related air pollution was associated with increased measures of inflammatory markers in youths with type 1 diabetes
+2) [Inflammation in type 1 diabetes](https://www.ncbi.nlm.nih.gov/pubmed/31419765){target="_blank"} - fine particle exposure (**PM~2.5~**) from traffic-related air pollution was associated with increased measures of inflammatory markers in youths with Type 1 diabetes
 3) [Lung function and emphysema](https://www.ncbi.nlm.nih.gov/pubmed/31408135){target="_blank"} - higher concentrations of ozone (O~3~), nitrogen oxides (NO~x~), black carbon, and fine particle exposure **PM~2.5~** , at study baseline were significantly associated with greater increases in percent emphysema per 10 years 
 4) [Low birthweight](https://www.ncbi.nlm.nih.gov/pubmed/31386643){target="_blank"} - fine particle exposure(**PM~2.5~**) was associated with lower birth weight in full-term live births
 5) [Viral Infection](https://www.tandfonline.com/doi/full/10.1080/08958370701665434){target="_blank"} - higher rates of infection and increased severity of infection are associated with higher exposures to pollution levels including fine particle exposure (**PM~2.5~**)
 
 See this [review article](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full){target="_blank"} for more information about sources of air pollution and the influence of air pollution on health.
 
-#### Sparse Monitoring is Problematic for Public Health
+#### Sparse monitoring is problematic for Public Health
 
-Historically epidemiological studies would assess the influence of air pollution on health outcomes by relying on a number of monitors located around the country. However as can be seen in the following figure, these monitors remain to be relatively sparse in certain regions of the country. Furthermore, dramatic differences in pollution rates can be seen even within the same city.
+Historically, epidemiological studies would assess the influence of air pollution on health outcomes by relying on a number of monitors located around the country. 
+However, as can be seen in the following figure, these monitors are relatively sparse in certain regions of the country. 
+Furthermore, dramatic differences in pollution rates can be seen even within the same city.
 
 <p align="center">
   <img width="400" src="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4137272/bin/1476-069X-13-63-1.jpg">
@@ -142,9 +145,9 @@ Historically epidemiological studies would assess the influence of air pollution
 This lack of granularity in air pollution monitoring has hindered our ability to discern the full impact of air pollution on health and to identify at-risk locations. 
 
 
-#### Machine Learning Offers a Solution
+#### Machine learning offers a solution
 
-An [article](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63){target="_blank"} published in the *Environmental Health* journal dealt with this issue by using data about population density, road density, among other features to model or predict air pollution levels at a more localized scale using machine learning methods. 
+An [article](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63){target="_blank"} published in the *Environmental Health* journal dealt with this issue by using data, including population density, road density, among other features, to model or predict air pollution levels at a more localized scale using machine learning methods. 
 
 ```{r, echo = FALSE, out.width= "800 px"}
 knitr::include_graphics(here::here("img", "thepaper.png"))
@@ -168,10 +171,11 @@ county-specific ambient concentrations."
 knitr::include_graphics(here::here("img", "deaths.png"))
 ```
 
-The article above explains that machine learning methods can be used to predict air pollution levels when traditional monitoring systems are not available in a particular area or when there is not enough spatial granularity with current monitoring systems. We will use similar methods to predict annual air pollution levels spatially within the US.
+The article above demonstrates that machine learning methods can be used to predict air pollution levels when traditional monitoring systems are not available in a particular area or when there is not enough spatial granularity with current monitoring systems. 
+We will use similar methods to predict annual air pollution levels spatially within the US.
 
 
-### Main Questions
+### Main Question
 
 #### {.main_question_block}
 <b><u> Our main question: </u></b>
@@ -182,7 +186,7 @@ The article above explains that machine learning methods can be used to predict 
 
 ### Learning Objectives 
 
-In this case study, we will walk you through importing data from CSV files and performing machine learning methods to predict our outcome variable of interest (in this case annual fine particle air pollution estimates). We will especially focus on using packages and functions from the [`Tidyverse`](https://www.tidyverse.org/){target="_blank"}, and more specifically the [`tidymodels`](https://cran.r-project.org/web/packages/tidymodels/tidymodels.pdf){target="_blank"} package/ecosystem primarily developed and maintained by [Max Kuhn](https://resources.rstudio.com/authors/max-kuhn){target="_blank"} and [Davis Vaughan](https://resources.rstudio.com/authors/davis-vaughan){target="_blank"}. This package loads more modeling related packages like `rsample`, `recipes`, `parsnip`, `yardstick`,  and `dials`. We will also briefly cover the `workflows` and `tune` packages. The tidyverse is a library of packages created by RStudio. While some students may be familiar with previous R programming packages, these packages make data science in R especially efficient.
+In this case study, we will walk you through importing data from CSV files and performing machine learning methods to predict our outcome variable of interest (in this case annual fine particle air pollution estimates). We will especially focus on using packages and functions from the [`tidyverse`](https://www.tidyverse.org/){target="_blank"}, and more specifically the [`tidymodels`](https://cran.r-project.org/web/packages/tidymodels/tidymodels.pdf){target="_blank"} package/ecosystem primarily developed and maintained by [Max Kuhn](https://resources.rstudio.com/authors/max-kuhn){target="_blank"} and [Davis Vaughan](https://resources.rstudio.com/authors/davis-vaughan){target="_blank"}. This package loads more modeling related packages like `rsample`, `recipes`, `parsnip`, `yardstick`,  and `dials`. We will also briefly cover the `workflows` and `tune` packages. The tidyverse is a library of packages created by RStudio. While some students may be familiar with previous R programming packages, these packages make data science in R especially efficient.
 
 
 ```{r, out.width = "20%", echo = FALSE, fig.align ="center"}
@@ -207,7 +211,7 @@ library(corrplot)
 library(RColorBrewer)
 library(ggcorrplot)
 library(GGally)
-library(tidymodels)# broom, dials, infer, parsnip, purrr, recipes, rsample, tibble, yardstick
+library(tidymodels)
 library(workflows)
 library(vip)
 library(tune)
@@ -235,6 +239,7 @@ library(cowplot)
 [corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
 [ggcorrplot](http://www.sthda.com/english/wiki/ggcorrplot-visualization-of-a-correlation-matrix-using-ggplot2){target="_blank"} | also to make large correlation plots
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
+[tidymodels](https://www.tidymodels.org){target="_blank"} | to load in a set of packages (broom, dials, infer, parsnip, purrr, recipes, rsample, tibble, yardstick)
 [rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets; to split the training set for cross-validation  
 [recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `juice()` - extracts final preprocessed training data and `bake()` - applies recipe steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
 [parsnip](https://tidymodels.github.io/parsnip/){target="_blank"}   | an interface to create models (major functions are `fit()`, `set_engine()`)
@@ -257,7 +262,8 @@ library(cowplot)
 ___
 
 
-The first time we use a function, we will use the `::` to indicate which package we are using. Unless we have overlapping function names, this is not necessary, but we will include it here to be informative about where the functions we will use come from.
+The first time we use a function, we will use the `::` to indicate which package we are using. 
+Unless we have overlapping function names, this is not necessary, but we will include it here to be informative about where the functions we will use come from.
 
 
 ### Context
@@ -275,6 +281,8 @@ Each year, **more** people die from air pollution–related disease than from ro
 <img width="600" src="https://www.healtheffects.org/sites/default/files/SoGA-Figures-01.jpg">
 </p>
 
+##### [[source]](https://www.stateofglobalair.org/sites/default/files/soga_2019_report.pdf){target="_blank"}
+
 The report also stated that:
 
 > In 2017, air pollution is estimated to have contributed to close to 5 million
@@ -283,6 +291,7 @@ deaths globally — nearly **1 in every 10 deaths**.
 ```{r, echo = FALSE, out.width="800px"}
 knitr::include_graphics(here::here("img","2017deaths.png"))
 ```
+
 ##### [[source]](https://www.stateofglobalair.org/sites/default/files/soga_2019_fact_sheet.pdf){target="_blank"}
 
 The [State of Global Air 2018 report](https://www.stateofglobalair.org/sites/default/files/soga-2018-report.pdf){target="_blank"} using data from 2016 which separated different types of air pollution, found that **particulate pollution was particularly associated with mortality**.
@@ -298,6 +307,8 @@ The 2019 report shows that the highest levels of fine particulate pollution occu
 ```{r, echo = FALSE, out.width="800px"}
 knitr::include_graphics(here::here("img","PMworld.png"))
 ```
+
+##### [[source]](https://www.stateofglobalair.org/sites/default/files/soga_2019_fact_sheet.pdf){target="_blank"}
 
 Looking at the US specifically, air pollution levels are generally improving, with declining national air pollutant concentration averages as shown from the 2019 [*Our Nation's Air*](https://gispub.epa.gov/air/trendsreport/2019/#home){target="_blank"} report from the US Environmental Protection Agency (EPA): 
 
@@ -317,9 +328,9 @@ For example, here are the conditions in Topeka Kansas at the time this case stud
 knitr::include_graphics(here::here("img", "Kansas.png"))
 ```
 
-It reports particulate values using what is called the [Air Quality Index](https://www.airnow.gov/index.cfm?action=aqibasics.aqi){target="_blank"} scale (AQI).
+It reports particulate values using what is called the [Air Quality Index](https://www.airnow.gov/index.cfm?action=aqibasics.aqi){target="_blank"} (AQI).
 This [calculator](https://airnow.gov/index.cfm?action=airnow.calculator){target="_blank"} indicates that 114 AQI is equivalent to 40.7 ug/m^3^ and is considered unhealthy for sensitive individuals.
-Thus, some areas exceed the WHO annual exposure guideline (10 ug/m^3^) at certain times and this may adversely affect the health of people living in these locations.
+Thus, some areas exceed the WHO annual exposure guideline (10 ug/m^3^) and this may adversely affect the health of people living in these locations.
 
 Adverse health effects have been associated with populations experiencing higher pollution exposure despite the levels being below suggested guidelines. 
 Also, it appears that the composition of the particulate mater and the influence of other demographic factors may make specific populations more at risk for adverse health effects due to air pollution. 
@@ -327,7 +338,7 @@ For example, see this [article](https://www.nejm.org/doi/full/10.1056/NEJMoa1702
 
 The monitor data that we will use in this case study come from a system of monitors in which roughly 90% are located within cities. 
 Hence, there is an **equity issue** in terms of capturing the air pollution levels of more rural areas. 
-To get a better sense of the pollution exposures for the individuals living in these areas, methods like machine learning can be very useful to estimate air pollution levels in **areas with little to no monitoring**. 
+To get a better sense of the pollution exposures for the individuals living in these areas, methods like machine learning can be useful to estimate air pollution levels in **areas with little to no monitoring**. 
 Specifically, these methods can be used to estimate air pollution in these low monitoring areas so that we can make a map like this where we have annual estimates for all of the contiguous US:
 
 <p align="center">
@@ -357,9 +368,9 @@ When using machine learning for prediction, there are two main types of variable
 2) A set of predictor (or explanatory) variable(s)
 
 The **outcome variable** is what are trying to **predict**. 
-To build our model, we use both the outcome and predictor variable(s).
+To build (or train) our model, we use both the outcome and predictor variable(s).
 The goal is to identify informative predictor variable(s) that can explain a large amount of variation in our outcome variable. 
-Using this model, we can then predict the outcome from new observations with the same predictor variable(s) where have not actually observed the outcome. 
+Using this model, we can then predict the outcome from new observations with the same predictor variable(s) where have not observed the outcome. 
 
 As a simple example, imagine that we have data about the sales and characteristics of cars from last year and we want to predict which cars might sell well this year. 
 We do not have the sales data yet for this year, but we do know the characteristics of our cars for this year. 
@@ -367,7 +378,7 @@ We can build a model of the characteristics that explained sales last year to es
 In this case, our outcome variable is the sales of cars, while the different characteristics of the cars make up our predictor variables.
 
 In this case study, we want to **predict** air pollution levels. 
-To build this machine learningmodel, our **outcome variable** is fine particulate mater (PM~2.5~) captured from air pollution monitors in the contiguous US from 2008. 
+To build this machine learning model, our **outcome variable** is fine particulate mater (PM~2.5~) captured from air pollution monitors in the contiguous US from 2008. 
 Our **predictor variables* include data about population density, road density, urbanization levels, and NASA satellite data. 
 Using this model, we predict air pollution in new areas where there are no monitors. 
 
@@ -387,27 +398,28 @@ knitr::include_graphics(here::here("img","filter.png"))
 
 ##### [[source]](https://publiclab.org/wiki/filter-pm){target="_blank"}
 
-The weight of this matter is manually measured daily or weekly. 
+The weight of this particulate matter is manually measured daily or weekly. 
 For the EPA standard operating procedure for PM gravimetric analysis in 2008, we refer the reader to [here](https://www3.epa.gov/ttnamti1/files/ambient/pm25/spec/RTIGravMassSOPFINAL.pdf){target="_blank"}.
 
-For more on Gravimetric analysis, you can expand here. 
+<details><summary>For more on Gravimetric analysis, you can expand here </summary>
 
 Gravimetric analysis is also used for [emission testing](https://www.mt.com/us/en/home/applications/Laboratory_weighing/emissions-testing-particulate-matter.html){target="_blank"}. 
 The same idea applies: a fresh filter is applied and the desired amount of time passes, then the filter is removed and weighed. 
 
 There are [other monitoring systems](https://www.sensirion.com/en/about-us/newsroom/sensirion-specialist-articles/particulate-matter-sensing-for-air-quality-measurements/){target="_blank"} that can provide hourly measurements, but we will not be using data from these monitors in our analysis. 
-Gravimetric analysis is considered to be among the most accurate methods.
+Gravimetric analysis is considered to be among the most accurate methods for measuring particulate matter.
+
+</details>
 
 In our dataset, the `value` column indicates the PM~2.5~ monitor average for 2008 in mass of fine particles/volume of air for 876 gravimetric monitors. 
-The units are micro grams of fine particulate mater (PM) that is less than 2.5 micrometers in diameter per cubic meter of air - mass concentration (ug/m^3^).
-Recall the WHO exposure  guideline is < 10 ug/m^3^ on average annually for PM~2.5~.
+The units are micrograms of fine particulate mater (PM) that is less than 2.5 micrometers in diameter per cubic meter of air - mass concentration (ug/m^3^).
+Recall the WHO exposure guideline is < 10 ug/m^3^ on average annually for PM~2.5~.
 
 ### Our predictor variables
 
 There are 48 predictor variables with values for each of the 876 monitors included in our outcome variable. The data comes from the US [Enivornmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}, the [National Aeronautics and Space Administration (NASA)](https://www.nasa.gov/){target="_blank"}, the US [Census](https://www.census.gov/about/what/census-at-a-glance.html){target="_blank"}, and the [National Center for Health Statistics (NCHS)](https://www.cdc.gov/nchs/about/index.htm){target="_blank"}.
 
-<details><summary> Click here to see a table about the variables </summary>
-
+<details><summary> Click here to see a table about the set of predictor variables </summary>
 
 Variable   | Details                                                                        
 ---------- |-------------
@@ -463,7 +475,6 @@ Variable   | Details
 
 </details>
 
-
 Many of these predictor variables have to do with the circular area around the monitor called the "buffer". These are illustrated in the following figure:
 
 ```{r, echo = FALSE, out.width = "800px",}
@@ -478,15 +489,17 @@ knitr::include_graphics(here::here("img", "regression.png"))
 
 We have one CSV file that contains both our single **outcome variable** and all of our **predictor variables**.
 
-Let's import our data into R now so that we can explore the data further. We will call our data object `pm` for particulate matter.
+Next, we import our data into R now so that we can explore the data further. 
+We will call our data object `pm` for particulate matter. 
+We import the data using the `read_csv` function from the `readr` package. 
 
 ```{r}
-pm <-readr::read_csv(here("docs", "pm25_data.csv"))
+pm <- readr::read_csv(here("docs", "pm25_data.csv"))
 ```
 
 ## Data Exploration and Wrangling
 
-The first step in performing a machine learning analysis is to explore the data to better understand the variables  included in the data, as we may learn about important details about the data that we should keep in mind as we try to predict our outcome variable.
+The first step in performing a machine learning analysis is to explore the data to better understand the variablesincluded in the data, as we may learn about important details about the data that we should keep in mind as we try to predict our outcome variable.
 
 First let's just get a general sense of our data. We can do that using the `glimpse()` function of the `dplyr` package (it is also in the `tibble` package).
 
