@@ -491,7 +491,7 @@ We have one CSV file that contains both our single **outcome variable** and all 
 
 Next, we import our data into R now so that we can explore the data further. 
 We will call our data object `pm` for particulate matter. 
-We import the data using the `read_csv` function from the `readr` package. 
+We import the data using the `read_csv()` function from the `readr` package. 
 
 ```{r}
 pm <- readr::read_csv(here("docs", "pm25_data.csv"))
@@ -499,13 +499,19 @@ pm <- readr::read_csv(here("docs", "pm25_data.csv"))
 
 ## Data Exploration and Wrangling
 
-The first step in performing a machine learning analysis is to explore the data to better understand the variablesincluded in the data, as we may learn about important details about the data that we should keep in mind as we try to predict our outcome variable.
+The first step in performing any data analysis is to explore the data. 
+For example, we might want to better understand the variables included in the data, as we may learn about important details about the data that we should keep in mind as we try to predict our outcome variable.
 
-First let's just get a general sense of our data. We can do that using the `glimpse()` function of the `dplyr` package (it is also in the `tibble` package).
+First, let's just get a general sense of our data. 
+We can do that using the `glimpse()` function of the `dplyr` package (it is also in the `tibble` package).
 
-We will also use the `%>%` pipe which can be used to define the input for later sequential steps. This will make more sense when we have multiple sequential steps using the same data object. To use the pipe notation we need to install and load dplyr as well.
+We will also use the `%>%` pipe, which can be used to define the input for later sequential steps. 
+This will make more sense when we have multiple sequential steps using the same data object. 
+To use the pipe notation we need to install and load `dplyr` as well.
 
-For example here we will first grab the `pm` data object, then we use the `glimpse()` function on it based on the pipe notation.
+For example, here we start with `pm` data object and "pipe" the object into as input into the `glimpse()` function. 
+The output is is an overview of what is in the `pm` object such as the number of rows and columns, all the column names, the data types for each column and the first view values in each column. 
+The output below is scrollable so you can see everything from the `glimpse()` function. 
 
 #### {.scrollable }
 
@@ -517,11 +523,19 @@ pm %>%
 
 ####
 
-We can see that there are 876 monitors and that we have 50 total variables - one of which is the outcome. In this case our outcome variable is called `value`. 
+We can see that there are 876 monitors (rows) and that we have 50 total variables (columns) - one of which is the outcome variable. In this case, the outcome variable is called `value`. 
 
-Notice that some of the variables that we would think of as factors (categorical) are currently of class double as indicated by the `<dbl>` just to the right of the column names/variable names in the `glimpse()` output. For example the monitor ID (id), the Federal Information Processing Standard number for the county where the monitor was located (fips), as well as the zcta
+AVOCADO: Should we link to a code book here? Like could we use this as a teaching opportunity to demonstrate the purpose of a code book so a student knows how we know the PM values are `value`? 
 
-Let's convert these variables into factors. We can do this using the `mutate_at()` function of the `dplyr` package and the `as.factor()` base function. 
+Notice that some of the variables that we would think of as factors (or categorical data) are currently of class double as indicated by the `<dbl>` just to the right of the column names/variable names in the `glimpse()` output. 
+For example, the monitor ID (`id`), the Federal Information Processing Standard number for the county where the monitor was located (`fips`), as well as the zip code tabulation area (`zcta`). 
+
+AVOCADO: should we explain what we mean by a "double" data type? I think factor and character are more understandable? But maybe we should explain those too? 
+
+Let's convert these variables into factors. 
+We can do this using the `mutate_at()` function of the `dplyr` package and the `as.factor()` base function. 
+
+AVOCADO: Should we use `across()` instead of `mutate_at()`? https://dplyr.tidyverse.org/reference/mutate_all.html 
 
 In this case we are also using the magrittr assignment pipe or double pipe that looks like this `%<>%` of the `magrittr` package. This allows us use the `pm` data as input but also reassign the output to the same data object name.
 
