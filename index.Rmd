@@ -537,8 +537,8 @@ We can do this using the `mutate_at()` function of the `dplyr` package and the `
 
 AVOCADO: Should we use `across()` instead of `mutate_at()`? https://dplyr.tidyverse.org/reference/mutate_all.html 
 
-In this case we are also using the magrittr assignment pipe or double pipe that looks like this `%<>%` of the `magrittr` package. This allows us use the `pm` data as input but also reassign the output to the same data object name.
-
+In this case we are also using the `magrittr` assignment pipe or double pipe that looks like this `%<>%` of the `magrittr` package. 
+This allows us use the `pm` data as input, but also reassigns the output to the same data object name.
 
 #### {.scrollable }
 
@@ -557,6 +557,8 @@ Great! Now we can see that these variables are now factors as indicated by `<fct
 ### Packages to get a sense of the data
 
 The `skim()` function of the `skimr` package is also really helpful for getting a general sense of your data.
+By design, it provies summary statistics about variables in the dataset. 
+designed to provide summary statistics about variables. 
 
 
 #### {.scrollable }
@@ -567,9 +569,18 @@ skim(pm)
 ```
 
 ####
-Notice how there is a column called `n_missing` about the number of values that are missing. It looks like our data is very complete and we do not have any missing data. This is also indicated by the `complete_rate` variable, which shows the ratio of completeness, in our case all variables have a value of 1 indicating they are fully complete.
 
-The `n_unqiue` column shows us the number of unique values for each of our columns. We can see that there are 49 states represented in the data, and we know that the data should be of the contiguous states. Let's take a look to see which states are included:
+Notice how there is a column called `n_missing` about the number of values that are missing. 
+This is also indicated by the `complete_rate` variable (or missing/number of observations). 
+In our dataset, it looks like our data do not contain any missing data. 
+
+Also notice how the function provides separate tables of summary statistics for each data type: character, factor and numeric. 
+
+Next, the `n_unqiue` column shows us the number of unique values for each of our columns. 
+We can see that there are 49 states represented in the data, and we know that the data should be of the contiguous states. (AVOCADO: how do we know it's only the contiguous states?)
+Let's take a look to see which states are included:
+
+AVOCADO: I'm not sure I understand why the `print(n = 1e3)` is needed below? It looks the same if I remove the code? I was going to just deleted, but left an avocado as a sanity check in case I'm missing something? 
 
 #### {.scrollable }
 ```{r}
@@ -580,7 +591,10 @@ pm %>%
 ```
 ####
 
-Looks like "District of Columbia" is being included as a state. We can see that indeed Alaska and Hawaii are not included in the data.
+Ah, it looks like "District of Columbia" is being included as a state. 
+We can see that indeed Alaska and Hawaii are not included in the data.
+
+AVOCADO: do you think we need two summary functions or is 1 enough? 
 
 Here is another method of looking at the data using the `dfSummary()` function of the `summarytools`package. We need to copy and paste the output into the rmarkdown.
 
@@ -897,61 +911,83 @@ dfSummary(pm, plain.ascii = FALSE, style = "grid",
 
 </details>
 
-We can see that for many variables there are many low values as the distribution shows two peaks, one near zero and another with a higher value. This is true for the imp variables (measures of development), the nei variables (measures of emission sources) and the road density variables. We can also see that the range of some of the variables is very large, in particular the area and population related variables.
+We can see that for many variables there are many low values as the distribution shows two peaks, one near zero and another with a higher value. 
+This is true for the `imp` variables (measures of development), the `nei` variables (measures of emission sources) and the road density variables. 
+We can also see that the range of some of the variables is very large, in particular the area and population related variables.
 
 ### Evaluate correlation among possible predictors
+
 In prediction analyses, it is also useful to evaluate if any of the variables are correlated.
+
+AVOCADO: maybe we should add an explanation of why we would care about correlated variables in a model? 
 
 Intuitively we can expect some of our variables to be correlated.
 
 Let's first take a look at all of our numeric variabels with the`corrplot` package:
-The `corrplot` package is another option to look at correlation among possible predictors. This is a great option if we have many predictors. 
-First we need to create a correlation matrix using the `cor()` function of the `stats` package (which is loaded automatically).
+The `corrplot` package is another option to look at correlation among possible predictors, and particularly useful if we have many predictors. 
+First, we calculate the Pearson correlation coefficients between all predictor variables pairwise using the `cor()` function of the `stats` package (which is loaded automatically). Then we use the `corrplot::corrplot()` function. 
 
 ```{r}
-
 PM_cor <- cor(pm %>% dplyr::select_if(is.numeric))
-
 corrplot::corrplot(PM_cor, tl.cex = 0.5)
+```
+The `tl.cex = 0.5` argument controls the size of the text label. 
 
-## here we can see absolute values
-corrplot(abs(PM_cor), order = "AOE", tl.cex = 0.5,  cl.lim = c(0, 1))
+We can also plot the absolute value of the Pearson correlation coefficients using the `abs()` function from base R and change the order of the columns.  
+```{r}
+corrplot(abs(PM_cor), order = "AOE", tl.cex = 0.5, cl.lim = c(0, 1))
+```
+AVOCADO: I read the help file, but I'm still not sure what "AOE" means? Either, I think if we change a default parameter argument, then we should explain it here. 
 
-#library(RColorBrewer) #need this package for the color
-corrplot(PM_cor, diag = FALSE, order = "FPC",
-         tl.pos = "td", tl.cex = 0.5, method = "color", type = "upper", col = brewer.pal(n = 8, name = "PuOr"))
+The `cl.lim = c(0, 1)` argument limits the color label to be between 0 and 1. 
 
+Next, we can change the visualization method (`method = "color"`) with colored 
+boxes, only show the upper half of the plot (`type = "upper"`) without the diagnoal 
+(`diag = FALSE), change the order of the columns (`order = "FPC"`), and change
+the color palatte using the `RColorBrewer` package. 
+
+```{r}
+corrplot(PM_cor, method = "color",  type = "upper", 
+         diag = FALSE, order = "FPC", tl.cex = 0.5,  
+         col = RColorBrewer::brewer.pal(n = 8, name = "PuOr"))
 ```
 
-Also notice that none of the predictors are highly correlated with our outcome variable(`value`).
+Also notice that none of the predictors are highly correlated with our outcome variable (`value`).
 
-The `ggcorrplot` package is also very useful.
+The `ggcorrplot()` function from the `ggcorrplot` package is also very useful.
 ```{r}
 ggcorrplot(PM_cor, hc.order = TRUE, type = "lower", tl.cex = 5)
 ```
 
-We can see that the development variables (imp) variables are correlated with each other as we might expect. We also see that the road density variables seem to be correlated with each other, and the emission variables seem to be correlated with each other. We can take a closer look  using the `ggcorr()` function and the `ggpairs()` function of the `GGally` package. To select our variables of interest we can use the `select()` function with the `contains()` function of the `tidyr` package. 
+AVOCADO: So I think if we introduce more than one package to do a similar task, I think we have to explain what's the adv or disadv of both. Otherwise, it feels like we are just showing the student to just show them but without clear guidance on when to use which function? 
 
-First let's look at the imp/development variables. 
+We can see that the development variables (`imp`) variables are correlated with each other as we might expect. 
+We also see that the road density variables seem to be correlated with each other, and the emission variables seem to be correlated with each other. 
+We can take a closer look  using the `ggcorr()` function and the `ggpairs()` function of the `GGally` package. 
+To select our variables of interest we can use the `select()` function with the `contains()` function of the `tidyr` package. 
+
+First let's look at the `imp`/development variables. 
+We can change the default color palette (`palette = "RdBu"`) and add on 
+correlation coefficients to the plot (`label = TRUE`).
+
 ```{r, out.width = "400px"}
 select(pm, contains("imp")) %>%
   ggcorr(palette = "RdBu", label = TRUE)
 
 select(pm, contains("imp")) %>%
   ggpairs()
-  
 ```
 
-Indeed, we can see that imp_a1000 and imp_a500 are perfectly correlated, as well as imp_a10000, imp_a15000.
 
 
-Now let's take a look at the road density data:
+Indeed, we can see that `imp_a1000` and `imp_a500` are highly correlated, as well as `imp_a10000`, `imp_a15000`.
+
+Next, let's take a look at the road density data:
 
 ```{r, fig.weight=12}
 select(pm, contains("pri")) %>%
-  ggcorr(palette = "RdBu",  hjust = .85, size = 3,
+  ggcorr(palette = "RdBu", hjust = .85, size = 3,
        layout.exp=2, label = TRUE)
-
 ```
 
 We can see that many of the road density variables are highly correlated with one another, while others are less so.
@@ -960,48 +996,50 @@ Finally let's look at the emission variables.
 
 ```{r}
 select(pm, contains("nei")) %>%
-  ggcorr(palette = "RdBu",  hjust = .85, size = 3,
+  ggcorr(palette = "RdBu", hjust = .85, size = 3,
        layout.exp=2, label = TRUE)
 
 select(pm, contains("nei")) %>%
   ggpairs()
 ```
 
-We would also expect the population density data might correlate with some of these variables. Let's take a look.
+We would also expect the population density data might correlate with some of these variables. 
+Let's take a look.
 
 ```{r}
 pm %>%
-select(log_nei_2008_pm25_sum_10000, popdens_county, log_pri_length_10000, imp_a10000) %>%
+select(log_nei_2008_pm25_sum_10000, popdens_county, 
+       log_pri_length_10000, imp_a10000) %>%
   ggcorr(palette = "RdBu",  hjust = .85, size = 3,
        layout.exp=2, label = TRUE)
 
 pm %>%
-select(log_nei_2008_pm25_sum_10000, popdens_county, log_pri_length_10000, imp_a10000, county_pop) %>%
+select(log_nei_2008_pm25_sum_10000, popdens_county, 
+       log_pri_length_10000, imp_a10000, county_pop) %>%
   ggpairs()
 ```
 
 
 Interesting, so these variables don't appear to be highly correlated, therefore we might need variables from each of the categories to predict our monitor PM~2.5~ pollution values.
 
-We seem to have some pretty extreme population values though, so let's see what happens when we take the log value.
-
+Becauses some variables in our data have extreme values, it might be good to take a log transformation. This can affect our estimates of correlation. 
 ```{r}
 pm %>%
   mutate(log_popdens_county= log(popdens_county)) %>%
-select(log_nei_2008_pm25_sum_10000, log_popdens_county, log_pri_length_10000, imp_a10000) %>%
+select(log_nei_2008_pm25_sum_10000, log_popdens_county, 
+       log_pri_length_10000, imp_a10000) %>%
   ggcorr(palette = "RdBu",  hjust = .85, size = 3,
        layout.exp=2, label = TRUE)
 
 pm %>%
   mutate(log_popdens_county= log(popdens_county)) %>%
   mutate(log_pop_county = log(county_pop)) %>%
-select(log_nei_2008_pm25_sum_10000, log_popdens_county, log_pri_length_10000, imp_a10000, log_pop_county) %>%
+select(log_nei_2008_pm25_sum_10000, log_popdens_county, 
+       log_pri_length_10000, imp_a10000, log_pop_county) %>%
   ggpairs()
 ```
 
 Indeed this increased the correlation, but variables from each of these categories may still prove to be useful for prediction.
-
-
 
 
 ## Data Analysis
