@@ -360,26 +360,37 @@ There are some important considerations regarding the data analysis in this case
 3. Our analysis will use annual mean estimates of pollution levels, but these can vary greatly by season, day and even hour. There are data sources that have finer levels of temporal data, however we are interested in long term exposures, as these appear to be the most influential for health outcomes, so we chose to use annual level data. 
 
 
-## What are the data?
+## What are the data? {#whatarethedata}
 
-When using machine learning for prediction, there are two main types of variables of interest:
+When using machine learning for prediction, there are two main types of data of interest:
 
-1) An outcome variable
-2) A set of predictor (or explanatory) variable(s)
+1. An **continuous** outcome variable that we want to predict 
+2. A set of feature(s) (or predictor variables) that we use to predict the outcome variable
 
 The **outcome variable** is what are trying to **predict**. 
-To build (or train) our model, we use both the outcome and predictor variable(s).
-The goal is to identify informative predictor variable(s) that can explain a large amount of variation in our outcome variable. 
-Using this model, we can then predict the outcome from new observations with the same predictor variable(s) where have not observed the outcome. 
+To build (or train) our model, we use both the outcome and features.
+The goal is to identify informative features that can explain a large amount of variation in our outcome variable. 
+Using this model, we can then predict the outcome from new observations with the same features where have not observed the outcome. 
 
 As a simple example, imagine that we have data about the sales and characteristics of cars from last year and we want to predict which cars might sell well this year. 
 We do not have the sales data yet for this year, but we do know the characteristics of our cars for this year. 
 We can build a model of the characteristics that explained sales last year to estimate what cars might sell well this year. 
-In this case, our outcome variable is the sales of cars, while the different characteristics of the cars make up our predictor variables.
+In this case, our outcome variable is the sales of cars, while the different characteristics of the cars make up our features.
+
+### Start with a question
+
+This is the most commonly missed step when developing a machine learning algorithm. 
+Machine learning can very easily be turned into an engineering problem. 
+Just dump the outcome and the features into a black box algorithm and viola! 
+But this kind of thinking can lead to major problems. In general good machine learning questions:
+
+1. Have a plausible explanation for why the features predict the outcome. 
+2. Consider potential variation in both the features and the outcome over time
+3. Are consistently re-evaluated on criteria 1 and 2 over time. 
 
 In this case study, we want to **predict** air pollution levels. 
-To build this machine learning model, our **outcome variable** is fine particulate mater (PM~2.5~) captured from air pollution monitors in the contiguous US from 2008. 
-Our **predictor variables* include data about population density, road density, urbanization levels, and NASA satellite data. 
+To build this machine learning algorithm, our **outcome variable** is fine particulate matter (PM~2.5~) captured from air pollution monitors in the contiguous US from 2008. 
+Our **features** (or predictor variables) include data about population density, road density, urbanization levels, and NASA satellite data. 
 Using this model, we predict air pollution in new areas where there are no monitors. 
 
 ### Our outcome variable
@@ -415,11 +426,12 @@ In our dataset, the `value` column indicates the PM~2.5~ monitor average for 200
 The units are micrograms of fine particulate mater (PM) that is less than 2.5 micrometers in diameter per cubic meter of air - mass concentration (ug/m^3^).
 Recall the WHO exposure guideline is < 10 ug/m^3^ on average annually for PM~2.5~.
 
-### Our predictor variables
+### Our features (predictor variables) 
 
-There are 48 predictor variables with values for each of the 876 monitors included in our outcome variable. The data comes from the US [Enivornmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}, the [National Aeronautics and Space Administration (NASA)](https://www.nasa.gov/){target="_blank"}, the US [Census](https://www.census.gov/about/what/census-at-a-glance.html){target="_blank"}, and the [National Center for Health Statistics (NCHS)](https://www.cdc.gov/nchs/about/index.htm){target="_blank"}.
+There are 48 features with values for each of the 876 monitors (observations). 
+The data comes from the US [Enivornmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}, the [National Aeronautics and Space Administration (NASA)](https://www.nasa.gov/){target="_blank"}, the US [Census](https://www.census.gov/about/what/census-at-a-glance.html){target="_blank"}, and the [National Center for Health Statistics (NCHS)](https://www.cdc.gov/nchs/about/index.htm){target="_blank"}.
 
-<details><summary> Click here to see a table about the set of predictor variables </summary>
+<details><summary> Click here to see a table about the set of features </summary>
 
 Variable   | Details                                                                        
 ---------- |-------------
@@ -475,7 +487,7 @@ Variable   | Details
 
 </details>
 
-Many of these predictor variables have to do with the circular area around the monitor called the "buffer". These are illustrated in the following figure:
+Many of these features have to do with the circular area around the monitor called the "buffer". These are illustrated in the following figure:
 
 ```{r, echo = FALSE, out.width = "800px",}
 knitr::include_graphics(here::here("img", "regression.png"))
@@ -487,7 +499,7 @@ knitr::include_graphics(here::here("img", "regression.png"))
 
 ## Data Import
 
-We have one CSV file that contains both our single **outcome variable** and all of our **predictor variables**.
+We have one CSV file that contains both our single **outcome variable** and all of our **features** (or predictor variables).
 
 Next, we import our data into R now so that we can explore the data further. 
 We will call our data object `pm` for particulate matter. 
@@ -925,7 +937,7 @@ Intuitively we can expect some of our variables to be correlated.
 
 Let's first take a look at all of our numeric variabels with the`corrplot` package:
 The `corrplot` package is another option to look at correlation among possible predictors, and particularly useful if we have many predictors. 
-First, we calculate the Pearson correlation coefficients between all predictor variables pairwise using the `cor()` function of the `stats` package (which is loaded automatically). Then we use the `corrplot::corrplot()` function. 
+First, we calculate the Pearson correlation coefficients between all features pairwise using the `cor()` function of the `stats` package (which is loaded automatically). Then we use the `corrplot::corrplot()` function. 
 
 ```{r}
 PM_cor <- cor(pm %>% dplyr::select_if(is.numeric))
@@ -1044,129 +1056,133 @@ Indeed this increased the correlation, but variables from each of these categori
 
 ## Data Analysis
 
-Now that we have a sense of what our data is like we can get started with data analysis.
+Now that we have a sense of what our data are, we can get started with building a machine learning model to predict air pollution. 
 
-### The machine learning process
+### What is machine learning? 
 
-There are two major types of machine learning:  
+You may have learned about the central dogma of statistics that you sample from a population
 
-1) Unsupervised  
-2) Supervised  
+![](img/cdi1.png)
 
-Unsupervised learning is used to learn about the structure of the data without knowing much about the data. We let the data reveal properties about itself. Examples include clustering the data into groups or reducing the dimensionality of the data using methods like [principal component analysis](https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007){target="_blank"} (which we will describe in more detail later) to capture patterns of variance within the data.
+Then you try to guess what will happen in the population from the sample. 
 
-```{r, out.width = "80%", echo = FALSE, fig.align ="center"}
-include_graphics("https://miro.medium.com/max/1400/1*lhkCOodCMZ0-SSziEDpwpA.png")
-```
+![](img/cdi2.png)
 
-#### [[source]](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}
+For prediction we have a similar sampling problem
 
-In contrast, in supervised learning we have some knowledge about the data that we want to use to create a model to be able to generalize about other similar data.
+![](img/cdp1.png)
 
-There are two distinct goals of supervised machine learning:  
+But now we are trying to build a rule that can be used to predict a single observation's value of some characteristic using the others. 
 
-1) Prediction  
-2) Classification  
+![](img/cdp2.png)
 
-```{r, out.width = "80%", echo = FALSE, fig.align ="center"}
-include_graphics("https://miro.medium.com/max/1400/1*ASYpFfDh7XnreU-ygqXonw.png")
-```
+Let's make this more concrete.
+If you recall from the [What are the data?](#whatarethedata) section above, when we are using machine learning for prediction, our data consists of: 
 
-#### [[source]](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}
+1. An **continuous** outcome variable that we want to predict 
+2. A set of feature(s) (or predictor variables) that we use to predict the outcome variable
 
-We will be performing a prediction analysis (which is also referred to as regression), which aims to predict **continuous outcome** variables given a number of predictors/explanatory variables/features/parameters, as we have already described.
+The goal is to build a machine learning algorithm uses the features as input and predicts a outcome variable (or air pollution levels) in the situation where we do not know the outcome variable. 
+The way we do this is to use data where we have both the input and output data to _train_ a machine learning algorithm. 
+To train a machine learning algorithm, we will use the `tidymodels` package ecosystem. 
 
-Classification on the other hand aims to discern or predict group identity for a **categorical outcome** based on a number of predictors/explanatory variables/features/parameters.
+#### The tidymodels ecosystem
 
-The overall process is the same in either case and involves the following steps (which will each be explained in detail): 
-
-1) Data exploration  
-
-We have already performed this step to get a sense of the data. It is important to know if we have `NA` values, to understand the class of variables, and if to determine if there are any redundant variables that might need to removed.
-
-2) Data splitting 
-
-The data needs to be split into two pieces: a training set and a testing set. The training set will be used to optimize the model, while the testing set will be used to evaluate model performance. 
-
-3) Variable assignment and preprocessing  
-
-Both the training and testing data needs to be processed so that the data is compatible and optimized to be used with the model. This involves assigning variables to specific roles within the model and preprocessing like scaling variables and removing redundant variables. This process is also called feature engineering.
-
-4) Model specification, fitting, tuning and performance evaluation using the training data
-
-The model needs to first be fit to the training data. First the method or algorithm in which the model will be fit is specified (regression, random forest etc.).  Then in both classification and prediction, the model is fit to the training data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. If the model fits well than these estimated values will be very similar to the true outcome variable values. If the model does not fit well, than these estimates will be more disimilar from the true outcome variable. In this case, aspects about the model may need to be modified to improve the similarity of the estimates with that of the true outcome values. One way to optimize model performance is a process called tuning in which different model [hyper-parameter](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"} options are tested to determine the best option for model performance.
-
-5) Overall model performance evaluation
-
-Model performance is assessed as the similarity between the estimates of the outcome variable produced by the model and the true outcome variable values. This is done typically as an iterative process with the training data along side modification of the model until the performance using the training data is satisfactory. At this point, the final model performance is assessed using the testing data. This then gives an estimate about how well the model will predict or classify the outcome variable of interest with new independent data. Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources.
-
-### The tidymodels ecosystem
-
-To perform our analysis we will be using the `tidymodels` suite of packages. You may be familiar with the older packages `caret` or `mlr` which are also for machine learning and modeling but are not a part of the `tidyverse`. [Max Kuhn](https://resources.rstudio.com/authors/max-kuhn){target="_blank"} describes `tidymodels` like this:
+To perform our analysis we will be using the `tidymodels` suite of packages. 
+You may be familiar with the older packages `caret` or `mlr` which are also for machine learning and modeling but are not a part of the `tidyverse`. 
+[Max Kuhn](https://resources.rstudio.com/authors/max-kuhn){target="_blank"} describes `tidymodels` like this:
 
 > "Other packages, such as caret and mlr, help to solve the R model API issue. These packages do a lot of other things too: preprocessing, model tuning, resampling, feature selection, ensembling, and so on. In the tidyverse, we strive to make our packages modular and parsnip is designed only to solve the interface issue. It is not designed to be a drop-in replacement for caret.
 The tidymodels package collection, which includes parsnip, has other packages for many of these tasks, and they are designed to work together. We are working towards higher-level APIs that can replicate and extend what the current model packages can do."
 
-There are many packages in the tidymodels ecosystem which assist with the various steps of the machine learning process:
+There are many R packages in the `tidymodels` ecosystem, which assist with various steps in the process of building a machine learning algorithm:
+
+AVOCADO: Is it possible to get a higher resolution figure here?
 
 ```{r, echo=FALSE, out.width="800px"}
 knitr::include_graphics(here::here("img","simpletidymodels.png"))
 ```
 
-
-This is a depiction of how these tools help perform the overall machine learning process:
+This is a schematic of how these packages work together to build a machine learning algorithm:
 
 ```{r, echo=FALSE, out.width="800px"}
 knitr::include_graphics(here::here("img","MachineLearning.png"))
 ```
 
-### The major benefits of tidymodels  
+#### Benefits of tidymodels  
 
-1) Standardized workflow/format/notation across different types of algorithms  
+The two major benefits of `tidymodels` are: 
 
-Different notations are required for different algorithms as the algorithms have been developed by many different people. This would require the painstaking process of reformatting the data to be compatible with each algorithm if multiple algorithms were tested.
+1. Standardized workflow/format/notation across different types of machine learning algorithms  
 
-2) Can easily modify preprocessing, algorithm choice, and hyper-parameter tuning making optimization easy  
+Different notations are required for different algorithms as the algorithms have been developed by different people. This would require the painstaking process of reformatting the data to be compatible with each algorithm if multiple algorithms were tested.
 
-Modifying a piece of the overall process is now much easier than before because many of the steps are specified using the tidymodel packages in a convenient manner. Thus the entire process can be rerun after a simple change to preprocessing without much difficulty.
+2. Can easily modify preprocessing, algorithm choice, and hyper-parameter tuning making optimization easy  
+
+Modifying a piece of the overall process is now easier than before because many of the steps are specified using the `tidymodels` packages in a convenient manner. Thus the entire process can be rerun after a simple change to preprocessing without much difficulty.
+
+
 
 ### Splitting the Data
 
 The first step after data exploration in machine learning analysis is to [split the data](https://towardsdatascience.com/train-validation-and-test-sets-72cb40cba9e7){target="_blank"} into **training** and **testing** datasets. 
 
-The training dataset will be used to build and tune our model. This is the data that the model "learns" on.
+The training dataset will be used to build and tune our model. 
+This is the data that the model "learns" on. 
+The testing dataset will be used to evaluate the performance of our model in a more generalizable way. What do we mean by "generalizable"?
 
-The testing set will be used to evaluate the performance of our model in a more generalizable way. What do we mean by "generalizable"?
-
-Remember that our main goal is to use our model to be able to predict air pollution levels in areas where there are no gravimetric monitors. Therefore, if our model is super good at predicting air pollution with the data that we use to build it, it might not do the best job for the areas where there are few to no monitors. This would cause us to have really good prediction accuracy and we might assume that we were going to do a good job estimating air pollution any time we use our model, but in fact this would likely not be the case. This situation is what we call **[overfitting](https://towardsdatascience.com/train-test-split-and-cross-validation-in-python-80b61beca4b6){target="_blank"} **.
+Remember that our main goal is to use our model to be able to predict air pollution levels in areas where there are no gravimetric monitors. 
+Therefore, if our model is really good at predicting air pollution with the data that we use to build it, it might not do the best job for the areas where there are few to no monitors. 
+This would cause us to have really good prediction accuracy and we might assume that we were going to do a good job estimating air pollution any time we use our model, but in fact this would likely not be the case. 
+This situation is what we call **[overfitting](https://towardsdatascience.com/train-test-split-and-cross-validation-in-python-80b61beca4b6){target="_blank"} **.
 
 Overfitting happens when we end up modeling not only the major relationships in our data but also the noise within our data. 
 
-
-```{r}
+```{r, echo=FALSE}
 knitr::include_graphics("https://miro.medium.com/max/1110/1*tBErXYVvTw2jSUYK7thU2A.png")
 ```
 
 ##### [[source]](https://miro.medium.com/max/1110/1*tBErXYVvTw2jSUYK7thU2A.png){target="_blank"}
 
-If we get fairly good prediction with our testing set then we will know that our model can be applied to other data and will perform fairly well. We will discuss this more later.
+If we get good prediction with our testing set, then we know that our model can be applied to other data and will likely perform well. We will discuss this more later.
 
-We will not touch the testing set until we have completed optimizing our model with the training set. This will allow us to have a less biased evaluation of how well our model can do with other data besides the data used in the training set to build the model. Ideally you would also want a completely independent dataset to further test the performance of your model.
+We will not touch the testing set until we have completed optimizing our model with the training set. 
+This will allow us to have a less biased evaluation of how well our model can do with other data besides the data used in the training set to build the model. 
+Ideally, you would also want a completely independent dataset to further test the performance of your model.
 
-[Here](https://machinelearningmastery.com/difference-test-validation-datasets/){target="_blank"} is a great description of the differences between testing and training datasets.
+To split the data into training and testing, we will use the `initial_split()` function in the `rsample` package to specify how we want to split our data.
+
+AVOCADO: should we use "sample" or "observation"? Also, should we use "predictor" or "feature" in the figure? Could the figure be made to be more horizontal where the yellow and blue boxes are on top of each other? 
 
 ```{r, echo=FALSE, out.width="400px"}
 knitr::include_graphics(here::here("img","split.png"))
 ```
-We will use the `rsample` package to perform this step.
 
-The`initial_split()` function allows us to specify how we want to split our data. Typically data is split into 3/4 for training and 1/4 for testing.This is the default proportion and does not need to be specified. However you can change the proportion using the `prop` argument, which we will do that here for illustrative purposes. You can also specify a variable to stratify by with the `strata` argument. This is useful if you have imbalanced categorical variables and you would like to intentionally make sure that there are similar number of samples of the rarer categories in both the testing and training sets. Otherwise the split is performed randomly. 
+```{r}
+set.seed(1234)
+pm_split <- rsample::initial_split(data = pm, prop = 2/3)
+pm_split
+```
+
+A couple of notes from the code above: 
+
+- Typically, data are split into 3/4 of the observations for training and 1/4 for testing. This is the default proportion and does not need to be specified. However, you can change the proportion using the `prop` argument, which we will do that here for illustrative purposes.
+- Since the split is performed randomly, it is a good idea to use the `set.seed()` function in base R to ensure that if your rerun your code that your split will be the same next time.
+- We can see the number of monitors in our training, testing, and original data by typing in the name of our split object. The result will look like this:
+<training data sample number, testing data sample number, original sample number> 
+
+Now, you can also specify a variable to stratify by with the `strata` argument. 
+This is useful if you have imbalanced categorical variables and you would like to intentionally make sure that there are similar number of samples of the rarer categories in both the testing and training sets. 
+Otherwise the split is performed randomly. 
 
 > The strata argument causes the random sampling to be conducted within the stratification variable. The can help ensure that the number of data points in the training data is equivalent to the proportions in the original data set.
 
-In the case with our dataset, perhaps we would like our training set to have similar proportions of monitors from each of the states as in the initial data. This might be useful if we want our model to be generalizable across all of the states.
+In the case with our dataset, perhaps we would like our training set to have similar proportions of monitors from each of the states as in the initial data. 
+This might be useful if we want our model to be generalizable across all of the states.
 
-We can see that indeed there are different proportions of monitors in each state by using the `count()` function of the `dpyr` package. 
+We can see that indeed there are different proportions of monitors in each state by using the `count()` function of the `dplyr` package. 
+
+AVOCADO: why `print(n = 1e3)`? it's a same question as above? 
 
 #### {.scrollable }
 ```{r}
@@ -1176,29 +1192,16 @@ count(pm, state) %>%
 ```
 ####
 
-If our dataset were large enough it might be nice then to stratify by state, but our data is unfortunately not large enough. We will show how one would do this though for illustrative purposes. This option is often more important for classification applications of machine learning than it is for prediction.
+If our dataset were large enough it might be nice then to stratify by state using the `strata = "state"` argument in `initial_split()`, but our data is unfortunately not large enough. 
 
-Since the split is performed randomly, it is a good idea to use the `set.seed()` base function to ensure that if your rerun your code that your split will be the same next time. We can see the number of monitors in our training, testing, and original data by typing in the name of our split object. The result will look like this:
-<training data sample number, testing data sample number, original sample number> 
-
-```{r}
-set.seed(1234)
-pm_split <-rsample::initial_split(data = pm, prop = 2/3)
-pm_split
-
-# If stratifying:
-# pm_split_strata <-rsample::initial_split(data = pm, prop = 2/3, strata = "state")
-
-```
-
-Importantly the `initial_split` function only determines what rows of our pm data frame should be assigned for training or testing, it does not actually split the data. 
+Importantly the `initial_split` function only determines what rows of our `pm` data frame should be assigned for training or testing, it does not actually split the data. 
 
 To extract the testing and training data we can use the `training()` and `testing()` functions also of the `rsample` package.
 
 #### {.scrollable }
 ```{r}
- train_pm <-rsample::training(pm_split)
- test_pm <-rsample::testing(pm_split)
+train_pm <-rsample::training(pm_split)
+test_pm <-rsample::testing(pm_split)
  
 # Scroll through the output!
 count(train_pm, state)
@@ -1209,6 +1212,7 @@ count(test_pm, state)
 
 
 ### Variable Role Assignment and Preprocessing
+3. Variable assignment and preprocessing -- Both the training and testing data needs to be processed so that the data are compatible and optimized to be used with the model. This involves assigning variables to specific roles within the model and preprocessing like scaling variables and removing redundant variables. This process is also called feature engineering.
 
 In tidymodels we will create a recipe, which is a standardized format for a sequence of steps for processing the data.
 
@@ -1381,6 +1385,7 @@ simple_rec
 
 
 ### Running the preprocessing
+
 
 The next major function of the `recipes` package is `prep()`.
 
@@ -1579,6 +1584,8 @@ Note: if you use the skip option for some of the preprocessing steps, be careful
 
 ### Specifying the Model
 
+4. Model specification, fitting, tuning and performance evaluation using the training data -- The model needs to first be fit to the training data. First the method or algorithm in which the model will be fit is specified (regression, random forest etc.).  Then in both classification and prediction, the model is fit to the training data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. If the model fits well than these estimated values will be very similar to the true outcome variable values. If the model does not fit well, than these estimates will be more disimilar from the true outcome variable. In this case, aspects about the model may need to be modified to improve the similarity of the estimates with that of the true outcome values. One way to optimize model performance is a process called tuning in which different model [hyper-parameter](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"} options are tested to determine the best option for model performance.
+
 So far we have used `rsample` to split the data and `recipes` to assign variable and to specify and prep our preprocessing (as well as to optionally extract the preprocessed data).
 
 We will now use the `parsnip` package (which is similar to the previous `caret` package - and hence why it is named after the vegetable) to specify our model.
@@ -1706,6 +1713,10 @@ PM_wflow_fit %>%
 ```
 
 ### Model Performance
+
+5) Overall model performance evaluation
+
+Model performance is assessed as the similarity between the estimates of the outcome variable produced by the model and the true outcome variable values. This is done typically as an iterative process with the training data along side modification of the model until the performance using the training data is satisfactory. At this point, the final model performance is assessed using the testing data. This then gives an estimate about how well the model will predict or classify the outcome variable of interest with new independent data. Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources.
 
 Let's take a look at how well our model fit our training data:
 
