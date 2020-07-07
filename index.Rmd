@@ -1970,7 +1970,7 @@ yardstick::mae(wf_fitted_values,
                truth = value, estimate = .fitted)
 ```
 
-### Cross validation sample splitting
+### Cross validation
 
 Until now we have used everything in our "training" dataset (and have not touched the "testing" dataset) from the `rsample` package to build our machine learning (ML) model $\hat{Y} = f(X)$ (or to estimate $f$ using the features or predictor variable $X$). 
 
@@ -2066,91 +2066,117 @@ tune::show_best(resample_fit, metric = "rmse", "rsq")
 AVOCADO: maybe add a sentence here of what we see? 
 
 
-### Tuning
+### Model tuning
+
+AVOCADO: maybe an intro sentence here what we mean by tuning? 
 
 Now let's try some tuning.
 
-Let's take a closer look at how the air pollution monitor values vary with the location latitude and longitude.
+Let's take a closer look at how the air pollution monitor values vary with the location (`loc_value`), specifically latitude (`lat`) and longitude (`lon`).
 
 ```{r}
-
 train_pm %>% 
   dplyr::select(value, lon, lat) %>% 
   tidyr::pivot_longer(cols = c(lon, lat), 
                       names_to = "predictor", values_to = "loc_value") %>% 
   ggplot(aes(x = loc_value, value)) + 
-  geom_point(alpha = .2) + 
-  geom_smooth(se = FALSE) + 
-  #scale_y_log10() +
-  facet_wrap(~ predictor, scales = "free_x")
+    geom_point(alpha = .2) + 
+    geom_smooth(se = FALSE) + 
+    facet_wrap(~ predictor, scales = "free_x")
 ```
 
-We can see that there does not appear to be a single linear relationship for either of these predictors. Thus we might want to think about using  [splines](https://www.math.uh.edu/~jingqiu/math4364/spline.pdf){target="_blank"}  or this(https://towardsdatascience.com/numerical-interpolation-natural-cubic-spline-52c1157b98ac){target="_blank"}  or just this(https://tidymodels.github.io/tune/articles/getting_started.html){target="_blank"}  or this(https://www.psych.mcgill.ca/misc/fda/ex-basis-b1.html){target="_blank"}  to model the relationship in our training data more closely. For example for the latitude plot (left) if we had 2 lines and one break-point called a knot around 40, with the first line having a positive slope and the second with a negative slope this would fit the data more similarly to the blue line shown in the figure.
+We can see that there does not appear to be a linear relationship for either of these predictors. 
+Therefore, we might want to think about using  [splines](https://www.math.uh.edu/~jingqiu/math4364/spline.pdf){target="_blank"} or [natural cubic splines](https://towardsdatascience.com/numerical-interpolation-natural-cubic-spline-52c1157b98ac){target="_blank"} or just the [tune getting started guide ](https://tidymodels.github.io/tune/articles/getting_started.html){target="_blank"} to model the relationship in our training data more closely. 
+For example, in the latitude plot (left) if we had 2 lines and one break-point called a knot around 40, with the first line having a positive slope and the second with a negative slope this would fit the data more similarly to the blue line shown in the figure.
 
-We can tune for the number of knots by using a step function in the `recipes` package called `step_ns()` where ns stands for natural splines. In order to tune for the number of knots or degrees of freedom, we can set the `deg_free` argument to `tune()`. This is helpful, becuase we aren't exactly sure how closely we should be following the relationship with the value and our longitude and latitude data in our training data to achieve good accuracy yet keep our model generalizable for other data. 
+AVOCADO: maybe we should explain a bit more by what we mean splines? I'm not sure just linking out to various resources would be enough here? 
 
-This is when our cross validation methods become really handy. We can test out different values for the `deg_free` argument and see how our model performance varies across our training folds to try to find the optimal value.
+AVOCADO: should we explain what are knots or degrees of freedom? 
 
-We will update our recipe to add these steps. It is a good idea to do this for individual predictors because you can name each with the `tune` argument so that you can keep track of it later. We can see what we intend to tune with the `parameters()` function of the `dials` package. 
+We can tune for the number of knots by using a step function in the `recipes` package called `step_ns()` where `ns` stands for natural splines. 
+In order to tune for the number of knots or degrees of freedom, we can set the `deg_free` argument to `tune()`. 
 
-See [here](this(https://tidymodels.github.io/tune/articles/getting_started.html)){target="_blank"}  for more information about implementing this in tidymodels.
+Let's update our `novel_rec` recipe to add this step. 
 
 ```{r}
-
 novel_rec %<>%
   step_ns(lon, deg_free = tune("lon df")) %>%
   step_ns(lat,  deg_free = tune("lat df"))
-# novel_rec %<>%
-#   step_ns(lat,  deg_free = tune())
-# novel_rec
+```
 
-pm_param <-dials::parameters(novel_rec)
+This is helpful, because we aren't exactly sure how closely we should be following the relationship with the value and our longitude and latitude data in our training data to achieve good accuracy yet keep our model generalizable for other data.
+
+This is when our cross validation methods become really handy. 
+For example, we can test out different values for the `deg_free` argument and see how our model performance varies across our training folds to try to find the optimal value.
+
+Also, it is a good idea to do this for individual predictors, because you can name each with the `tune` argument so that you can keep track of it later. 
+We can see what we intend to tune with the `parameters()` function of the `dials` package. 
+
+```{r}
+pm_param <- dials::parameters(novel_rec)
 pm_param
 ```
 
-Generally you could use the `grid_*()` functions of the `dials` package to create the different combinations of degrees of freedom to test for both variables to optimize the model. In our case we can visibly see that if we add more than say 4 or 5 degrees of freedom we will likely over-fit the data. So instead of using these functions we will create our own grid using the base `seq()` and `expand.grid()` functions.
+AVOCADO: While I generally understand what's happening in the `dials::parameter()` function, i'm not sure I actually get it. Could we provide a bit more text here explaining what's happening? or what the output above (`pm_param`) is showing? 
+
+See [the tune getting started guide ](https://tidymodels.github.io/tune/articles/getting_started.html){target="_blank"} for more information about implementing this in `tidymodels`.
+
+AVOCADO: everything after this point until the start of the next section is really confusing to me. I see sometimes you have examples commented out, but i'm not sure we should include code if we aren't going to talk about it? Part of me wonders if this section should be in a "Click more here if.." down arrow? That or we need to talk about how to make this section more clear. For now 
+
+Generally you could use the `grid_*()` functions of the `dials` package to create the different combinations of degrees of freedom to test for both variables to optimize the model. 
+In our case we can visibly see that if we add more than say 4 or 5 degrees of freedom we will likely over-fit the data. 
+So instead of using these functions we will create our own grid using the base `seq()` and `expand.grid()` functions.
 
 ```{r}
 #an example of what you could do:
-#spline_grid <-dials::grid_regular(pm_param, levels = 3)
+#spline_grid <- dials::grid_regular(pm_param, levels = 3)
 df_vals <- seq(1, 5, by = 2)
 spline_grid <- expand.grid(`lon df` = df_vals, `lat df` = df_vals)
 spline_grid
 ```
 
+AVOCADO: I'm not sure what these numbers mean? 
 
 Now we will tune this hyper-parameter (degrees of freedom) for both the `lat` and `lon` variables using our cross validation folds. To do this we will use the `tune_grid()` function of the `tune` package.
 
-```{r}
-
-df_tuning <-lm_PM_model %>% 
-  tune::tune_grid(novel_rec, resamples =vfold_pm, 
+```{r, eval=FALSE}
+df_tuning <- 
+  lm_PM_model %>% 
+  tune::tune_grid(novel_rec, resamples = vfold_pm, 
                   grid = spline_grid)
 
-#df_tuning <-PM_wflow %>% tune::tune_grid(resamples =vfold_pm, 
- #                                        grid = spline_grid, 
-  
-#                                       param_set =pm_param)
+#df_tuning <-PM_wflow %>% tune::tune_grid(resamples = vfold_pm, 
+#                                         grid = spline_grid, 
+#                                         param_set =pm_param)
 
 df_tuning
 ```
 
+AVOCADO: I got this output after running the code chunk above `df_tuning`: 
+```
+> df_tuning
+#  4-fold cross-validation 
+cannot open compressed file '/Users/shicks/Documents/github/websites/opencasestudies/ocs-bp-air-pollution/.Rproj.user/shared/notebooks/4922A1-index/1/4E3CFC04439A89E6/cmq1o1r6gyahs_t/_rs_rdf_1d6f4f240c09.rdf', probable reason 'No such file or directory'Error in gzfile(file, "wb") : cannot open the connection
+```
+AVOCADO: Any idea what it means? I'm going to comment it out for now so i can compile
 
+AVOCADO: Assuming my error can get fixed, could we write a sentence explaining what we see at output? 
 
-```{r}
-
+```{r, eval=FALSE}
 df_tuning %>%
   collect_metrics()
 
 show_best(df_tuning, metric = "rmse", n =1)
 ```
 
-
+AVOCADO: Could we write a sentence explaining what we see at output? also about what the functions `collect_metrics()` and `show_best()` are? 
 
 
 
 
 ## Data Analysis
+
+
 
 ### Linear Regression Model with PCA
 
@@ -2604,6 +2630,8 @@ We used the `recipes` package to assign variable roles (such as outcome, predict
 We learned that the model needs to first be fit to the training data. We learned that in both classification and prediction, the model is fit to the training data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. We learned that we specify the model and its specifications using the `parnsip` package and that we also use this package to fit the model using the `fit()` function. We learned that we if just use `parsnip` to fit the model, then we need to use the pre-processed training data (output from `juice()`). We learned that we can use the raw training data if we use the `workflows` package to create a workflow that pre-processes our data for us.   
 
 We learned that if the model fits well than the estimated values will be very similar to the true outcome variable values in our training data. We learned that we can assess model performance using the `yardstick` package and the `metrics()` function. We also learned that we can use subsets of our training data (which we created with the `rsample` package) to perform cross validation to get a better estimate about the performance of our model using our training data, as we want our results to be generalizable and to perform well with other data, not just our training data. We used the `fit_resamples()` function of the tune package to fit our model on our different training data subsets and the `collect_metrics()` function (also of the `tune` package) to evaluate model performance using these subsets.  We also learned that we can potentially improve model performance by tuning aspects about the model called [hyper-parameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"} to determine the best option for model performance. We learned that we can do this using the `tune` and `dials` packages and evaluating the performance of our model with the different hyper-parameter options and our training data subsets that we used for cross validation. After we tested several different methods to model our data, we compared them to choose the best performing model as our final model.  
+
+AVOCADO: could we use a different link instead of to data camp? 
 
 5) Overall model performance evaluation  
 
