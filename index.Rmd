@@ -422,7 +422,7 @@ Gravimetric analysis is considered to be among the most accurate methods for mea
 
 </details>
 
-In our dataset, the `value` column indicates the PM~2.5~ monitor average for 2008 in mass of fine particles/volume of air for 876 gravimetric monitors. 
+In our data set, the `value` column indicates the PM~2.5~ monitor average for 2008 in mass of fine particles/volume of air for 876 gravimetric monitors. 
 The units are micrograms of fine particulate mater (PM) that is less than 2.5 micrometers in diameter per cubic meter of air - mass concentration (ug/m^3^).
 Recall the WHO exposure guideline is < 10 ug/m^3^ on average annually for PM~2.5~.
 
@@ -568,7 +568,7 @@ Great! Now we can see that these variables are now factors as indicated by `<fct
 ### Packages to get a sense of the data
 
 The `skim()` function of the `skimr` package is also really helpful for getting a general sense of your data.
-By design, it provies summary statistics about variables in the dataset. 
+By design, it provies summary statistics about variables in the data set. 
 designed to provide summary statistics about variables. 
 
 
@@ -583,7 +583,7 @@ skim(pm)
 
 Notice how there is a column called `n_missing` about the number of values that are missing. 
 This is also indicated by the `complete_rate` variable (or missing/number of observations). 
-In our dataset, it looks like our data do not contain any missing data. 
+In our data set, it looks like our data do not contain any missing data. 
 
 Also notice how the function provides separate tables of summary statistics for each data type: character, factor and numeric. 
 
@@ -1122,13 +1122,13 @@ Modifying a piece of the overall process is now easier than before because many 
 
 
 
-### Splitting the Data
+### Splitting the data
 
-The first step after data exploration in machine learning analysis is to [split the data](https://towardsdatascience.com/train-validation-and-test-sets-72cb40cba9e7){target="_blank"} into **training** and **testing** datasets. 
+The first step after data exploration in machine learning analysis is to [split the data](https://towardsdatascience.com/train-validation-and-test-sets-72cb40cba9e7){target="_blank"} into **training** and **testing** data sets. 
 
-The training dataset will be used to build and tune our model. 
+The training data set will be used to build and tune our model. 
 This is the data that the model "learns" on. 
-The testing dataset will be used to evaluate the performance of our model in a more generalizable way. What do we mean by "generalizable"?
+The testing data set will be used to evaluate the performance of our model in a more generalizable way. What do we mean by "generalizable"?
 
 Remember that our main goal is to use our model to be able to predict air pollution levels in areas where there are no gravimetric monitors. 
 Therefore, if our model is really good at predicting air pollution with the data that we use to build it, it might not do the best job for the areas where there are few to no monitors. 
@@ -1147,7 +1147,7 @@ If we get good prediction with our testing set, then we know that our model can 
 
 We will not touch the testing set until we have completed optimizing our model with the training set. 
 This will allow us to have a less biased evaluation of how well our model can do with other data besides the data used in the training set to build the model. 
-Ideally, you would also want a completely independent dataset to further test the performance of your model.
+Ideally, you would also want a completely independent data set to further test the performance of your model.
 
 To split the data into training and testing, we will use the `initial_split()` function in the `rsample` package to specify how we want to split our data.
 
@@ -1174,9 +1174,11 @@ Now, you can also specify a variable to stratify by with the `strata` argument.
 This is useful if you have imbalanced categorical variables and you would like to intentionally make sure that there are similar number of samples of the rarer categories in both the testing and training sets. 
 Otherwise the split is performed randomly. 
 
+AVOCADO: Is this a quote from someone/some place? If so should we add a citation / URL? 
+
 > The strata argument causes the random sampling to be conducted within the stratification variable. The can help ensure that the number of data points in the training data is equivalent to the proportions in the original data set.
 
-In the case with our dataset, perhaps we would like our training set to have similar proportions of monitors from each of the states as in the initial data. 
+In the case with our data set, perhaps we would like our training set to have similar proportions of monitors from each of the states as in the initial data. 
 This might be useful if we want our model to be generalizable across all of the states.
 
 We can see that indeed there are different proportions of monitors in each state by using the `count()` function of the `dplyr` package. 
@@ -1191,7 +1193,7 @@ count(pm, state) %>%
 ```
 ####
 
-If our dataset were large enough it might be nice then to stratify by state using the `strata = "state"` argument in `initial_split()`, but our data is unfortunately not large enough. 
+If our data set were large enough it might be nice then to stratify by state using the `strata = "state"` argument in `initial_split()`, but our data is unfortunately not large enough. 
 
 Importantly the `initial_split` function only determines what rows of our `pm` data frame should be assigned for training or testing, it does not actually split the data. 
 
@@ -1210,29 +1212,23 @@ count(test_pm, state)
 
 
 
-### Variable Role Assignment and Preprocessing
-3. Variable assignment and preprocessing -- Both the training and testing data needs to be processed so that the data are compatible and optimized to be used with the model. This involves assigning variables to specific roles within the model and preprocessing like scaling variables and removing redundant variables. This process is also called feature engineering.
+### Pre-processing the data
 
-In tidymodels we will create a recipe, which is a standardized format for a sequence of steps for processing the data.
+After splitting the data, the next step is to process the training and testing data so that the data are are compatible and optimized to be used with the model. 
+This involves assigning variables to specific roles within the model and pre-processing like scaling variables and removing redundant variables. 
+This process can also be called feature engineering.
 
-This can be very useful because it makes testing out different preprocessing steps or different algorithms with the same preprocessing very easy and reproducible.
+To do this in `tidymodels`, we will create a what's called a "recipe" using the `recipes` package, which is a standardized format for a sequence of steps for processing the data.
+This can be very useful because it makes testing out different pre-processing steps or different algorithms with the same pre-processing very easy and reproducible.
+Creating a recipe specifies **how a data frame of predictors should be created** - it specifies what  variables to be used  and the pre-processing steps, but it **does not execute these steps** or create the data frame of predictors.
 
-**Creating a recipe specifies how a data frame of predictors should be created  - it specifies what  variables to be used  and the  preprocessing steps  but it does not execute these steps or create the data frame of predictors.**
+#### Step 1: Specify the variables with `recipe()` function
 
-#### List the ingredients / specify the variables with the `recipe()` function
+The first thing to do to create a recipe is to specify which variables we will be using as our outcome and predictors using the `recipe()` function. 
+In terms of the metaphor of baking, we can think of this as listing our ingredients. 
+Translating this to the `recipes` package, we use the `recipe()` function to assign roles to all the variables. 
 
-The first thing to do to create a recipe is to specify which variables we will be using as our outcome and predictors using the `recipe()` function. In terms of the metaphor of baking, we can think of this as listing our ingredients. The naming convention for recipe object names is `*_rec` or `rec`. 
-
-```{r, echo=FALSE, out.width="400px"}
-knitr::include_graphics(here::here("img","Starting_a_recipe_recipes1.png"))
-```
-
-
-In our case recall that our `value` variable, which is the average annual gravimetric monitor PM~2.5~ concentration in ug/m^3^. Our predictors are all the other variables except the monitor ID, which is an `id` variable.
-
-The reason not to include this variable is because this variable includes the county number and a number designating which particular monitor the values came from of the monitors there are in that county. Since this number is arbitrary and the county information is also given in the data, and the fact that each monitor only has one value in the `value` variable, nothing is gained by including this variable and it may instead introduce noise. However, it is useful to keep this data to take a look at what is happening later. We will show you what to do in this case in just a bit.
-
-The simplest recipe with no preprocessing steps, would be to simply list the outcome and predictor variables.
+Let's try the simplest recipe with no pre-processing steps: simply list the outcome and predictor variables.
 
 We can do so in two ways:  
 
@@ -1251,44 +1247,62 @@ If we want to include all predictors we can use a period like so:
 
 outcome_variable_name ~ .  
 
-Now with our data we will start by making a recipe for our training data. In the simplest case we might use all predictors like this:
+Now with our data, we will start by making a recipe for our training data.
+If you recall, the continuous outcome variable is `value` (the average annual gravimetric monitor PM~2.5~ concentration in ug/m^3^). 
+Our features (or predictor variables) are all the other variables except the monitor ID, which is an `id` variable.
+
+The reason not to include the `id` variable is because this variable includes the county number and a number designating which particular monitor the values came from of the monitors there are in that county. 
+Since this number is arbitrary and the county information is also given in the data, and the fact that each monitor only has one value in the `value` variable, nothing is gained by including this variable and it may instead introduce noise. 
+However, it is useful to keep this data to take a look at what is happening later. 
+We will show you what to do in this case in just a bit.
+
+In the simplest case, we might use all predictors like this:
 
 ```{r}
-
-simple_rec <-train_pm %>%
+simple_rec <- train_pm %>%
   recipes::recipe(value ~ .)
 
 simple_rec
 ```
 
+We see a recipe has been created with 1 outcome variable and 49 predictor variables (or features). 
+Also, notice how we named the output of `recipe()`. 
+The naming convention for recipe objects is `*_rec` or `rec`. 
 
-However, to deal with the id variable we could use the `update_role()` function of the `recipes` package. This option works well with the newer `workflows` package, however id variables are often dropped from analyses that do not use this newer package as they can make the process difficult with using the `parsnip` package alone due to the fact that new levels (or possible values) may be introduced with the testing data.
+Now, let's get back to the `id` variable. 
+Instead of including it as a predictor variable, we could also use the `update_role()` function of the `recipes` package.
 
 ```{r}
-
-simple_rec <-train_pm %>%
+simple_rec <- train_pm %>%
   recipes::recipe(value ~ .) %>%
   recipes::update_role(id, new_role = "id variable")
 
 simple_rec
 ```
 
-We could also specify the outcome and predictors in the same way as the id variable. Please see [here](https://tidymodels.github.io/recipes/reference/recipe.html){target="_blank"}  for examples of other roles for variables. The role can be actually be any value. 
+<details><summary> Click here learn more about the working with `id` variables </summary>
 
-The order is important here, as we first make all variables predictors and then override this role for the outcome and id variable. We will use the `everything()` function of the `dplyr` package to start with all of the variables in `train_pm`.
+This option works well with the newer `workflows` package, however `id` variables are often dropped from analyses that do not use this newer package as they can make the process difficult with using the `parsnip` package alone due to the fact that new levels (or possible values) may be introduced with the testing data.
+
+</details>
+
+We could also specify the outcome and predictors in the same way as the id variable. 
+Please see [here](https://tidymodels.github.io/recipes/reference/recipe.html){target="_blank"} for examples of other roles for variables. 
+The role can be actually be any value. 
+
+The order is important here, as we first make all variables predictors and then override this role for the outcome and `id` variable. 
+We will use the `everything()` function of the `dplyr` package to start with all of the variables in `train_pm`.
 
 ```{r}
-
 simple_rec <-recipe(train_pm) %>%
     update_role(everything(), new_role = "predictor")%>%
     update_role(value, new_role = "outcome")%>%
     update_role(id, new_role = "id variable")
 
 simple_rec
-
 ```
 
-If we want to take a look at our formula from our recipe we can do use the `formula()` function of the `stats` package.
+If we want to take a look at our formula from our recipe, we can do use the `formula()` function of the `stats` package.
 
 ```{r}
 formula(simple_rec)
@@ -1300,40 +1314,46 @@ We can also view our recipe in more detail using the base `summary()` function.
 summary(simple_rec)
 ```
 
-#### List the preprocessing steps using the step functions of the `recipe` package
+To summarize this step, we use the `recipe()` function to assign roles to all the variables: 
 
-The other thing the recipes package allows for is specifying preprocessing steps using a variety of `step*()` functions.
+```{r, echo=FALSE, out.width="400px"}
+knitr::include_graphics(here::here("img","Starting_a_recipe_recipes1.png"))
+```
+
+
+#### Step 2: Specify the preprocessing steps with `step*()` functions
+
+Next, we use the `step*()` functions from the `recipe` package to specify preprocessing steps. 
 
 ```{r, echo=FALSE, out.width="400px"}
 knitr::include_graphics(here::here("img","Making_a_recipe_recipes2.png"))
 ```
 
-
 **This [link](https://tidymodels.github.io/recipes/reference/index.html){target="_blank"} and this [link](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"} show the many options for recipe step functions.**
 
 <u>There are step functions for a variety of purposes:</u>
 
-1) [**Imputation**](https://en.wikipedia.org/wiki/Imputation_(statistics)){target="_blank"}  -- which means filling in missing values based on the existing data 
-2) [**Transformation**](https://en.wikipedia.org/wiki/Data_transformation_(statistics)){target="_blank"}  -- which means changing all values of a variable in the same way, typically to make it more normal or easier to interpret)  
-3) [**Discretization**](https://en.wikipedia.org/wiki/Discretization_of_continuous_features){target="_blank"}  -- which means converting continuous values into discrete or nominal values - binning for example to reduce the number of possible levels)  (However this is generally not advisable!)
-4) [**Encoding / Creating Dummy Variables**](https://en.wikipedia.org/wiki/Dummy_variable_(statistics)){target="_blank"}  -- which means creating a numeric code for categorical variables
-[**More on Dummy Variables and one hot encoding**](https://medium.com/p/b5840be3c41a/responses/show){target="_blank"} 
-5) [**Data type conversions**](https://cran.r-project.org/web/packages/hablar/vignettes/convert.html){target="_blank"}  -- which means changing from integer to factor or numeric to date etc.
-6) [**Interaction**](https://statisticsbyjim.com/regression/interaction-effects/){target="_blank"}  term addition to the model -- which means that we would be modeling for predictors that would influence the capacity of each other to predict the outcome
-7) [**Normalization**](https://en.wikipedia.org/wiki/Normalization_(statistics)){target="_blank"}  -- which means centering and scaling the data to a similar range of values
-8) [**Dimensionality Reduction/ Signal Extraction**](https://en.wikipedia.org/wiki/Dimensionality_reduction){target="_blank"}  -- which means mathematically obtaining a new smaller set of variables that capture the variation or signal in the original variables (ex. Principal Component Analysis and Independent Component Analysis)
-9) **Filtering** -- Filtering options for removing variables (ex. remove variables that are highly correlated to others or remove variables with very little variance and therefore likely little predictive capacity)
-10) [**Row operations**](https://tartarus.org/gareth/maths/Linear_Algebra/row_operations.pdf){target="_blank"}  -- which means performing functions on the values within the rows  (ex. rearranging, filtering, imputing)
-11) **Checking functions** -- Sanity checks to look for missing values, to look at the variable classes etc.
+1. [**Imputation**](https://en.wikipedia.org/wiki/Imputation_(statistics)){target="_blank"} -- filling in missing values based on the existing data 
+2. [**Transformation**](https://en.wikipedia.org/wiki/Data_transformation_(statistics)){target="_blank"} -- changing all values of a variable in the same way, typically to make it more normal or easier to interpret
+3. [**Discretization**](https://en.wikipedia.org/wiki/Discretization_of_continuous_features){target="_blank"} -- converting continuous values into discrete or nominal values - binning for example to reduce the number of possible levels (However this is generally not advisable!)
+4. [**Encoding / Creating Dummy Variables**](https://en.wikipedia.org/wiki/Dummy_variable_(statistics)){target="_blank"} -- creating a numeric code for categorical variables
+([**More on Dummy Variables and one hot encoding**](https://medium.com/p/b5840be3c41a/responses/show){target="_blank"})
+5. [**Data type conversions**](https://cran.r-project.org/web/packages/hablar/vignettes/convert.html){target="_blank"}  -- which means changing from integer to factor or numeric to date etc.
+6. [**Interaction**](https://statisticsbyjim.com/regression/interaction-effects/){target="_blank"}  term addition to the model -- which means that we would be modeling for predictors that would influence the capacity of each other to predict the outcome
+7. [**Normalization**](https://en.wikipedia.org/wiki/Normalization_(statistics)){target="_blank"} -- centering and scaling the data to a similar range of values
+8. [**Dimensionality Reduction/ Signal Extraction**](https://en.wikipedia.org/wiki/Dimensionality_reduction){target="_blank"} -- reducing the space of features or predictors to a smaller set of variables that capture the variation or signal in the original variables (ex. Principal Component Analysis and Independent Component Analysis)
+9. **Filtering** -- filtering options for removing variables (ex. remove variables that are highly correlated to others or remove variables with very little variance and therefore likely little predictive capacity)
+10. [**Row operations**](https://tartarus.org/gareth/maths/Linear_Algebra/row_operations.pdf){target="_blank"} -- performing functions on the values within the rows  (ex. rearranging, filtering, imputing)
+11. **Checking functions** -- Sanity checks to look for missing values, to look at the variable classes etc.
 
-All of the step functions look like `step_*` except for the check functions which look like `check_*`.
+All of the step functions look like `step_*()` with the `*` replaced with a name, except for the check functions which look like `check_*()`.
 
 There are several ways to select what variables to apply steps to:  
-1) tidyselect methods: `contains()`, `matches()`, `starts_with()`, `ends_with()`, `everything()`, `num_range()`  
-2) based on the type: `all_nominal()`, `all_numeric()` , `has_type()` 
-3) based on the role: `all_predictors()`, `all_outcomes()`, `has_role()`
-4) name - use the actual name of the variable/variables of interest  
 
+1. Using `tidyselect` methods: `contains()`, `matches()`, `starts_with()`, `ends_with()`, `everything()`, `num_range()`  
+2. Using the type: `all_nominal()`, `all_numeric()` , `has_type()` 
+3. Using the role: `all_predictors()`, `all_outcomes()`, `has_role()`
+4. Using the name - use the actual name of the variable/variables of interest  
 
 Let's try adding some steps to our recipe.
 
@@ -1343,19 +1363,52 @@ pm %>%
   select(matches("_pop|_area")) %>%
   map(range)
 ```
+
+AVOCADO: should we explain `map()`? 
+AVOCADO: unclear why this is commented out? The next sentence suggests it was executed but I don't think the code works? 
+
 We can see that the range for each of these variables is quite large, we can log transform this data using the `step_log()` function of the `recipes` package.
 
-We would also want to potentially [one hot encode](https://machinelearningmastery.com/why-one-hot-encode-data-in-machine-learning/){target="_blank"} some of our categorical variables so that they can be used with certain algorithms. We can do this with the `step_dummy()` function and the `one_hot = TRUE` argument. one hot encoding means that we don't just simply encode our categorical variables numerically, as our numeric assignments can be interpreted by algorithms as having a particular rank or order. Instead, binary variables made of 1s and 0s are used to arbitrarily assign a numeric value that has no apparent order.
+We would also want to potentially [one hot encode](https://machinelearningmastery.com/why-one-hot-encode-data-in-machine-learning/){target="_blank"} some of our categorical variables so that they can be used with certain algorithms. 
+We can do this with the `step_dummy()` function and the `one_hot = TRUE` argument. 
+One hot encoding means that we do not simply encode our categorical variables numerically, as our numeric assignments can be interpreted by algorithms as having a particular rank or order. 
+Instead, binary variables made of 1s and 0s are used to arbitrarily assign a numeric value that has no apparent order.
 
-Our fips variable includes a numeric code for state and county - and therefore is essentially a proxy for county.  Since we already have county, we will just use it and keep the fips id as another ID variable.
+```{r}
+simple_rec %>%
+  step_dummy(state, county, city, zcta, one_hot = TRUE)
+```
 
-We can remove the `fips` variable from the predictors using `update_role()` to make sure that the role is no longer `"predictor"`. We can make the role anything we want actually, so we will keep it something identifiable.
+Our `fips` variable includes a numeric code for state and county - and therefore is essentially a proxy for county.
+Since we already have county, we will just use it and keep the `fips` ID as another ID variable.
 
-We might also want to remove variables that appear to be redundant and are highly correlated with others, as we know from our exploratory data analysis that many of our variables are correlated with one another. We can do this using the `step_corr()` function.
+We can remove the `fips` variable from the predictors using `update_role()` to make sure that the role is no longer `"predictor"`. 
+We can make the role anything we want actually, so we will keep it something identifiable.
 
-It is also a good idea to remove variables with near-zero variance, which can be done with the `step_nzv()` function. Variables have low variance if all the values are very similar, the values are very sparse, or if they are highly imbalanced. 
+```{r}
+simple_rec %>%
+  update_role("fips", new_role = "county id")
+```
 
-Examples where you might have near-zero variance variables include: 
+We might also want to remove variables that appear to be redundant and are highly correlated with others, as we know from our exploratory data analysis that many of our variables are correlated with one another. 
+We can do this using the `step_corr()` function.
+
+```{r}
+simple_rec %>%
+  step_corr(all_predictors(), - CMAQ, - aod)
+```
+
+Notice, we don't want to remove some of our variables, like the `CMAQ` and `aod` variables. 
+
+It is also a good idea to remove variables with near-zero variance, which can be done with the `step_nzv()` function. 
+Variables have low variance if all the values are very similar, the values are very sparse, or if they are highly imbalanced. 
+
+```{r}
+simple_rec %>%
+  step_nzv(all_predictors(), - CMAQ, - aod)
+```
+
+<details><summary> Click here to learn about examples where you might have near-zero variance variables</summary>
 
 1) **Similar Values** - If the population density was nearly the same for every zcta that contained a monitor, then knowing the population density near our monitor would contribute little to our model in assisting us to predict monitor air pollution values. 
 2) **Sparse Data** - If all of the monitors were in locations where the populations did not attend graduate school, then these values would mostly be zero, again this would do very little to help us distinguish our air pollution monitors.When many of the values are zero this is also called sparse data.  
@@ -1363,22 +1416,24 @@ Examples where you might have near-zero variance variables include:
 
 See this [blog post](https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/){target="_blank"} about why removing near-zero variance variables isn't always a good idea if we think that a variable might be especially informative.
 
-**It is important to add the steps to the recipe in an order that makes sense just like with a cooking recipe.**
+</details>
 
-Thus first we are going to create numeric values for our categorical variables, then we will look at correlation and near-zero variance. We don't want to remove some of our variables, like the CMAQ and aod variables so we can make sure they are kept in the model by excluding them from those steps. If we specifically wanted to remove a predictor we could use `step_rm()`.
+Let's put all this together now. 
+
+**Remember: it is important to add the steps to the recipe in an order that makes sense just like with a cooking recipe.**
+
+First, we are going to create numeric values for our categorical variables, then we will look at correlation and near-zero variance. 
+We do not want to remove the `CMAQ` and `aod` variables, so we can make sure they are kept in the model by excluding them from those steps. 
+If we specifically wanted to remove a predictor we could use `step_rm()`.
 
 ```{r}
 simple_rec %<>%
   update_role("fips", new_role = "county id") %>%
-# create numeric dummy variables to encode for categorical variables
   step_dummy(state, county, city, zcta, one_hot = TRUE) %>%
-  # identify and remove all correlated predictors (now that they are numeric)
   step_corr(all_predictors(), - CMAQ, - aod)%>%
-  # identify variables with near zero variance and remove
   step_nzv(all_predictors(), - CMAQ, - aod)
   
 simple_rec
-
 ```
 
 
@@ -1388,7 +1443,7 @@ simple_rec
 
 The next major function of the `recipes` package is `prep()`.
 
-This function updates the recipe object based on the training data. It estimates parameters (estimating the required quantities and statistics required by the steps for the variables) for preprocessing and  updates the model terms, as some of the predictors may be removed, this allows the recipe to be ready to use on other datasets. It doesn't necessarily actually execute the preprocessing itself, however we will specify in argument for it to do this so that we can take a look at the preprocessed data.
+This function updates the recipe object based on the training data. It estimates parameters (estimating the required quantities and statistics required by the steps for the variables) for preprocessing and  updates the model terms, as some of the predictors may be removed, this allows the recipe to be ready to use on other data sets. It doesn't necessarily actually execute the preprocessing itself, however we will specify in argument for it to do this so that we can take a look at the preprocessed data.
 
 There are some important arguments to know about:
 1) training - you must supply a training data set to estimate parameters for preprocessing operations (recipe steps) - this may already be included in your recipe - as is the case for us
