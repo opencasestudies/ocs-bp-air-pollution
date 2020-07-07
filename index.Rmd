@@ -2176,9 +2176,13 @@ AVOCADO: Could we write a sentence explaining what we see at output? also about 
 
 ## Data Analysis
 
+In the previous section, we demonstrated how to build a machine learning model (specifically a linear regression model) to predict air pollution with the `tidymodels` framework. 
 
+In the next few sections, we will demonstrate a few other machine learning models. 
 
 ### Linear Regression Model with PCA
+
+AVOCADO: I think we should take out this section (Linear Regression Model with PCA). My sense is we would need to do quite a bit more explanation of what is PCA and I'm hestitant to make this case study longer... happy to hear your thoughts on this though. For now I'm not going to edit it until we have a chance to talk. 
 
 We can create another workflow to see how model performance compares using a different model. In this case we are going to perform something called [Principal Component Analysis or PCA](https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007){target="_blank"}. 
 
@@ -2214,33 +2218,29 @@ lm_PM_model
 
 
 ```{r}
-pca_wflow <-workflows::workflow() %>%
-            workflows::add_recipe(lm_PCA_rec) %>%
-            workflows::add_model(lm_PM_model)
-
-
+pca_wflow <- 
+  workflows::workflow() %>%
+  workflows::add_recipe(lm_PCA_rec) %>%
+  workflows::add_model(lm_PM_model)
 pca_wflow
 ```
-
-
-
-
 
 Remember that using `workflows` we don't actually need to prep our recipe, we can just fit our model directly. 
 
 Fit the cross validation samples:
 
 ```{r}
-resample_pca_fit <-tune::fit_resamples(pca_wflow, vfold_pm)
+resample_pca_fit <- tune::fit_resamples(pca_wflow, vfold_pm)
 ```
-
 
 Look at the performance:
 ```{r}
 collect_metrics(resample_pca_fit)
 ```
 
-And we can compare this with our previous performance:
+And we can compare this with our previous performance using the linear model:
+
+AVOCADO: if we keep this section, could it be renamed something like `resample_lm_fit`? 
 
 ```{r}
 collect_metrics(resample_fit)
@@ -2248,37 +2248,37 @@ collect_metrics(resample_fit)
 
 So we can see that our performance isn't quite as good - especially if we look at the `rmse` value.  
 
+AVOCADO: did you mean `rsq` value? I think the `rmse` is smaller for the original linear model? 
 
 ### Random Forest
 
+Now for one last recipe, we are going to predict our outcome variable (air pollution) using a decision tree method called [random forest](https://en.wikipedia.org/wiki/Random_forest){target="_blank"}.
 
-Now for one last recipe, we are going to predict using a decision tree method called [random forest](https://en.wikipedia.org/wiki/Random_forest){target="_blank"}.
-
-A [decision tree](https://medium.com/greyatom/decision-trees-a-simple-way-to-visualize-a-decision-dc506a403aeb){target="_blank"} is a tool to partition data or anything really, based on a series of sequential (often binary) decisions, where the decisions are chosen  based on their ability to optimally split the data.
+A [decision tree](https://medium.com/greyatom/decision-trees-a-simple-way-to-visualize-a-decision-dc506a403aeb){target="_blank"} is a tool to partition data or anything really, based on a series of sequential (often binary) decisions, where the decisions are chosen based on their ability to optimally split the data.
 
 Here you can see a simple example:
 
-```{r}
+```{r, echo = FALSE}
 knitr::include_graphics("https://miro.medium.com/max/1000/1*LMoJmXCsQlciGTEyoSN39g.jpeg")
-
 ```
 
 ##### [[source]](https://towardsdatascience.com/understanding-random-forest-58381e0602d2){target="_blank"}
 
-In the case of [random forest](https://towardsdatascience.com/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9){target="_blank"} , multiple decision trees are created - hence the name forest, and each tree is built using a random subset of the training data (with replacement) - hence the full name random forest. This random aspect helps to keep the algorithm from overfitting the data.
+In the case of [random forest](https://towardsdatascience.com/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9){target="_blank"}, multiple decision trees are created - hence the name forest, and each tree is built using a random subset of the training data (with replacement) - hence the full name random forest. This random aspect helps to keep the algorithm from overfitting the data.
 
 The mean of the predictions from each of the trees is used in the final output.
 
-```{r}
+```{r, echo = FALSE}
 knitr::include_graphics("https://miro.medium.com/max/1400/0*f_qQPFpdofWGLQqc.png")
 ```
 
 
 In our case, the random forest algorithm that we are working with does not work well when there are categorical variables with more than 53 levels, so we will need to remove the `zcta` variable.
 
-```{r}
+AVOCADO: why the specific number 53 levels? 
 
-RF_rec <-recipe(train_pm) %>%
+```{r}
+RF_rec <- recipe(train_pm) %>%
     update_role(everything(), new_role = "predictor")%>%
     update_role(value, new_role = "outcome")%>%
     update_role(id, new_role = "id variable") %>%
@@ -2294,59 +2294,68 @@ RF_rec <-recipe(train_pm) %>%
 
 The `rand_forest()` function of the `parsnip` package has three important arguments that act as an interface for the different possible engines to perform a random forest analysis:
 
-1) mtry
-The number of predictor or explanatory variables that will be randomly sampled as options at each split when creating the tree models. The default number for regression analyses is the number of predictors divided by 3. 
-
-2) min_n - The minimum number of data points in a node that are required for the node to be split further.
-
-3) trees - the number of trees in the ensemble
+1. `mtry` - The number of predictor variables (or features) that will be randomly sampled at each split when creating the tree models. The default number for regression analyses is the number of predictors divided by 3. 
+2. `min_n` - The minimum number of data points in a node that are required for the node to be split further.
+3. `trees` - the number of trees in the ensemble
 10 and 3
 
+AVOCADO: not sure what the "10 and 3" mean? 
+
+Now that we have our recipe (`RF_rec`), let's specify the model with `rand_forest()` from `parsnip` with the `mode = "regression"` argument to specify our outcome variable (air pollution) is continuous. 
+
 ```{r}
-
-PMtree_model <- parsnip::rand_forest(mtry = 10, min_n = 3, mode = "regression")
+PMtree_model <- 
+  parsnip::rand_forest(mtry = 10, min_n = 3, 
+                       mode = "regression")
 PMtree_model
+```
 
+Next, we set the engine and mode
+```{r}
 RF_PM_model <- 
-  PMtree_model  %>%
-  parsnip::set_engine("randomForest") %>%
+  PMtree_model %>%
+  set_engine("randomForest") %>%
   set_mode("regression")
 
 RF_PM_model
+```
 
+Then, we put this all together into a `workflow`: 
 
-RF_wflow <-workflows::workflow() %>%
+```{r}
+RF_wflow <- workflows::workflow() %>%
             workflows::add_recipe(RF_rec) %>%
             workflows::add_model(RF_PM_model)
 RF_wflow
 ```
 
-Fitting the data with just parsnip and with the workflow:
+Finally, we fit the data to the model using either just `parsnip` 
+
 ```{r}
-
-##just parsnip
 RF_fit <- RF_PM_model %>% 
-parsnip::fit(value ~., data =juiced_train_ready)
+  parsnip::fit(value ~., data =juiced_train_ready)
+```
 
-## with workflow
+Or using `workflows`: 
+```{r}
 RF_wflow_fit <- parsnip::fit(RF_wflow, data = train_pm)
 RF_wflow_fit
 ```
 
-
 Let's take a look at the top 10 contributing variables:
 
 ```{r}
-RF_wflow_fit%>% 
+RF_wflow_fit %>% 
   pull_workflow_fit() %>% 
   vip(num_features = 10)
 ```
+AVOCADO: i got a different output than you did with `state` being the top, followed by `CMAQ`, then `county_area`. I'm guessing we needed to set a seed somewhere? The text below might not be right? 
 
 Interesting, in the previous model the CMAQ values were also important, however the variable about if the monitor was located in California or not was also very predictive. 
 
 Now let's take a look at model performance by fitting the data using cross validation:
 ```{r}
-resample_RF_fit <-tune::fit_resamples(RF_wflow, vfold_pm)
+resample_RF_fit <- tune::fit_resamples(RF_wflow, vfold_pm)
 collect_metrics(resample_RF_fit)
 ```
 
@@ -2359,22 +2368,20 @@ collect_metrics(resample_fit)
 show_best(df_tuning, metric = "rmse", n =1)
 # our PCA model:
 collect_metrics(resample_pca_fit)
-
 ```
-OK, so our first model had a mean rmse value of 2.18.
+
+OK, so our first model had a mean `rmse` value of 2.18.
 The model with the lat/long degrees of freedom  tuning had a mean rmse value of 2.02, thus showing some improvement.
 The PCA model had a mean rmse value of 2.76.
 
-It looks like the random forest model had the lowest rmse value of 1.79.
+It looks like the random forest model had the lowest `rmse` value of 1.79.
 
 
 If we tuned our random forest model based on the number of trees or the value for `mtry` (which is "The number of predictors that will be randomly sampled at each split when creating the tree models"), we might get a model with even better performance.
 
+However, our cross validated mean rmse value of 1.79 is quite good because our range of true outcome values is much larger: (`r round(range(test_pm$value),3)`).
 
-However, our cross validated mean rmse value of 1.79 is quite good because our range of true outcome values is much larger:`r range(test_pm$value)`.
-
-### Final Model Performance Evaluation
-
+### Final model performance evaluation
 
 Now that we have decided that we have reasonable performance with the training data, we could stop here and use the `yardstick` package (and `tune` if using `workflows` to fit our model) to evaluate performance with our testing data. 
 
