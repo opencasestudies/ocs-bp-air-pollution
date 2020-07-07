@@ -1055,7 +1055,7 @@ Indeed this increased the correlation, but variables from each of these categori
 
 Now that we have a sense of what our data are, we can get started with building a machine learning model to predict air pollution. 
 
-## What is machine learning? 
+## What is machine learning?  {#whatisml}
 
 You may have learned about the central dogma of statistics that you sample from a population
 
@@ -1117,10 +1117,11 @@ Now that we know a bit more about machine learning, let's build a model to predi
 
 ## Machine learning with `tidymodels`
 
-
 The goal is to build a machine learning algorithm uses the features as input and predicts a outcome variable (or air pollution levels) in the situation where we do not know the outcome variable. 
 The way we do this is to use data where we have both the input and output data to _train_ a machine learning algorithm. 
 To train a machine learning algorithm, we will use the `tidymodels` package ecosystem. 
+
+### Overview 
 
 #### The tidymodels ecosystem
 
@@ -1873,73 +1874,106 @@ PM_wflow_fit %>%
 In this next section, our goal is to assess the overall model performance. 
 The way we do this is to compare the similarity between the predicted estimates of the outcome variable produced by the model and the true outcome variable values. 
 
+If you recall the [What is machine learning?](#whatisml) section, we showed how to think about machine learning (ML) as an optimization problem that tries to minimize the distance between our predicted outcome $\hat{Y} = f(X)$ and actual outcome $Y$ using our features (or predictor variables) $X$ as input to a function $f$ that we want to estimate. 
 
+$$d(Y - \hat{Y})$$
+
+As our goal in this section is to assess overall model performance, we will now talk about different distance metrics that you can use. 
+
+First, let's pull out our predicted outcome values $\hat{Y} = f(X)$ from the models we fit (using different approaches). 
+
+Using the `parsnip` package, we can grab the predicted outcome values (or fitted values) like this: 
+
+```{r}
+parsnip_fitted_values <- fitted(PM_fit[["fit"]])
+
+head(parsnip_fitted_values)
+```
+
+Alternatively, we can get the fitted values using the `augment()` function using the output from `parsnip`: 
+
+```{r}
+parsnip_fitted_values <- 
+  augment(PM_fit[["fit"]], data = juiced_train) %>% 
+  select(value, .fitted:.std.resid)
+
+head(parsnip_fitted_values)
+```
+
+Alternatively, we can use the output from `workflows`:
+
+```{r}
+wf_fit <- PM_wflow_fit %>% 
+  pull_workflow_fit()
+
+wf_fitted_values <- fitted(wf_fit[["fit"]])
+head(wf_fitted_values)
+```
+
+Alternatively, we can get the fitted values using the `augment()` function using the output from `workflows`: 
+
+```{r}
+wf_fitted_values <- 
+  augment(wf_fit[["fit"]], data = juiced_train) %>% 
+  select(value, .fitted:.std.resid)
+
+head(wf_fitted_values)
+```
+
+Either way, this gives us the same fitted values
+
+```{r}
+identical(parsnip_fitted_values, wf_fitted_values)
+```
+
+#### Visualizing model performance
+
+Now, we can compare the predicted outcome values (or fitted values) $\hat{Y}$ to the actual outcome values $Y$ that we observed: 
+
+```{r}
+wf_fitted_values %>% 
+  ggplot(aes(x =  value, y = .fitted)) + 
+  geom_point() + 
+  xlab("actual outcome values") + 
+  ylab("predicted outcome values")
+```
+
+OK, so our range of the predicted outcome values appears to be smaller than the real values. 
+We could probably do a bit better.
+
+#### Quantifying model performance 
+
+Next, let's use different distance functions $d(\cdot)$ to assess how far off our predicted outcome $\hat{Y} = f(X)$ and actual outcome $Y$ values are from each other: 
+
+$$d(Y - \hat{Y})$$
+
+As mentioned, there are entirely scholarly fields of research dedicated to identifying different distance metrics $d(\cdot)$ for machine learning applications. 
+However, when performing prediction with a continuous outcome $Y$, a few of the mostly commonly used distance metrics are: 
+
+1. mean absolute error (`mae`)  
+2. R squared error (`rsq`) -- this is also known as the coefficient of determination which is the squared correlation between truth and estimate  
+3. root mean squared error (`rmse`)   
+
+AVOCADO: could we add the distance metrics themselves here? 
+
+One way to calculate these metrics within the `tidymodels` framework is to use the `yardstick` package using the `metrics()` function. 
+
+```{r}
+yardstick::metrics(wf_fitted_values, 
+                   truth = value, estimate = .fitted)
+```
+
+Alternatively if you only wanted one metric you could use the `mae()`, `rsq()`, or `rmse()` functions, respectively. 
+
+```{r}
+yardstick::mae(wf_fitted_values, 
+               truth = value, estimate = .fitted)
+```
+
+### Cross validation sample splitting
 
 
 This is done typically as an iterative process with the training data along side modification of the model until the performance using the training data is satisfactory. At this point, the final model performance is assessed using the testing data. This then gives an estimate about how well the model will predict or classify the outcome variable of interest with new independent data. Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources.
-
-Let's take a look at how well our model fit our training data:
-
-
-```{r}
-##using the parsnip version
-#can grab the fitted values simply like this:
-parsnip_fitted_values<-fitted(PM_fit[["fit"]])
-
-head(parsnip_fitted_values)
-
-#can also get the values using the augment function
-parsnip_fitted_values <- augment(PM_fit[["fit"]], data = juiced_train) %>% 
-select(value, .fitted:.std.resid)
-
-head(parsnip_fitted_values)
-
-##using the workflows version
-wf_fit <-PM_wflow_fit %>% 
-  pull_workflow_fit()
-
-#can grab the fitted values simply like this:
-wf_fitted_values<-fitted(wf_fit[["fit"]])
-
-head(wf_fitted_values)
-
-#can also get the values using the augment function
-wf_fitted_values <-augment(wf_fit[["fit"]], data = juiced_train) %>% 
-select(value, .fitted:.std.resid)
-
-head(wf_fitted_values)
-
-#gives us the same fitted values
-identical(parsnip_fitted_values, wf_fitted_values)
-
-## Let's make a plot of fitted and real values
-
-ggplot(wf_fitted_values, aes(x = .fitted, y = value)) + geom_point()
-```
-
-OK, so our fitted range appears to be smaller than the real values. We could probably do a bit better.
-
-
-Let's take a look at how well our model seems to be preforming more formally:
-
-When assessing the performance of a model, the metrics we use depend on if we are preforming a classification or prediction also known as regression analysis. In our case we are performing a regression or prediction analysis and the metrics often used are:
-1) mean absolute error (mae)  
-2) R squared error (rsq) 
-This is also known as the coefficient of determination which is the squared correlation between truth and estimate  
-3) root mean squared error (rmse)   
-
-
-We can use the `yardstick` package to quickly calculate estimates for all of these values using the `metrics()` function. Alternatively if you only wanted one metric you could use the `mae()`, `rsq()`, or `rmse()` functions respectively. This is helpful to examine with our fitted training set values to see how well our model is performing and if we need to make adjustments. 
-
-```{r}
-
-yardstick::metrics(wf_fitted_values, truth = value, estimate = .fitted)
-yardstick::mae(wf_fitted_values, truth = value, estimate = .fitted)
-
-```
-
-
-### Cross validation sample splitting
 
 We will use the `rsample` package again in order to further implement what are called [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} techniques. This is also called **resampling** or **repartioning**.  
 
