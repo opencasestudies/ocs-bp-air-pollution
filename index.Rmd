@@ -1723,19 +1723,24 @@ lm_PM_model
 
 
 
-### Fitting the model: two ways - `workflows` and `parsnip`
+### Fitting the model
 
-To fit our model we can use the `parsnip` package and then assess our fit using the `yardstick` package.
+At the moment, there are actually a few ways to fit our model. 
 
-However a newer package called `workflows` allows us to keep track of both our pre-processing steps and our model specification. It also allows us to implement fancier optimizations in an automated way and it is currently being developed to also handle post-processing operations, so it is good to learn about it!
+1. We can use the `parsnip` package and then assess our fit using the `yardstick` package. 
+2. We can also the `parsnip` package with a newer package called `workflows` (still under development) that allows us to keep track of both our pre-processing steps and our model specification. It also allows us to implement fancier optimizations in an automated way and it is currently being developed to also handle post-processing operations. 
 
-So we will now create a workflow with the recipe (our pre-processing specifications) that we made and the model that we just specified.
+AVOCADO: I feel like we should do a bit more explaining or maybe draw a figure of these two approaches? 
 
-First we use the `workflow()` function of the `workflows` package to create a workflow.
+Here we will talk about the second way to fit out model using the `workflows` and `parsnip` package. 
 
-Then we add our recipe with the `add_recipe()` function and we add our model with the `add_model()` function of the `workflows` package. 
+We begin by creating a workflow using the `workflow()` function in the `workflows` package. 
+Next, we use `add_recipe()` (our pre-processing specifications) and we add our model with the `add_model()` function -- both functions from the `workflows` package.
 
-Note: We do not need to actually prep our recipe before using workflows!
+**Note**: We do not need to actually `prep()` our recipe before using workflows!
+
+If you recall `novel_rec` is the recipe we previously created with the `recipes` package and `lm_PM_model` is where we specified our model with the `parsnip` package.
+Here, we combine everything together into a `workflow()`. 
 
 ```{r}
 PM_wflow <-workflows::workflow() %>%
@@ -1744,25 +1749,37 @@ PM_wflow <-workflows::workflow() %>%
 PM_wflow
 ```
 
-Ah, nice. Notice how it tells us about both our pre-processing steps and our model specifications.
+Ah, nice. 
+Notice how it tells us about both our pre-processing steps and our model specifications.
 
-Now we can prepare the recipe (estimate the parameters) and fit the model to our training data all at once. Printing the output we can see the coefficients of the model.
+Next, we "prepare the recipe" (or estimate the parameters) and fit the model to our training data all at once. 
+Printing the output, we can see the coefficients of the model.
 
 ```{r}
 PM_wflow_fit <- parsnip::fit(PM_wflow, data = train_pm)
 PM_wflow_fit
 ```
 
-Otherwise we could have done this without the `workflows` package. Notice here we will used the processed training data (`juiced_train`) as opposed to the raw training data that we used with the workflow we created with `workflows`.
 
-In this case, we actually need to write your model again! Recall that `id` and `fips` are ID variables and that `values` is our outcome of interest (the pm air pollution measure at each monitor). 
+<details><summary> Click here learn how to do this without the `workflows` package </summary>
+
+AVOCADO: this section feels like it should either have more explanation or just deleted. To me it feels confusing because it feels like we are showing a compeltely alternative path without an explanation why you might want to do? or when you would want to do this? 
+
+We could have also done this without the `workflows` package. 
+Notice below that we use the processed training data (`juiced_train`) as opposed to the raw training data that we used with the `workflow()` we created with `workflows` above.
+
+In this case, we actually need to write your model again! 
+Recall that `id` and `fips` are ID variables and that `values` is our outcome of interest (the air pollution measure at each monitor). 
 
 ```{r}
-juiced_train_ready <- juiced_train%>% select( -id, -fips)
-PM_fit <- lm_PM_model %>% 
-parsnip::fit(value ~., data =juiced_train_ready)
+juiced_train_ready <- juiced_train %>% 
+  select(-id, -fips)
 
+PM_fit <- lm_PM_model %>% 
+  parsnip::fit(value ~., data = juiced_train_ready)
 ```
+
+</details>
 
 ### Looking at model fit with `broom`
 
