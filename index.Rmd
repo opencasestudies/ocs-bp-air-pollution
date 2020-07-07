@@ -193,7 +193,7 @@ In this case study, we will walk you through importing data from CSV files and p
 include_graphics("https://tidyverse.tidyverse.org/logo.png")
 ```
 
-```{r, out.width = "100px", echo = FALSE, fig.align ="center"}
+```{r, out.width = "50px", echo = FALSE, fig.align ="center"}
 include_graphics("https://pbs.twimg.com/media/DkBFpSsW4AIyyIN.png")
 ```
 
@@ -545,11 +545,10 @@ For example, the monitor ID (`id`), the Federal Information Processing Standard 
 AVOCADO: should we explain what we mean by a "double" data type? I think factor and character are more understandable? But maybe we should explain those too? 
 
 Let's convert these variables into factors. 
-We can do this using the `mutate_at()` function of the `dplyr` package and the `as.factor()` base function. 
+We can do this using the `across()` function of the `dplyr` package and the `as.factor()` base function. 
+The `across()` function has two main arguments: (i) the columns you want to operate on and (ii) the function or list of functions to apply to each column. 
 
-AVOCADO: Should we use `across()` instead of `mutate_at()`? https://dplyr.tidyverse.org/reference/mutate_all.html 
-
-In this case we are also using the `magrittr` assignment pipe or double pipe that looks like this `%<>%` of the `magrittr` package. 
+In this case, we are also using the `magrittr` assignment pipe or double pipe that looks like this `%<>%` of the `magrittr` package. 
 This allows us use the `pm` data as input, but also reassigns the output to the same data object name.
 
 #### {.scrollable }
@@ -557,7 +556,7 @@ This allows us use the `pm` data as input, but also reassigns the output to the 
 ```{r}
 # Scroll through the output!
 pm %<>%
-  dplyr::mutate_at(vars(id, fips, zcta), as.factor) 
+  mutate(across(c(id, fips, zcta), as.factor)) 
 
 glimpse(pm)
 ```
@@ -1034,7 +1033,7 @@ select(log_nei_2008_pm25_sum_10000, popdens_county,
 
 Interesting, so these variables don't appear to be highly correlated, therefore we might need variables from each of the categories to predict our monitor PM~2.5~ pollution values.
 
-Becauses some variables in our data have extreme values, it might be good to take a log transformation. This can affect our estimates of correlation. 
+Because some variables in our data have extreme values, it might be good to take a log transformation. This can affect our estimates of correlation. 
 ```{r}
 pm %>%
   mutate(log_popdens_county= log(popdens_county)) %>%
