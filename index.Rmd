@@ -241,7 +241,7 @@ library(cowplot)
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
 [tidymodels](https://www.tidymodels.org){target="_blank"} | to load in a set of packages (broom, dials, infer, parsnip, purrr, recipes, rsample, tibble, yardstick)
 [rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets; to split the training set for cross-validation  
-[recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `juice()` - extracts final preprocessed training data and `bake()` - applies recipe steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
+[recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `juice()` - extracts final pre-processed training data and `bake()` - applies recipe steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
 [parsnip](https://tidymodels.github.io/parsnip/){target="_blank"}   | an interface to create models (major functions are `fit()`, `set_engine()`)
 [yardstick](https://tidymodels.github.io/yardstick/){target="_blank"}   | to evaluate the performance of models
 [broom](https://www.tidyverse.org/blog/2018/07/broom-0-5-0/){target="_blank"} | to get tidy output for our model fit and performance
@@ -1091,7 +1091,7 @@ To perform our analysis we will be using the `tidymodels` suite of packages.
 You may be familiar with the older packages `caret` or `mlr` which are also for machine learning and modeling but are not a part of the `tidyverse`. 
 [Max Kuhn](https://resources.rstudio.com/authors/max-kuhn){target="_blank"} describes `tidymodels` like this:
 
-> "Other packages, such as caret and mlr, help to solve the R model API issue. These packages do a lot of other things too: preprocessing, model tuning, resampling, feature selection, ensembling, and so on. In the tidyverse, we strive to make our packages modular and parsnip is designed only to solve the interface issue. It is not designed to be a drop-in replacement for caret.
+> "Other packages, such as caret and mlr, help to solve the R model API issue. These packages do a lot of other things too: pre-processing, model tuning, resampling, feature selection, ensembling, and so on. In the tidyverse, we strive to make our packages modular and parsnip is designed only to solve the interface issue. It is not designed to be a drop-in replacement for caret.
 The tidymodels package collection, which includes parsnip, has other packages for many of these tasks, and they are designed to work together. We are working towards higher-level APIs that can replicate and extend what the current model packages can do."
 
 There are many R packages in the `tidymodels` ecosystem, which assist with various steps in the process of building a machine learning algorithm:
@@ -1116,9 +1116,9 @@ The two major benefits of `tidymodels` are:
 
 Different notations are required for different algorithms as the algorithms have been developed by different people. This would require the painstaking process of reformatting the data to be compatible with each algorithm if multiple algorithms were tested.
 
-2. Can easily modify preprocessing, algorithm choice, and hyper-parameter tuning making optimization easy  
+2. Can easily modify pre-processing, algorithm choice, and hyper-parameter tuning making optimization easy  
 
-Modifying a piece of the overall process is now easier than before because many of the steps are specified using the `tidymodels` packages in a convenient manner. Thus the entire process can be rerun after a simple change to preprocessing without much difficulty.
+Modifying a piece of the overall process is now easier than before because many of the steps are specified using the `tidymodels` packages in a convenient manner. Thus the entire process can be rerun after a simple change to pre-processing without much difficulty.
 
 
 
@@ -1321,9 +1321,9 @@ knitr::include_graphics(here::here("img","Starting_a_recipe_recipes1.png"))
 ```
 
 
-#### Step 2: Specify the preprocessing steps with `step*()` functions
+#### Step 2: Specify the pre-processing steps with `step*()` functions
 
-Next, we use the `step*()` functions from the `recipe` package to specify preprocessing steps. 
+Next, we use the `step*()` functions from the `recipe` package to specify pre-processing steps. 
 
 ```{r, echo=FALSE, out.width="400px"}
 knitr::include_graphics(here::here("img","Making_a_recipe_recipes2.png"))
@@ -1444,8 +1444,8 @@ simple_rec
 
 The next major function of the `recipes` package is `prep()`.
 This function updates the recipe object based on the training data. 
-It estimates parameters (estimating the required quantities and statistics required by the steps for the variables) for preprocessing and updates the model terms, as some of the predictors may be removed, this allows the recipe to be ready to use on other data sets. 
-It **does not necessarily actually execute the preprocessing itself**, however we will specify in argument for it to do this so that we can take a look at the preprocessed data.
+It estimates parameters (estimating the required quantities and statistics required by the steps for the variables) for pre-processing and updates the model terms, as some of the predictors may be removed, this allows the recipe to be ready to use on other data sets. 
+It **does not necessarily actually execute the pre-processing itself**, however we will specify in argument for it to do this so that we can take a look at the pre-processed data.
 
 AVOCADO: I'm not sure I get what "updates the model terms" in the paragraph above means. I didn't think a model had been specified yet? 
 
@@ -1666,31 +1666,36 @@ Great now we no longer have `NA` values! :)
 
 ### Specifying the model
 
-4. Model specification, fitting, tuning and performance evaluation using the training data -- The model needs to first be fit to the training data. First the method or algorithm in which the model will be fit is specified (regression, random forest etc.).  Then in both classification and prediction, the model is fit to the training data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. If the model fits well than these estimated values will be very similar to the true outcome variable values. If the model does not fit well, than these estimates will be more disimilar from the true outcome variable. In this case, aspects about the model may need to be modified to improve the similarity of the estimates with that of the true outcome values. One way to optimize model performance is a process called tuning in which different model [hyper-parameter](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"} options are tested to determine the best option for model performance.
-
-So far we have used `rsample` to split the data and `recipes` to assign variable and to specify and prep our pre-processing (as well as to optionally extract the preprocessed data).
+So far we have used the packages `rsample` to split the data and `recipes` to assign variable types, and to specify and prep our pre-processing (as well as to optionally extract the pre-processed data).
 
 We will now use the `parsnip` package (which is similar to the previous `caret` package - and hence why it is named after the vegetable) to specify our model.
 
-There are four aspects to define about our model:  
-1) the **type** of model (using specific functions in parsnip like `rand_forest()`, `logistic_reg()` etc.)  
-2) the **mode** of learning - classification or regression (using the `set_mode()` function)  
-3) the package or **engine** that we will use to implement the type of model selected (using the `set_engine()` function)  
-4) any **arguments** necessary for the model/package selected (using the `set_args()`function -  for example the `mtry =` argument for random forest which is the number of variables to be used as options for splitting at each tree node)  
+There are four things we need to define about our model:  
 
-We are going to start our analysis with a linear regression but we will demonstrate how we can try different models.
+1. The **type** of model (using specific functions in parsnip like `rand_forest()`, `logistic_reg()` etc.)  
+2. The package or **engine** that we will use to implement the type of model selected (using the `set_engine()` function) 
+3. The **mode** of learning - classification or regression (using the `set_mode()` function) 
+4. Any **arguments** necessary for the model/package selected (using the `set_args()`function -  for example the `mtry =` argument for random forest which is the number of variables to be used as options for splitting at each tree node)
 
-The first thing we do is define what type of model we would like to use. See [here](https://tidymodels.github.io/parsnip/articles/articles/Models.html
-){target="_blank"} for modeling [options]in parsnip.
+Let's walk through these steps one by one. 
+For our case, we are going to start our analysis with a linear regression but we will demonstrate how we can try different models.
+
+The first step is to define what type of model we would like to use. 
+See [here](https://tidymodels.github.io/parsnip/articles/articles/Models.html){target="_blank"} for modeling [options] in `parsnip`.
+
+AVOCADO: looks like the "[options]" above is missing a link?  
 
 ```{r}
-PM_model <- parsnip::linear_reg() #PM for particulate mater
+PM_model <- parsnip::linear_reg() # PM for particulate matter
 PM_model
 ```
 
-OK. So far all we have told `parsnip` is we want to use a linear regression...  Let's tell `parsnip` more about what we want.
+OK. So far, all we have defined is that we want to use a linear regression...  
+Let's tell `parsnip` more about what we want.
 
-We would like to use the ordinary least squares method to fit our linear regression. So we will tell `parsnip` that we want to use the `lm` package to implement our linear regression (there are many options actually- such as [`rstan`](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html){target="_blank"}  [`glmnet`](https://cran.r-project.org/web/packages/glmnet/index.html){target="_blank"} , [`keras`](https://keras.rstudio.com/){target="_blank"} , and [`sparklyr`](https://therinspark.com/starting.html#starting-sparklyr-hello-world)){target="_blank"}. We will do so by using the `set_engine()` function of the `parsnip` package.
+We would like to use the ordinary least squares method to fit our linear regression. 
+So we will tell `parsnip` that we want to use the `lm` package to implement our linear regression (there are many options actually such as [`rstan`](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html){target="_blank"}  [`glmnet`](https://cran.r-project.org/web/packages/glmnet/index.html){target="_blank"}, [`keras`](https://keras.rstudio.com/){target="_blank"}, and [`sparklyr`](https://therinspark.com/starting.html#starting-sparklyr-hello-world){target="_blank"}). 
+We will do so by using the `set_engine()` function of the `parsnip` package.
 
 ```{r}
 lm_PM_model <- 
@@ -1698,10 +1703,11 @@ lm_PM_model <-
   parsnip::set_engine("lm")
 
 lm_PM_model
-
 ```
 
-In some cases some packages can do either classification or prediction, so it is a good idea to specify which mode you intend to perform. You can do this with the `set_mode()` function of the `parsnip` package, by using either `set_mode("classification")` or `set_mode("regression")`.
+In some cases some packages can do either classification or prediction, so it is a good idea to specify which mode you intend to perform. 
+Here, we aim to predict the air pollution. 
+You can do this with the `set_mode()` function of the `parsnip` package, by using either `set_mode("classification")` or `set_mode("regression")`.
 
 ```{r}
 lm_PM_model <- 
@@ -1710,16 +1716,20 @@ lm_PM_model <-
   set_mode("regression")
 
 lm_PM_model
-
 ```
+
+
+4. Model specification, fitting, tuning and performance evaluation using the training data -- The model needs to first be fit to the training data. First the method or algorithm in which the model will be fit is specified (regression, random forest etc.).  Then in both classification and prediction, the model is fit to the training data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. If the model fits well than these estimated values will be very similar to the true outcome variable values. If the model does not fit well, than these estimates will be more disimilar from the true outcome variable. In this case, aspects about the model may need to be modified to improve the similarity of the estimates with that of the true outcome values. One way to optimize model performance is a process called tuning in which different model [hyper-parameter](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"} options are tested to determine the best option for model performance.
+
+
 
 ### Fitting the model: two ways - `workflows` and `parsnip`
 
 To fit our model we can use the `parsnip` package and then assess our fit using the `yardstick` package.
 
-However a newer package called `workflows` allows us to keep track of both our preprocessing steps and our model specification. It also allows us to implement fancier optimizations in an automated way and it is currently being developed to also handle post-processing operations, so it is good to learn about it!
+However a newer package called `workflows` allows us to keep track of both our pre-processing steps and our model specification. It also allows us to implement fancier optimizations in an automated way and it is currently being developed to also handle post-processing operations, so it is good to learn about it!
 
-So we will now create a workflow with the recipe (our preprocessing specifications) that we made and the model that we just specified.
+So we will now create a workflow with the recipe (our pre-processing specifications) that we made and the model that we just specified.
 
 First we use the `workflow()` function of the `workflows` package to create a workflow.
 
@@ -1734,7 +1744,7 @@ PM_wflow <-workflows::workflow() %>%
 PM_wflow
 ```
 
-Ah, nice. Notice how it tells us about both our preprocessing steps and our model specifications.
+Ah, nice. Notice how it tells us about both our pre-processing steps and our model specifications.
 
 Now we can prepare the recipe (estimate the parameters) and fit the model to our training data all at once. Printing the output we can see the coefficients of the model.
 
@@ -2016,6 +2026,7 @@ df_tuning %>%
 
 show_best(df_tuning, metric = "rmse", n =1)
 ```
+
 
 
 
@@ -2466,9 +2477,9 @@ We used a packages like `skimr`, `summarytools`, `corrplot`, `ggcorrplot`, and `
 
 We used the `rsample` package to first perform an initial split of our data into two pieces: a training set and a testing set. The training set was used to optimize the model, while the testing set was used only to evaluate the performance of our final model. We also used the `rsample` package to create cross validation subsets of our training data. This allowed us to better assess the performance of our tested models using our training data.  
 
-3) Variable assignment and preprocessing   
+3) Variable assignment and pre-processing   
 
-We used the `recipes` package to assign variable roles (such as outcome, predictor, and id variable). We also used this package to create a recipe for preprocessing our training and testing data. This involved steps such as: ` step_dummy` to create dummy numeric encodings of our categorical variables, `step_corr` to remove highly correlated variables, `step_nzv` to remove near zero variance variables that would contribute little to our model and potentially add noise.  We learned that once our recipe was created and prepped using `prep()`we could extract the pre-processed training data using `juice()` or our pre-processed testing data using `bake()`. We also learned that if we used the newer workflows package that we did not need to the `prep()`, `juice()`, or `bake()` functions, but that it is still useful to know how to do so if we want to look at our data and how the recipe is influencing it more deeply.  
+We used the `recipes` package to assign variable roles (such as outcome, predictor, and id variable). We also used this package to create a recipe for pre-processing our training and testing data. This involved steps such as: ` step_dummy` to create dummy numeric encodings of our categorical variables, `step_corr` to remove highly correlated variables, `step_nzv` to remove near zero variance variables that would contribute little to our model and potentially add noise.  We learned that once our recipe was created and prepped using `prep()`we could extract the pre-processed training data using `juice()` or our pre-processed testing data using `bake()`. We also learned that if we used the newer workflows package that we did not need to the `prep()`, `juice()`, or `bake()` functions, but that it is still useful to know how to do so if we want to look at our data and how the recipe is influencing it more deeply.  
 
 4) Model specification, fitting, tuning and performance evaluation using the training data  
 
@@ -2493,7 +2504,7 @@ Students can predict air pollution monitor values using a different algorithm an
 1) A review of [tidymodels](https://rviews.rstudio.com/2019/06/19/a-gentle-intro-to-tidymodels/){target="_blank"}  
 2) A [course on tidymodels](https://juliasilge.com/blog/tidymodels-ml-course/){target="_blank"} by Julia Silge  
 3) [More examples, explanations, and info about tidymodels development](https://www.tidymodels.org/learn/){target="_blank"} from the developers  
-4) A guide for [preprocessing with recipes](http://www.rebeccabarter.com/blog/2019-06-06_pre_processing/){target="_blank"}  
+4) A guide for [pre-processing with recipes](http://www.rebeccabarter.com/blog/2019-06-06_pre_processing/){target="_blank"}  
 5) A [guide](https://briatte.github.io/ggcorr/){target="_blank"} for using GGally to create correlation plots  
 6) A [guide](https://www.tidyverse.org/blog/2018/11/parsnip-0-0-1/){target="_blank"} for using parsnip to try different algorithms or engines  
 7) A [list of recipe functions](https://tidymodels.github.io/recipes/reference/index.html){target="_blank"}  
@@ -2542,7 +2553,7 @@ Students can predict air pollution monitor values using a different algorithm an
 [ggcorrplot](http://www.sthda.com/english/wiki/ggcorrplot-visualization-of-a-correlation-matrix-using-ggplot2){target="_blank"}| also to make large correlation plots
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
 [rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets and to split the training set for cross-validation  
-[recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `juice()` - extracts final preprocessed training data and `bake()` - applies recipe steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
+[recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `juice()` - extracts final pre-processed training data and `bake()` - applies recipe steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
 [parsnip](https://tidymodels.github.io/parsnip/){target="_blank"}   | an interface to create models (major functions are  `fit()`, `set_engine()`)
 [yardstick](https://tidymodels.github.io/yardstick/){target="_blank"}   | to evaluate the performance of models
 [broom](https://www.tidyverse.org/blog/2018/07/broom-0-5-0/){target="_blank"} | to get tidy output for our model fit and performance
