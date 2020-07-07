@@ -2383,35 +2383,56 @@ However, our cross validated mean rmse value of 1.79 is quite good because our r
 
 ### Final model performance evaluation
 
-Now that we have decided that we have reasonable performance with the training data, we could stop here and use the `yardstick` package (and `tune` if using `workflows` to fit our model) to evaluate performance with our testing data. 
+Now that we have decided that we have reasonable performance with our training data, we could stop here and use the `yardstick` package (and `tune` if using `workflows` to fit our model) to evaluate performance with our testing data. 
 
-So now we will use our random forest model to predict values for the monitors in the testing data.
+Here, we will use the random forest model that we built to predict values for the monitors in the testing data.
 
 Using `parsnip` we would need to use the baked data testing data. With the `workflows` package, we could use the raw testing data.
 
-Importantly, ID variables are not dealt with as nicely as with the `workflows` package so we would need to remove them. We did this above when created the processed training data for this model, the `juiced_train` data as well.
+AVOCADO: maybe remind readers what is baked testing data? 
 
-```{r}
+Importantly, ID variables are not dealt with as nicely as with the `workflows` package so we would need to remove them. 
+We did this above when created the processed training data for this model, the `juiced_train` data as well.
 
- baked_test_pm_ready <-baked_test_pm %>%select( -"id", -"fips")
- values_pred_parsnip <-predict(RF_fit, baked_test_pm_ready)
- values_pred_parsnip
- 
-# using the workflows version
+First, let's extract the predicted outcome values on the testing data. 
+
+```{r,eval=FALSE}
+baked_test_pm_ready <- 
+  baked_test_pm %>% 
+  select( -"id", -"fips")
+
+values_pred_parsnip <- predict(RF_fit, baked_test_pm_ready)
+values_pred_parsnip
+```
+
+AVOCADO: I'm getting the following output: 
+
+```
+Error in predict.randomForest(object = object$fit, newdata = new_data) : missing values in newdata
+```
+
+AVOCADO: any ideas on what i should do? 
+
+AVOCADO: Setting the rest of the code chunks to `eval=FALSE` for now
+
+Alternatively, you can also do this with `workflows`: 
+```{r,eval=FALSE}
 values_pred_wfs <- 
   predict(RF_wflow_fit, test_pm) %>% 
   bind_cols(test_pm %>% select(value, fips, county, id)) 
 values_pred_wfs
+```
 
-#model performance with test set
-yardstick::metrics(values_pred_wfs, truth = value, estimate = .pred)
-
+Next we calculate the performance metrics with `yardstick`
+```{r,eval=FALSE}
+yardstick::metrics(values_pred_wfs, 
+                   truth = value, estimate = .pred)
 ```
 Awesome! We can see that our rmse of 1.49 is quite similar with our testing data. We achieved quite good performance, which suggests that we would could predict other locations with more sparse monitoring based on our predictors with reasonable accuracy.
 
 We could also use the `last_fit()` function of the `tune` package to look at performance if we chose to create a workflow using the `workflows` package.
 
-```{r}
+```{r,eval=FALSE}
 overallfit <-tune::last_fit(RF_wflow, pm_split)
  # or
 overallfit <-RF_wflow %>%
@@ -2423,16 +2444,22 @@ overallfit$.metrics[[1]]
 We could check out test performance using the `collect_metrics()` function of the `tune` package.
 
 
-```{r}
-test_performance <- overallfit  %>%tune::collect_metrics()
+```{r,eval=FALSE}
+test_performance <- 
+  overallfit %>% 
+  tune::collect_metrics()
+
 test_performance
 ```
 
 Here you can see the predictions for the test set (the 292 rows with predictions out of the 876 original monitor values) also using the `tune` package with the `collect_predictions()` function.
 
 #### {.scrollable }
-```{r}
-test_predictions <- overallfit  %>%tune::collect_predictions()
+```{r,eval=FALSE}
+test_predictions <- 
+  overallfit %>% 
+  tune::collect_predictions()
+
 test_predictions %>%
   print(n = 1e3)
 ```
@@ -2440,58 +2467,70 @@ test_predictions %>%
 ####
 
 
+
 ## Data Visualization
 
 Our main question for this case study was:  
 
-1) Can we predict annual average air pollution concentrations at the granularity of zip code regional levels using predictors such as data about population density, urbanization, road density, as well as, satellite pollution data and chemical modeling data?
+> Can we predict annual average air pollution concentrations at the granularity of zip code regional levels using predictors such as data about population density, urbanization, road density, as well as, satellite pollution data and chemical modeling data?
 
-We have indeed created a model that can predict fine particulate matter air pollution levels based on our predictor variables.
+Thus far, we have build a machine learning (ML) model to predict fine particulate matter air pollution levels based on our predictor variables (or features).
 
-Now let's make a plot of our predicted values and the true values.
+Now, let's make a plot of our predicted outcome values ($\hat{Y}$) and actual outcome values $Y$ we observed. 
 
-First, let's start by making a plot of our monitors:
+First, let's start by making a plot of our monitors. 
+To do this, we will use the following packages to create a map of the US:
 
-We will use the following packages to create a map of the US:
-1)`sf`
-2)`maps`
-2)`rnaturalearth`
-3)`rgeos`
+AVOCADO: maybe remind readers what each package does by copying and pasting text from when you originally introduced the packages? that or link to the section? 
 
-According to this [link on wikipedia](https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States#Westernmost){target="_blank"} , these are the latitude and longitude bounds of the continental US.
+1. `sf`
+2. `maps`
+3. `rnaturalearth`
+4. `rgeos`
 
-top = 49.3457868 # north lat
-left = -124.7844079 # west long
-right = -66.9513812 # east long
-bottom =  24.7433195 # south lat
+According to this [link on wikipedia](https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States#Westernmost){target="_blank"}, these are the latitude and longitude bounds of the continental US.
+
+- top = 49.3457868 # north lat
+- left = -124.7844079 # west long
+- right = -66.9513812 # east long
+- bottom =  24.7433195 # south lat
+
+AVOCADO: maybe add a sentence about what the `ne_countries()` function does? 
 
 We will start with getting an outline of the US with the `ne_countries()` function of the `rnaturalearth` package.
-```{r}
+
+AVOCADO: So I definitely have the `rnaturalearthdata` package installed, but for someone reason every time I go to run the code below it says that I need to install the package. Just curious -- what version of R are you using? Setting the code chunks to false for now. 
+
+```{r, eval=FALSE}
 library("rgeos")
 
-world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+world <- ne_countries(scale = "medium", returnclass = "sf")
 
 ggplot(data = world) +
     geom_sf() +
     geom_point(data = pm, aes(x = lon, y = lat), size = 2, 
-        shape = 23, fill = "darkred") +
-    coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)
+               shape = 23, fill = "darkred") +
+    coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), 
+             expand = FALSE)
 ```
 
 Now let's add county lines.
 
-County graphical data is available from the `maps` package. The `sf` package which is short for simple features creates a data frame about this graphical data so that we can work with it.
+County graphical data is available from the `maps` package. 
+The `sf` package which is short for simple features creates a data frame about this graphical data so that we can work with it.
 
-```{r}
+```{r, eval=FALSE}
+counties <- 
+  sf::st_as_sf(maps::map("county", plot = FALSE, 
+                         fill = TRUE))
 
-counties <- sf::st_as_sf(maps::map("county", plot = FALSE, fill = TRUE))
-
-monitors <-ggplot(data = world) +
+monitors <- ggplot(data = world) +
     geom_sf(data = counties, fill = NA, color = gray(.5))+
     geom_point(data = pm, aes(x = lon, y = lat), size = 2, 
-        shape = 23, fill = "darkred") +
-    coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
-    ggtitle("Monitor Locations")+
+               shape = 23, fill = "darkred") +
+    coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), 
+             expand = FALSE) +
+    ggtitle("Monitor Locations") +
     theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
@@ -2502,26 +2541,24 @@ monitors <-ggplot(data = world) +
 monitors
 ```
 
-Now let's add a fill at the county level for the true monitor values of air pollution.
-
+Now, let's add a fill at the county level for the true monitor values of air pollution.
 First, we need to get the data for county to look the same for both our data and the county map data.
 
-```{r}
-
+```{r, eval=FALSE}
 head(counties)
 
-pm <-readr::read_csv(here("docs", "pm25_data.csv"))
-counties %<>% tidyr::separate(ID, into = c("state", "county"), sep = ",")
+pm <- readr::read_csv(here("docs", "pm25_data.csv"))
 
-counties[["county"]] <-stringr::str_to_title(counties[["county"]])
+counties %<>% 
+  tidyr::separate(ID, into = c("state", "county"), sep = ",")
+
+counties[["county"]] <- stringr::str_to_title(counties[["county"]])
 
 map_data <-inner_join(counties, pm, by = "county")
-
 
 truth <-ggplot(data = world) +
     geom_sf() +
     geom_sf(data = map_data, aes(fill = value)) +
-    #scale_fill_viridis_c(trans = "sqrt", alpha = .4) +
         coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
   scale_fill_gradientn(colours=topo.colors(7),na.value = "transparent",
                            breaks=c(0,10,20),labels=c(0,10,20),
@@ -2539,38 +2576,40 @@ truth
 ```
 
 
-Now let's do the same with our predicted values.
+Now let's do the same with our predicted outcome values.
 
-Let's grab both the testing and training fitted values so that we have as much data as possible. 
-In this case, the output structure for the training data fit is slightly different using `randomForest`. The fitted values are called `predicted` and the `broom` functions like `tidy()` and `augment()` will not work. So we will manually grab the fitted training data values.
+Let's grab both the testing and training predicted outcome values so that we have as much data as possible. 
+In this case, the output structure for the training data fit is slightly different using `randomForest`. 
+The fitted values are called `predicted` and the `broom` functions like `tidy()` and `augment()` will not work. 
+So we will manually grab the predicted training data values.
 
-```{r}
-
+```{r, eval=FALSE}
 #test data
 values_pred_wfs
 
 #training data
-training_RF_estimates <-RF_fit[["fit"]][["predicted"]]
-training_RF_estimates <-tibble(".pred" =training_RF_estimates,
-value= train_pm$value, fips = train_pm$fips,  county = train_pm$county, id =train_pm$id)
+training_RF_estimates <- RF_fit[["fit"]][["predicted"]]
+training_RF_estimates <- 
+  tibble(".pred" = training_RF_estimates,
+         value= train_pm$value, 
+         fips = train_pm$fips, 
+         county = train_pm$county, id =train_pm$id)
 
-all_pred <-bind_rows(values_pred_wfs, training_RF_estimates )
-
-
+all_pred <- bind_rows(values_pred_wfs, training_RF_estimates)
 ```
 
 
-```{r}
-map_data <-inner_join(counties, all_pred, by = "county")
+```{r, eval=FALSE}
+map_data <- inner_join(counties, all_pred, by = "county")
 
-pred <-ggplot(data = world) +
+pred <- ggplot(data = world) +
     geom_sf() +
     geom_sf(data = map_data, aes(fill = .pred)) +
-    # scale_fill_viridis_c(trans = "sqrt", alpha = .4) +
-        coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
-  scale_fill_gradientn(colours=topo.colors(7),na.value = "transparent",
-                           breaks=c(0,10,20),labels=c(0,10,20),
-                           limits=c(0,23.5), name = "PM ug/m3")+
+        coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), 
+                 expand = FALSE) +
+  scale_fill_gradientn(colours=topo.colors(7), na.value = "transparent",
+                       breaks=c(0,10,20),labels=c(0,10,20),
+                       limits=c(0,23.5), name = "PM ug/m3") +
   ggtitle("Predicted PM 2.5 levels")+
     theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
@@ -2580,17 +2619,16 @@ pred <-ggplot(data = world) +
         axis.ticks.y=element_blank())
 
 pred
-
 ```
 
 
 
-```{r}
+```{r, eval=FALSE}
 cowplot::plot_grid(monitors, truth, pred)
 ```
 
 
-```{r}
+```{r, eval=FALSE}
 cowplot::plot_grid(truth, pred,nrow = 2 )
 
 ```
