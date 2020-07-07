@@ -186,7 +186,13 @@ We will use similar methods to predict annual air pollution levels spatially wit
 
 ### Learning Objectives 
 
-In this case study, we will walk you through importing data from CSV files and performing machine learning methods to predict our outcome variable of interest (in this case annual fine particle air pollution estimates). We will especially focus on using packages and functions from the [`tidyverse`](https://www.tidyverse.org/){target="_blank"}, and more specifically the [`tidymodels`](https://cran.r-project.org/web/packages/tidymodels/tidymodels.pdf){target="_blank"} package/ecosystem primarily developed and maintained by [Max Kuhn](https://resources.rstudio.com/authors/max-kuhn){target="_blank"} and [Davis Vaughan](https://resources.rstudio.com/authors/davis-vaughan){target="_blank"}. This package loads more modeling related packages like `rsample`, `recipes`, `parsnip`, `yardstick`,  and `dials`. We will also briefly cover the `workflows` and `tune` packages. The tidyverse is a library of packages created by RStudio. While some students may be familiar with previous R programming packages, these packages make data science in R especially efficient.
+In this case study, we will walk you through importing data from CSV files and performing machine learning methods to predict our outcome variable of interest (in this case annual fine particle air pollution estimates). 
+We will especially focus on using packages and functions from the [`tidyverse`](https://www.tidyverse.org/){target="_blank"}, and more specifically the [`tidymodels`](https://cran.r-project.org/web/packages/tidymodels/tidymodels.pdf){target="_blank"} package/ecosystem primarily developed and maintained by [Max Kuhn](https://resources.rstudio.com/authors/max-kuhn){target="_blank"} and [Davis Vaughan](https://resources.rstudio.com/authors/davis-vaughan){target="_blank"}. 
+This package loads more modeling related packages like `rsample`, `recipes`, `parsnip`, `yardstick`,  and `dials`. 
+We will also briefly cover the `workflows` and `tune` packages. 
+
+The tidyverse is a library of packages created by RStudio. 
+While some students may be familiar with previous R programming packages, these packages make data science in R especially efficient.
 
 
 ```{r, out.width = "20%", echo = FALSE, fig.align ="center"}
@@ -612,6 +618,15 @@ Here is another method of looking at the data using the `dfSummary()` function o
 ```{r, eval = FALSE}
 dfSummary(pm, plain.ascii = FALSE, style = "grid", 
           graph.magnif = 0.45,  tmp.img.dir = "tmp")
+```
+
+AVOCADO: when I go to compile the entire document, i get the following error. the files in the `/tmp` folder fo rme range from 0001 to 0100. but the figure below starts at 0101? 
+
+```
+File tmp/ds0101.png not found in resource path
+Error: pandoc document conversion failed with error 99
+In addition: There were 11 warnings (use warnings() to see them)
+Execution halted
 ```
 
 <details><summary> Click here to see the dfSummary table </summary>
@@ -2361,7 +2376,7 @@ collect_metrics(resample_RF_fit)
 
 Now let's compare the performance of this model with the others:
 
-```{r}
+```{r, eval=FALSE}
 # our initial linear regression model:
 collect_metrics(resample_fit)
 # our initial linear regression model with lat/lon degrees of freedom tuning:
@@ -2633,44 +2648,54 @@ cowplot::plot_grid(truth, pred,nrow = 2 )
 
 ```
 
+AVOCADO: I would suggest adding more text in between the plots above in this section explaining what we see. 
 
-```{r, echo = FALSE, message=FALSE}
-
-png(here::here("img", "main_plot_maps.png"), height = 1500, width = 2000, res = 300)
+```{r, echo = FALSE, message=FALSE, eval=FALSE}
+png(here::here("img", "main_plot_maps.png"), 
+    height = 1500, width = 2000, res = 300)
 cowplot::plot_grid(truth, pred,nrow = 2 )
-
 dev.off()
-
 ```
 
 ## Summary
 
-Let's review everything:
+In this case study, we explored gravimetric monitoring data of fine particulate matter air pollution (outcome variable). 
+Our goal was to able to predict air pollution on monitors where we only had predictor variables (or features) without having observed a corresponding measurement of air pollution.
+
+Our learning objectives were: 
+
+- Introduce concepts in machine learning
+- Demonstrate how to build a machine learning model with `tidymodels`
+- Demonstrate how to visualize geo-spatial data using `ggplot`
+
+Using the machine learning models built in this case study, we could now extend this model to be used to predict air pollution levels in areas with poor monitoring, to help identify regions where populations maybe especially at risk for the health effects of air pollution.  
+Analyses like the one in our case study are important for defining which groups could benefit the most from interventions, education, and policy changes when attempting to mitigate public health challenges. You can see in this [article](https://www.nejm.org/doi/full/10.1056/NEJMoa1702747){target="_blank"} that many additional considerations would be involved to adequately understand the data enough to recommend policy changes.
+
+
+
+<details><summary> Click here for more on what we learned with `tidymodels` </summary>
+
+Here, we provide an overview of the `tidymodels` framework. 
 
 ```{r, echo=FALSE, out.width="800px"}
 knitr::include_graphics(here::here("img","ecosystem.png"))
 ```
 
-
-We have explored gravimetric monitoring data of fine particulate matter air pollution. We have utilized the tidymodels ecosystem of packages to predict monitor values using a variety of predictors, also known as explanatory variables, including satellite data, road density data, and population density, among others. Our model could now be extended to be used to predict pollution levels in areas poor  monitoring, to help identify regions where populations maybe especially at risk for the health effects of air pollution.  
-
-We learned that there are two major types of what is called supervised machine learning: prediction and classification. We learned that prediction is used when the outcome variable is numeric and classification is performed when the outcome variable is categorical.  
-
 We performed the major steps of machine learning that we introduced in the beginning of the data analysis:  
 
-1) Data exploration  
+1. Data exploration  
 
-We used a packages like `skimr`, `summarytools`, `corrplot`, `ggcorrplot`, and `GGally` to better understand our data. These packages gave can tell us how many missing values each variable has (if any), the class of each variable, the distribution of values for each variable, the sparsity of each variable, and the level of correlation between variables.  
+We used packages like `skimr`, `summarytools`, `corrplot`, `ggcorrplot`, and `GGally` to better understand our data. These packages gave can tell us how many missing values each variable has (if any), the class of each variable, the distribution of values for each variable, the sparsity of each variable, and the level of correlation between variables.  
 
-2) Data splitting 
+2. Data splitting 
 
 We used the `rsample` package to first perform an initial split of our data into two pieces: a training set and a testing set. The training set was used to optimize the model, while the testing set was used only to evaluate the performance of our final model. We also used the `rsample` package to create cross validation subsets of our training data. This allowed us to better assess the performance of our tested models using our training data.  
 
-3) Variable assignment and pre-processing   
+3. Variable assignment and pre-processing   
 
 We used the `recipes` package to assign variable roles (such as outcome, predictor, and id variable). We also used this package to create a recipe for pre-processing our training and testing data. This involved steps such as: ` step_dummy` to create dummy numeric encodings of our categorical variables, `step_corr` to remove highly correlated variables, `step_nzv` to remove near zero variance variables that would contribute little to our model and potentially add noise.  We learned that once our recipe was created and prepped using `prep()`we could extract the pre-processed training data using `juice()` or our pre-processed testing data using `bake()`. We also learned that if we used the newer workflows package that we did not need to the `prep()`, `juice()`, or `bake()` functions, but that it is still useful to know how to do so if we want to look at our data and how the recipe is influencing it more deeply.  
 
-4) Model specification, fitting, tuning and performance evaluation using the training data  
+4. Model specification, fitting, tuning and performance evaluation using the training data  
 
 We learned that the model needs to first be fit to the training data. We learned that in both classification and prediction, the model is fit to the training data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. We learned that we specify the model and its specifications using the `parnsip` package and that we also use this package to fit the model using the `fit()` function. We learned that we if just use `parsnip` to fit the model, then we need to use the pre-processed training data (output from `juice()`). We learned that we can use the raw training data if we use the `workflows` package to create a workflow that pre-processes our data for us.   
 
@@ -2678,13 +2703,15 @@ We learned that if the model fits well than the estimated values will be very si
 
 AVOCADO: could we use a different link instead of to data camp? 
 
-5) Overall model performance evaluation  
+5. Overall model performance evaluation  
 
 Once we chose our final model, we evaluated the final model performance using the testing data. This gives us a better estimate about how well the model will predict or classify the outcome variable of interest with new independent data. Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources. 
 
 We first fit our model to our testing data using either just parsnip and the pre-processed testing data (using the `bake()` recipes function), or our raw testing data if we used a workflow. We used the same performance evaluation functions (`yardstick::metrics()`  and `tune::collect_metrics()`(when using cross validation)). We also learned how we can use the `last_fit()` function of the `tune` package if we used a workflow to get the test data performance using the initial data and the testing/training split information.
 
-Analyses like the one in our case study are important for defining which groups could benefit the most from interventions, education, and policy changes when attempting to mitigate public health challenges. You can see in this [article](https://www.nejm.org/doi/full/10.1056/NEJMoa1702747){target="_blank"} that many additional considerations would be involved to adequately understand the data enough to recommend policy changes.
+</details>
+
+
 
 ### Suggested Homework
 
@@ -2692,20 +2719,20 @@ Students can predict air pollution monitor values using a different algorithm an
 
 ### Helpful Links
 
-1) A review of [tidymodels](https://rviews.rstudio.com/2019/06/19/a-gentle-intro-to-tidymodels/){target="_blank"}  
-2) A [course on tidymodels](https://juliasilge.com/blog/tidymodels-ml-course/){target="_blank"} by Julia Silge  
-3) [More examples, explanations, and info about tidymodels development](https://www.tidymodels.org/learn/){target="_blank"} from the developers  
-4) A guide for [pre-processing with recipes](http://www.rebeccabarter.com/blog/2019-06-06_pre_processing/){target="_blank"}  
-5) A [guide](https://briatte.github.io/ggcorr/){target="_blank"} for using GGally to create correlation plots  
-6) A [guide](https://www.tidyverse.org/blog/2018/11/parsnip-0-0-1/){target="_blank"} for using parsnip to try different algorithms or engines  
-7) A [list of recipe functions](https://tidymodels.github.io/recipes/reference/index.html){target="_blank"}  
-8) A great blog post about [cross validation](https://towardsdatascience.com/train-test-split-and-cross-validation-in-python-80b61beca4b6){target="_blank"}  
-9) A discussion about [evaluating model performance](https://medium.com/@limavallantin/metrics-to-measure-machine-learning-model-performance-e8c963665476){target="_blank"} for a deeper explanation about how to evaluate model performance  
-10) [RStudio cheatsheets](https://rstudio.com/resources/cheatsheets/){target="_blank"}
-11) An [explanation](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"} of supervised vs unsupervised machine learning and bias-variance trade-off.
-12) A thorough [explanation](https://royalsocietypublishing.org/doi/10.1098/rsta.2015.0202#:~:text=Principal%20component%20analysis%20(PCA)%20is,variables%20that%20successively%20maximize%20variance.){target="_blank"} of principal component analysis.
-13) If you have access, this is a great [discussion](https://www.tandfonline.com/doi/abs/10.1080/00031305.1984.10483183){target="_blank"}  about the difference between independence, orthogonality, and lack of correlation.
-14) Great [video explanation](https://youtu.be/_UVHneBUBW0){target="_blank"} of PCA.  
+1. A review of [tidymodels](https://rviews.rstudio.com/2019/06/19/a-gentle-intro-to-tidymodels/){target="_blank"}  
+2. A [course on tidymodels](https://juliasilge.com/blog/tidymodels-ml-course/){target="_blank"} by Julia Silge  
+3. [More examples, explanations, and info about tidymodels development](https://www.tidymodels.org/learn/){target="_blank"} from the developers  
+4. A guide for [pre-processing with recipes](http://www.rebeccabarter.com/blog/2019-06-06_pre_processing/){target="_blank"}  
+5. A [guide](https://briatte.github.io/ggcorr/){target="_blank"} for using GGally to create correlation plots  
+6. A [guide](https://www.tidyverse.org/blog/2018/11/parsnip-0-0-1/){target="_blank"} for using parsnip to try different algorithms or engines  
+7. A [list of recipe functions](https://tidymodels.github.io/recipes/reference/index.html){target="_blank"}  
+8. A great blog post about [cross validation](https://towardsdatascience.com/train-test-split-and-cross-validation-in-python-80b61beca4b6){target="_blank"}  
+9. A discussion about [evaluating model performance](https://medium.com/@limavallantin/metrics-to-measure-machine-learning-model-performance-e8c963665476){target="_blank"} for a deeper explanation about how to evaluate model performance  
+10. [RStudio cheatsheets](https://rstudio.com/resources/cheatsheets/){target="_blank"}
+11. An [explanation](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"} of supervised vs unsupervised machine learning and bias-variance trade-off.
+12. A thorough [explanation](https://royalsocietypublishing.org/doi/10.1098/rsta.2015.0202#:~:text=Principal%20component%20analysis%20(PCA)%20is,variables%20that%20successively%20maximize%20variance.){target="_blank"} of principal component analysis.
+13. If you have access, this is a great [discussion](https://www.tandfonline.com/doi/abs/10.1080/00031305.1984.10483183){target="_blank"}  about the difference between independence, orthogonality, and lack of correlation.
+14. Great [video explanation](https://youtu.be/_UVHneBUBW0){target="_blank"} of PCA.  
 
 <u>Terms and concepts covered:</u>  
 
@@ -2724,7 +2751,6 @@ Students can predict air pollution monitor values using a different algorithm an
 [Parameters and Hyper-parameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"}   
 [Supervised and Unspervised Learning](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}  
 [Principal Component Analysis](https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007){target="_blank"}  
-[Orthogonal](https://en.wikipedia.org/wiki/Orthogonality#:~:text=In%20mathematics%2C%20orthogonality%20is%20the,u%2C%20v)%20%3D%200.){target="_blank"}  
 [Linear Combinations](https://www.mathbootcamps.com/linear-combinations-vectors/){target="_blank"}  
 [Decision Tree](https://medium.com/greyatom/decision-trees-a-simple-way-to-visualize-a-decision-dc506a403aeb){target="_blank"}  
 [Random Forest](https://towardsdatascience.com/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9){target="_blank"}  
