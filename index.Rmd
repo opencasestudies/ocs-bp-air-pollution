@@ -1972,12 +1972,12 @@ yardstick::mae(wf_fitted_values,
 
 ### Cross validation sample splitting
 
+Until now we have used everything in our "training" dataset (and have not touched the "testing" dataset) from the `rsample` package to build our machine learning (ML) model $\hat{Y} = f(X)$ (or to estimate $f$ using the features or predictor variable $X$). 
 
-This is done typically as an iterative process with the training data along side modification of the model until the performance using the training data is satisfactory. At this point, the final model performance is assessed using the testing data. This then gives an estimate about how well the model will predict or classify the outcome variable of interest with new independent data. Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources.
+Here, we take move this beyond the simple split into training and testing data sets. 
+We will again use the `rsample` package again in order to further implement what are called [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} techniques. This is also called **re-sampling** or **repartioning**.  
 
-We will use the `rsample` package again in order to further implement what are called [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} techniques. This is also called **resampling** or **repartioning**.  
-
-Note: we are not actually getting new samples from the underlying distribution so the term resampling is a bit of a misnomer.
+**Note**: we are not actually getting new samples from the underlying distribution so the term re-sampling is a bit of a misnomer.
 
 [Cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} splits our training data into multiple training data sets to allow for a deeper assessment of the accuracy of the model.
 
@@ -1987,67 +1987,83 @@ Here is a visualization of the concept for cross validation/resampling/repartiti
 knitr::include_graphics(here::here("img","resampling.png"))
 ```
 
-Technically creating our testing and training set out of our original training data is sometimes considered a form of [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} called the holdout method. As we just learned this can give us a better sense of the accuracy of our data in a more generalizable way. 
+Technically creating our testing and training set out of our original training data is sometimes considered a form of [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"}, called the holdout method. 
+The reason we do this it so we can get a better sense of the accuracy of our model using data that we did not train it on. 
 
-However, we can do a better job of optimizing our model for accuracy if we also perform another type of [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} on the newly defined training set that we just created. There are many [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} methods and most can be easily implemented using `rsamples` package. We will use a very popular method called either [k-fold or v-fold cross validation](https://machinelearningmastery.com/k-fold-cross-validation/){target="_blank"}. 
+However, we can actually do a better job of optimizing our model for accuracy if we also perform another type of [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} on the newly defined training set that we just created. 
+There are many [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} methods and most can be easily implemented using `rsample` package. 
+Here, we will use a very popular method called either [k-fold or v-fold cross validation](https://machinelearningmastery.com/k-fold-cross-validation/){target="_blank"}. 
 
 This method involves essentially preforming the hold out method iteratively with the training data. 
 
-First the training set is divided into k or v equally sized smaller pieces. 
+AVOCADO: why $k$ (or $v$) instead of just one? 
 
-Then the model is trained on the model on k-1 or v-1 subsets of the data iteratively (removing a different v or k until all possible k-1 or v-1 sets have been evaluated) to get a sense of the performance of the model. This is really useful for fine tuning specific aspects of the model in a process called model tuning.
+First, the training set is divided into $k$ (or $v$) equally sized smaller pieces. 
 
+Next, the model is trained on the model on $k$-1 or $v$-1 subsets of the data iteratively (removing a different $v$ or $k$ until all possible $k$-1 or $v$-1 sets have been evaluated) to get a sense of the performance of the model. 
+This is really useful for fine tuning specific aspects of the model in a process called model tuning, which we will learn about in the next section. 
 
 Here is a visualization of how the folds are created:
 
 ```{r, echo=FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","vfold.png"))
+knitr::include_graphics(here::here("img", "vfold.png"))
 ```
 
+**Note**: People typically ignore spatial dependence with cross validation of air pollution monitoring data in the air pollution field, so we will do the same.  However, it might make sense to leave out blocks of monitors rather than  random individual monitors to help account for some spatial dependence.
 
-Note: People typically ignore spatial dependence with cross validation of air pollution monitoring data in the air pollution field, so we will do the same.  However, it might make sense to leave out blocks of monitors rather than  random individual monitors to help account for some spatial dependence.
+#### Creating the $v$-folds using `rsample`
 
-The [`vfold_cv()`](https://tidymodels.github.io/rsample/reference/vfold_cv.html){target="_blank"} function of the `rsample` package can be used to parse the training data into folds for k-fold/v-fold cross validation.
+The [`vfold_cv()`](https://tidymodels.github.io/rsample/reference/vfold_cv.html){target="_blank"} function of the `rsample` package can be used to parse the training data into folds for $k$-fold/$v$-fold cross validation.
 
-The `v` argument specifies the number of folds to create.
-The `repeats` argument specifies if any samples should be repeated across folds - default is `FALSE`
-The `strata` argument specifies a variable to stratify samples across folds (just like in `initial_split()`).
+- The `v` argument specifies the number of folds to create.
+- The `repeats` argument specifies if any samples should be repeated across folds - default is `FALSE`
+- The `strata` argument specifies a variable to stratify samples across folds - just like in `initial_split()`.
 
-Again because these are created at random, we need to use the base `set.seed()` function in order to obtain the same results each time we knit this document. Generally speaking using 10 folds is good practice, but this depends on the variablity within your data. We are going to use 4 for the sake of expediency. 
+Again, because these are created at random, we need to use the base `set.seed()` function in order to obtain the same results each time we knit this document. 
+Generally speaking using 10 folds is good practice, but this depends on the variability within your data. 
+We are going to use 4 for the sake of expediency. 
 
 ```{r}
 set.seed(1234)
-
-vfold_pm <-rsample::vfold_cv(data = train_pm, v = 4)
-
+vfold_pm <- rsample::vfold_cv(data = train_pm, v = 4)
 vfold_pm
+```
 
+AVOCADO: maybe add a sentence explaining what we see? 
 
+```{r}
 vfold_pm$splits$`1`
 vfold_pm$splits$`2`
 ```
 
-Once the folds are created they can be used to evaluate performance by fitting the model to each of the resamples that we created:
+AVOCADO: not sure how to interpret the above output? or what it means? 
 
+Once the folds are created they can be used to evaluate performance by fitting the model to each of the re-samples that we created:
 
 ```{r, echo=FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","cross_validation.png"))
+knitr::include_graphics(here::here("img", "cross_validation.png"))
 ```
 
+#### Assessing model performance on $v$-folds using `tune`
 
-We can fit the model to our cross validation folds using the `fit_resamples()` function of the `tune` package, by specifying our workflow object and the cross validation fold object we just created. See [here](https://tidymodels.github.io/tune/reference/fit_resamples.html){target="_blank"}  for more information.
+We can fit the model to our cross validation folds using the `fit_resamples()` function of the `tune` package, by specifying our `workflow` object and the cross validation fold object we just created. 
+See [here](https://tidymodels.github.io/tune/reference/fit_resamples.html){target="_blank"} for more information.
+
+AVOCADO: what is `control_resamples()` doing? 
 
 ```{r}
 control <- control_resamples(save_pred = TRUE)
-resample_fit <-tune::fit_resamples(PM_wflow, vfold_pm)
-
+resample_fit <- tune::fit_resamples(PM_wflow, vfold_pm)
 ```
 
-We can now take a look at various metrics of performance based on the fit of our cross validation "resamples". To do this we will use the `show_best()` function of the `tune` package.
+We can now take a look at various performance metrics based on the fit of our cross validation "resamples". 
+To do this we will use the `show_best()` function of the `tune` package.
 
 ```{r}
 tune::show_best(resample_fit, metric = "rmse", "rsq")
 ```
+
+AVOCADO: maybe add a sentence here of what we see? 
 
 
 ### Tuning
