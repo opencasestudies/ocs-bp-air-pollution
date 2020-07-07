@@ -1781,37 +1781,48 @@ PM_fit <- lm_PM_model %>%
 
 </details>
 
-### Looking at model fit with `broom`
+### Looking at model fit
 
-The `broom` package allows for an easy/tidy way to look at the fitted model:  
+After we fit our model, we can use the `broom` package allows for an easy/tidy way to look at the output from the fitted model.   
 
-`tidy()` grabs the coefficients from the model  
-`glance()` summarizes the model fit and gives us an idea about how well the model might perform
-`augment()` gives a 150 row observation level summary of the data and fit 
+The three functions from `broom` that we want to use are: 
 
-These `broom` functions currently only work with `parsnip` objects not raw `workflows` objects. To use the `tidy()` function with `workflows` we need to first use the `pull_workflow_fit()` function.
+1. `tidy()` - returns a tidy data frame with coefficients from the model (one row per coefficient)
+2. `glance()` - summarizes the model fit
+3. `augment()` - gives a 150 row observation level summary of the data and fit 
+
+AVOCADO: not sure I understand `augment()`. maybe more text here? 
+
+These `broom` functions currently only work with `parsnip` objects, not raw `workflows` objects. 
+Here, we will use the `PM_fit` using `parsnip`. 
 
 ```{r}
-broom::tidy(PM_fit) %>% arrange(p.value)
+broom::tidy(PM_fit) %>% 
+  arrange(p.value)
 broom::glance(PM_fit[["fit"]])
-broom::augment(PM_fit[["fit"]]) # this also gives us the fitted values, standard error for each and more!
+broom::augment(PM_fit[["fit"]])  
+```
+The `augment()` function gives us the fitted values, standard error for each and more!
 
+However, we can use the `broom` functions (e.g. `tidy()`) with `workflows`, but we first need to use the `pull_workflow_fit()` function.
 
-wflowoutput<-PM_wflow_fit %>% 
+```{r}
+wflowoutput <- PM_wflow_fit %>% 
   pull_workflow_fit() %>% 
   broom::tidy() 
-
-
-#The output is identical using workflows to fit the model or just parsnip
-identical(tidy(PM_fit), wflowoutput)
-
 ```
 
+We can see that the output is identical using `workflows` to fit the model or using the output from `parsnip`
 
-OK, so we have fit our model on our training data, which means we have created a model to predict values of air pollution based on the predictors that we have included. Yay!
+```{r}
+identical(tidy(PM_fit), wflowoutput)
+```
 
+We have fit our model on our training data, which means we have created a model to predict values of air pollution based on the predictors that we have included. Yay!
 
-We can get a sense of the variable importance using the `vip()` function of the `vip` package. 
+One last thing before we leave this section. 
+We often are interested in getting a sense of which variables are the most important in our model. 
+We can explore the variable importance using the `vip()` function of the `vip` package, which makes a bar plot with the variables ordered in importance. . 
 
 Let's take a look at the top 10 contributing variables:
 
@@ -1820,6 +1831,8 @@ PM_wflow_fit %>%
   pull_workflow_fit() %>% 
   vip(num_features = 10)
 ```
+
+
 
 ### Model performance
 
