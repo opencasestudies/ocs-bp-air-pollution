@@ -1053,7 +1053,7 @@ select(log_nei_2008_pm25_sum_10000, log_popdens_county,
 Indeed this increased the correlation, but variables from each of these categories may still prove to be useful for prediction.
 
 
-## Data Analysis
+## Machine learning with `tidymodels`
 
 Now that we have a sense of what our data are, we can get started with building a machine learning model to predict air pollution. 
 
@@ -1486,6 +1486,7 @@ knitr::include_graphics(here::here("img","training_preprocessing_recipes3.png"))
 
 Let's juice! 
 
+
 #### {.scrollable }
 ```{r}
 # Scroll through the output!
@@ -1663,11 +1664,11 @@ Great now we no longer have `NA` values! :)
 `bake()` will not necessarily conduct these steps on the new data.
 
 
-### Specifying the Model
+### Specifying the model
 
 4. Model specification, fitting, tuning and performance evaluation using the training data -- The model needs to first be fit to the training data. First the method or algorithm in which the model will be fit is specified (regression, random forest etc.).  Then in both classification and prediction, the model is fit to the training data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. If the model fits well than these estimated values will be very similar to the true outcome variable values. If the model does not fit well, than these estimates will be more disimilar from the true outcome variable. In this case, aspects about the model may need to be modified to improve the similarity of the estimates with that of the true outcome values. One way to optimize model performance is a process called tuning in which different model [hyper-parameter](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"} options are tested to determine the best option for model performance.
 
-So far we have used `rsample` to split the data and `recipes` to assign variable and to specify and prep our preprocessing (as well as to optionally extract the preprocessed data).
+So far we have used `rsample` to split the data and `recipes` to assign variable and to specify and prep our pre-processing (as well as to optionally extract the preprocessed data).
 
 We will now use the `parsnip` package (which is similar to the previous `caret` package - and hence why it is named after the vegetable) to specify our model.
 
@@ -1712,7 +1713,7 @@ lm_PM_model
 
 ```
 
-### Fitting the Model: two ways - `workflows` and `parsnip`
+### Fitting the model: two ways - `workflows` and `parsnip`
 
 To fit our model we can use the `parsnip` package and then assess our fit using the `yardstick` package.
 
@@ -1793,7 +1794,7 @@ PM_wflow_fit %>%
   vip(num_features = 10)
 ```
 
-### Model Performance
+### Model performance
 
 5) Overall model performance evaluation
 
@@ -2018,6 +2019,9 @@ show_best(df_tuning, metric = "rmse", n =1)
 
 
 
+
+
+## Data Analysis
 
 ### Linear Regression Model with PCA
 
@@ -2272,6 +2276,7 @@ test_predictions %>%
 ```
 
 ####
+
 
 ## Data Visualization
 
