@@ -543,14 +543,22 @@ pm %>%
 
 We can see that there are 876 monitors (rows) and that we have 50 total variables (columns) - one of which is the outcome variable. In this case, the outcome variable is called `value`. 
 
-AVOCADO: Should we link to a code book here? Like could we use this as a teaching opportunity to demonstrate the purpose of a code book so a student knows how we know the PM values are `value`? 
+AVOCADO: Should we link to a code book here? Like could we use this as a teaching opportunity to demonstrate the purpose of a code book so a student knows how we know the PM values are `value`?
+avocado comment: there isnt a code book related to this data, Roger wrangled it for me, but the vaping case study actually uses code books for that data. Would you like to link to a generic code book and describe that process?
 
-Notice that some of the variables that we would think of as factors (or categorical data) are currently of class double as indicated by the `<dbl>` just to the right of the column names/variable names in the `glimpse()` output. 
-For example, the monitor ID (`id`), the Federal Information Processing Standard number for the county where the monitor was located (`fips`), as well as the zip code tabulation area (`zcta`). 
+Notice that some of the variables that we would think of as factors (or categorical data) are currently of class character as indicated by the `<chr>` just to the right of the column names/variable names in the `glimpse()` output. This means that the variable values are character strings, such as words or phrases. 
 
-AVOCADO: should we explain what we mean by a "double" data type? I think factor and character are more understandable? But maybe we should explain those too? 
+The other variables are of class `<dbl>`, which stands for double precision which indicates that the are numeric and that they have decimal values. In contrast, one could have integer values which would not allow for decimal numbers. Here is a [link](https://en.wikipedia.org/wiki/Double-precision_floating-point_format){target="_blank"} for more information on double precision numeric values.
 
-Let's convert these variables into factors. 
+Another common data class is factor which is abreviated like this: `<fct>`. A factor is something that has unique levels but there is no appreciable order to the levels. For example we can have a numeric value that is just an id that we want to be interpreted as just a unique level and not as the number that it would typically indicate. This would be useful for several of our variables:
+
+1. the monitor ID (`id`)
+2. the Federal Information Processing Standard number for the county where the monitor was located (`fips`)
+3. the zip code tabulation area (`zcta`)
+
+None of the values actually have any real numeric meaning, so we want to make sure that R does not interpret them as if they do. 
+
+So let's convert these variables into factors. 
 We can do this using the `across()` function of the `dplyr` package and the `as.factor()` base function. 
 The `across()` function has two main arguments: (i) the columns you want to operate on and (ii) the function or list of functions to apply to each column. 
 
@@ -597,14 +605,22 @@ Next, the `n_unqiue` column shows us the number of unique values for each of our
 We can see that there are 49 states represented in the data, and we know that the data should be of the contiguous states. (AVOCADO: how do we know it's only the contiguous states?)
 Let's take a look to see which states are included:
 
-AVOCADO: I'm not sure I understand why the `print(n = 1e3)` is needed below? It looks the same if I remove the code? I was going to just deleted, but left an avocado as a sanity check in case I'm missing something? 
+
+
+```{r, eval = FALSE}
+pm %>% 
+  distinct(state) 
+```
+
+Scroll through the output:
 
 #### {.scrollable }
-```{r}
+```{r, echo = FALSE}
 # Scroll through the output!
 pm %>% 
   distinct(state) %>%
-  print(n = 1e3)
+# this allows us to show the full output in the rendered rmarkdown
+ print(n = 1e3)
 ```
 ####
 
@@ -1236,10 +1252,15 @@ This might be useful if we want our model to be generalizable across all of the 
 
 We can see that indeed there are different proportions of monitors in each state by using the `count()` function of the `dplyr` package. 
 
-AVOCADO: why `print(n = 1e3)`? it's a same question as above? 
+```{r, eval = FALSE}
+count(pm, state)
+```
+
+Scroll through the output:
 
 #### {.scrollable }
-```{r}
+
+```{r, echo=FALSE}
 # Scroll through the output!
 count(pm, state) %>%
   print(n = 1e3)
@@ -1568,20 +1589,31 @@ We can also see that there were more monitors listed as `"Not in a city"` than a
 
 We can see that California had the largest number of monitors compared to the other states.
 
+```{r, eval = FALSE}
+pm %>% count(state) 
+```
+
+
+Scroll through the output:
+
 #### {.scrollable }
 
-```{r}
-#Scroll through the output!
+```{r, echo = FALSE}
 pm %>% count(state)  %>%
   print(n = 1e3)
 ```
 
 ####
 
+```{r, eval = FALSE}
+pm %>% count(city)
+```
+
+Scroll through the output:
+
 #### {.scrollable }
 
-```{r}
-#Scroll through the output!
+```{r, echo=FALSE}
 pm %>% count(city) %>%
   print(n = 1e3)
 ```
@@ -1734,9 +1766,8 @@ Let's walk through these steps one by one.
 For our case, we are going to start our analysis with a linear regression but we will demonstrate how we can try different models.
 
 The first step is to define what type of model we would like to use. 
-See [here](https://tidymodels.github.io/parsnip/articles/articles/Models.html){target="_blank"} for modeling [options] in `parsnip`.
+See [here](https://www.tidymodels.org/find/parsnip/){target="_blank"} for modeling options in `parsnip`.
 
-AVOCADO: looks like the "[options]" above is missing a link?  
 
 ```{r}
 PM_model <- parsnip::linear_reg() # PM for particulate matter
@@ -1773,10 +1804,10 @@ lm_PM_model
 
 ### Fitting the model
 
-At the moment, there are actually a few ways to fit our model. 
+At the moment, there are actually a two ways to fit our model. 
 
 1. We can use the `parsnip` package and then assess our fit using the `yardstick` package. 
-2. We can also the `parsnip` package with a newer package called `workflows` (still under development) that allows us to keep track of both our pre-processing steps and our model specification. It also allows us to implement fancier optimizations in an automated way and it is currently being developed to also handle post-processing operations. 
+2. We can also use the `parsnip` package with a newer package called `workflows` (still under development) that allows us to keep track of both our pre-processing steps and our model specification. It also allows us to implement fancier optimizations in an automated way and it is currently being developed to also handle post-processing operations. 
 
 AVOCADO: I feel like we should do a bit more explaining or maybe draw a figure of these two approaches? 
 
@@ -1837,9 +1868,7 @@ The three functions from `broom` that we want to use are:
 
 1. `tidy()` - returns a tidy data frame with coefficients from the model (one row per coefficient)
 2. `glance()` - summarizes the model fit
-3. `augment()` - gives a 150 row observation level summary of the data and fit 
-
-AVOCADO: not sure I understand `augment()`. maybe more text here? 
+3. `augment()` - shows the data, the fitted values (`.fitted`), the standard error (`.se.fit`) for each value and more 
 
 These `broom` functions currently only work with `parsnip` objects, not raw `workflows` objects. 
 Here, we will use the `PM_fit` using `parsnip`. 
@@ -1850,7 +1879,6 @@ broom::tidy(PM_fit) %>%
 broom::glance(PM_fit[["fit"]])
 broom::augment(PM_fit[["fit"]])  
 ```
-The `augment()` function gives us the fitted values, standard error for each and more!
 
 However, we can use the `broom` functions (e.g. `tidy()`) with `workflows`, but we first need to use the `pull_workflow_fit()` function.
 
@@ -1962,14 +1990,36 @@ Next, let's use different distance functions $d(\cdot)$ to assess how far off ou
 
 $$d(Y - \hat{Y})$$
 
-As mentioned, there are entirely scholarly fields of research dedicated to identifying different distance metrics $d(\cdot)$ for machine learning applications. 
+As mentioned, there are entire scholarly fields of research dedicated to identifying different distance metrics $d(\cdot)$ for machine learning applications. 
 However, when performing prediction with a continuous outcome $Y$, a few of the mostly commonly used distance metrics are: 
 
 1. mean absolute error (`mae`)  
-2. R squared error (`rsq`) -- this is also known as the coefficient of determination which is the squared correlation between truth and estimate  
-3. root mean squared error (`rmse`)   
 
-AVOCADO: could we add the distance metrics themselves here? 
+$$MAE = \frac{\sum_{i=1}^{n}{(|\hat{y_t}- y_t|)}^2}{n}$$
+
+
+2. R squared error (`rsq`) -- this is also known as the coefficient of determination which is the squared correlation between truth and estimate
+
+This is calculated and 1 minus the fraction of the residual sum of squares ($SS_res$) by the total sum of squares ($SS_tot$)
+
+
+$$RSQ = R^2 = 1 - \frac{SSres}{SStot}$$
+
+$$SS_{tot} = \sum_{i=1}^{n}{(y_i- \bar{y})}^2$$
+The total sum of squares is proportional to the variance of the data. It is calculated as the sum of each  true value from the mean true value ($\bar{y}$).
+
+$$SS_{res} = \sum_{i=1}^{n}{(y_i- \hat{y_i})}^2$$
+
+The sum of squares of residuals is calculated as the sum of each predicted value ($\hat{y_i}$ or sometimes $f_i$) from the true value ($y_i$). 
+
+
+3. [root mean squared error](https://en.wikipedia.org/wiki/Root-mean-square_deviation){target="_blank"} (`rmse`)   
+
+$$RMSE = \sqrt{\frac{\sum_{i=1}^{n}{(\hat{y_t}- y_t)}^2}{n}}$$
+
+
+
+AVOCADO: could we add the distance metrics themselves here? avocado comment(I added the formulas... is that what you meant?)
 
 One way to calculate these metrics within the `tidymodels` framework is to use the `yardstick` package using the `metrics()` function. 
 
@@ -2469,12 +2519,17 @@ test_performance
 
 Here you can see the predictions for the test set (the 292 rows with predictions out of the 876 original monitor values) also using the `tune` package with the `collect_predictions()` function.
 
-#### {.scrollable }
+
+
 ```{r,eval=FALSE}
 test_predictions <- 
   overallfit %>% 
   tune::collect_predictions()
+```
 
+#### {.scrollable }
+
+```{r, eval =FALSE, echo =FALSE}
 test_predictions %>%
   print(n = 1e3)
 ```
