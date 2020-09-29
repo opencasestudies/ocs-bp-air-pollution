@@ -30,39 +30,157 @@ To cite this case study:
 
 Wright, Carrie and Jager, Leah and Taub, Margaret and Hicks, Stephanie. (2020, February 28). opencasestudies/ocs-bp-air-pollution: Exploring urban and rural obesity across time (Version v1.0.0). Zenodo.
 
+### Acknowledgements
+
+We would like to acknowledge [Roger Peng](http://www.biostat.jhsph.edu/~rpeng/), [Megan Latshaw](https://www.jhsph.edu/faculty/directory/profile/1708/megan-weil-latshaw), and [Kristen Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler)for assisting in framing the major direction of the case study.
+
+We would also like to acknowledge the [Bloomberg American Health Initiative](https://americanhealth.jhu.edu/) for funding this work. 
+
+
 ### Title 
 
 Predicting Annual Air Pollution
 
 ### Motivation 
 
+Machine learning methods have been used to predict air pollution levels when traditional monitoring systems are not available in a particular area or when there is not enough spatial granularity with current monitoring systems. 
+
+We will use machine learning methods to predict annual air pollution levels spatially within the US based on data about population density, urbanization, road density, as well as, satellite pollution data and chemical modeling data.
 
 
-### Motivating questions
+### Motivating question
 
+1) Can we predict annual average air pollution concentrations at the granularity of zip code regional levels using predictors such as data about population density, urbanization, road density, as well as, satellite pollution data and chemical modeling data?
 
 
 ### Data
 
+The data that we will use in this case study come from a **[gravimetric air pollution  monitor system](https://publiclab.org/wiki/filter-pm){target="_blank"}** operated by the US [Enivornmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"} that measures fine particulate matter (PM~2.5~) in the United States (US). We will use data from 876 gravimetric monitors in in the contiguous US in 2008.
+
+Roughly 90% of these monitors are located within cities. 
+
+Hence, there is an **equity issue** in terms of capturing the air pollution levels of more rural areas. To get a better sense of the pollution exposures for the individuals living in these areas, methods like machine learning can be useful to estimate or predict air pollution levels in **areas with little to no monitoring**. 
+
+We will use data related to population density, urbanization, road density, as well as, NASA satellite pollution data and chemical modeling data to predict the monitoring values captured from this air pollution monitoring system.
+
+The data for these 48 predictors comes from the US [Enivornmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}, the [National Aeronautics and Space Administration (NASA)](https://www.nasa.gov/){target="_blank"}, the US [Census](https://www.census.gov/about/what/census-at-a-glance.html){target="_blank"}, and the [National Center for Health Statistics (NCHS)](https://www.cdc.gov/nchs/about/index.htm){target="_blank"}.
+
+All of our data was previously collected by a [researcher](http://www.biostat.jhsph.edu/~rpeng/) at the [Johns Hopkins School of Public Health](https://www.jhsph.edu/) who studies air pollution and climate change. 
+
+
+#### Learning Objectives
+
+Data science skills:  
+  
+1. Familiarity with the tidymodels ecosystem
+2. Ability to evaluate correlation among predictor variables (`corrplot` and `GGally`)
+3. Ability to implement tidymodels packages such as `rsample` to split the data into training and testing sets as well as cross validation sets.
+4. Ability to use the `recipes`, `parsnip`, and `workflows` to train and test a linear regression model and random forest model
+5. Demonstrate how to visualize geo-spatial data using `ggplot2`
+
+Statistical concepts and methods:  
+  
+1. Basic understanding the utility of machine learning for prediction and classification
+2. Understanding of the need for training and test set
+3. Understanding of the utility of cross validation
+4. Understanding of random forest
+
 
 ### Analysis 
 
+This case study focuses on machine learning methods. We demonstrate how to train and test a linear regression model and a random forest model.
 
 #### Data import 
 
-
+The data is imported from a CSV file using the `readr` package.
 
 #### Data wrangling 
 
-
+This case study does not demonstrate very many data wrangling methods. However we do cover the `mutate()` and `across` functions of the `dplyr` package.
 
 #### Data exploration
 
+We demonstrate how to get a summary of a relatively large set of predictors using the `skim` package, as well as how to evaluate correlation among all variables using the `corrplot` package and among specific variables with more information using the `GGally` package.
 
 #### Statistical concepts
 
+We cover the basics of machine learning:
+1) the difference between prediction and classification
+2) the importance of training and testing
+3) the concept of cross validation and tuning
+4) how random forest works
+
 
 ### Other notes and resources 
+
+1. A review of [tidymodels](https://rviews.rstudio.com/2019/06/19/a-gentle-intro-to-tidymodels/){target="_blank"}  
+2. A [course on tidymodels](https://juliasilge.com/blog/tidymodels-ml-course/){target="_blank"} by Julia Silge  
+3. [More examples, explanations, and info about tidymodels development](https://www.tidymodels.org/learn/){target="_blank"} from the developers  
+4. A guide for [pre-processing with recipes](http://www.rebeccabarter.com/blog/2019-06-06_pre_processing/){target="_blank"}  
+5. A [guide](https://briatte.github.io/ggcorr/){target="_blank"} for using GGally to create correlation plots  
+6. A [guide](https://www.tidyverse.org/blog/2018/11/parsnip-0-0-1/){target="_blank"} for using parsnip to try different algorithms or engines  
+7. A [list of recipe functions](https://tidymodels.github.io/recipes/reference/index.html){target="_blank"}  
+8. A great blog post about [cross validation](https://towardsdatascience.com/train-test-split-and-cross-validation-in-python-80b61beca4b6){target="_blank"}  
+9. A discussion about [evaluating model performance](https://medium.com/@limavallantin/metrics-to-measure-machine-learning-model-performance-e8c963665476){target="_blank"} for a deeper explanation about how to evaluate model performance  
+10. [RStudio cheatsheets](https://rstudio.com/resources/cheatsheets/){target="_blank"}
+11. An [explanation](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"} of supervised vs unsupervised machine learning and bias-variance trade-off.
+12. A thorough [explanation](https://royalsocietypublishing.org/doi/10.1098/rsta.2015.0202#:~:text=Principal%20component%20analysis%20(PCA)%20is,variables%20that%20successively%20maximize%20variance.){target="_blank"} of principal component analysis.
+13. If you have access, this is a great [discussion](https://www.tandfonline.com/doi/abs/10.1080/00031305.1984.10483183){target="_blank"}  about the difference between independence, orthogonality, and lack of correlation.
+14. Great [video explanation](https://youtu.be/_UVHneBUBW0){target="_blank"} of PCA.  
+
+<u>Terms and concepts covered:</u>  
+
+[Tidyverse](https://www.tidyverse.org/){target="_blank"}  
+[Imputation](https://en.wikipedia.org/wiki/Imputation_(statistics)){target="_blank"}  
+[Transformation](https://en.wikipedia.org/wiki/Data_transformation_(statistics)){target="_blank"}  
+[Discretization](https://en.wikipedia.org/wiki/Discretization_of_continuous_features){target="_blank"}  
+[Dummy Variables](https://en.wikipedia.org/wiki/Dummy_variable_(statistics)){target="_blank"}  
+[One Hot Encoding](https://machinelearningmastery.com/why-one-hot-encode-data-in-machine-learning/){target="_blank"}  
+[Data Type Conversions](https://cran.r-project.org/web/packages/hablar/vignettes/convert.html){target="_blank"}  
+[Interaction](https://statisticsbyjim.com/regression/interaction-effects/){target="_blank"}  
+[Normalization](https://en.wikipedia.org/wiki/Normalization_(statistics)){target="_blank"}  
+[Dimensionality Reduction/Signal Extraction](https://en.wikipedia.org/wiki/Dimensionality_reduction){target="_blank"}  
+[Row Operations](https://tartarus.org/gareth/maths/Linear_Algebra/row_operations.pdf){target="_blank"}  
+[Near Zero Varaince](https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/){target="_blank"}  
+[Parameters and Hyper-parameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"}   
+[Supervised and Unspervised Learning](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}  
+[Principal Component Analysis](https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007){target="_blank"}  
+[Linear Combinations](https://www.mathbootcamps.com/linear-combinations-vectors/){target="_blank"}  
+[Decision Tree](https://medium.com/greyatom/decision-trees-a-simple-way-to-visualize-a-decision-dc506a403aeb){target="_blank"}  
+[Random Forest](https://towardsdatascience.com/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9){target="_blank"}  
+
+
+<u>Packages used in this case study: </u>
+
+ Package   | Use                                                                         
+---------- |-------------
+[here](https://github.com/jennybc/here_here){target="_blank"}       | to easily load and save data
+[readr](https://readr.tidyverse.org/){target="_blank"}      | to import the CSV file data
+[dplyr](https://dplyr.tidyverse.org/){target="_blank"}      | to view/arrange/filter/select/compare specific subsets of the data 
+[skimr](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data
+[summarytools](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data in a different style
+[magrittr](https://magrittr.tidyverse.org/articles/magrittr.html){target="_blank"}   | to use the `%<>%` pipping operator 
+[corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
+[GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
+[rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets and to split the training set for cross-validation  
+[recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `juice()` - extracts final pre-processed training data and `bake()` - applies recipe steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
+[parsnip](https://tidymodels.github.io/parsnip/){target="_blank"}   | an interface to create models (major functions are  `fit()`, `set_engine()`)
+[yardstick](https://tidymodels.github.io/yardstick/){target="_blank"}   | to evaluate the performance of models
+[broom](https://www.tidyverse.org/blog/2018/07/broom-0-5-0/){target="_blank"} | to get tidy output for our model fit and performance
+[ggplot2](https://ggplot2.tidyverse.org/){target="_blank"}    | to make visualizations with multiple layers
+[dials](https://www.tidyverse.org/blog/2019/10/dials-0-0-3/){target="_blank"} | to specify hyper-parameter tuning
+[tune](https://tune.tidymodels.org/){target="_blank"} | to perform cross validation, tune hyper-parameters, and get performance metrics
+[workflows](https://www.rdocumentation.org/packages/workflows/versions/0.1.1){target="_blank"} | to create modeling workflow to streamline the modeling process
+[vip](https://cran.r-project.org/web/packages/vip/vip.pdf){target="_blank"} | to create variable importance plots
+[randomForest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf){target="_blank"} | to perform the random forest analysis
+[stringr](https://stringr.tidyverse.org/articles/stringr.html){target="_blank"}    | to manipulate the text the map data
+[tidyr](https://tidyr.tidyverse.org/){target="_blank"}      | to separate data within a column into multiple columns
+[rnaturalearth](https://cran.r-project.org/web/packages/rnaturalearth/README.html){target="_blank"} | to get the geometry data for the earth to plot the US
+[maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get map database data about counties to draw them on our US map
+[sf](https://r-spatial.github.io/sf/){target="_blank"}  | to convert the map data into a data frame
+[lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert the map geographical data
+[rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
+[cowplot](https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html){target="_blank"} | to allow plots to be combined
 
 #### For users 
 
@@ -70,8 +188,13 @@ There is a [`Makefile`](Makefile) in this folder that allows you to type `make` 
 
 #### For instructors
 
+This case study is intended to introduce fundamental topics in Machine Learning and to introduce how to implement model prediction using the tidymodels ecosystem of packages in R. 
+
 #### Target audience 
 
+This case study is intended for those with some familiarity with linear regression and R programming.
 
 #### Suggested homework
+
+Students can predict air pollution monitor values using a different algorithm and provide an explanation for how that algorithm works and why it may be a good choice for modeling this data.
 

@@ -59,6 +59,7 @@ This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 [
 ## **Motivation**
 ***
 A variety of different sources contribute different types of pollutants to what we call air pollution. 
+
 Some sources are natural while others are anthropogenic (human derived):
 
 <p align="center">
@@ -171,11 +172,7 @@ Yanosky, J. D. et al. Spatio-temporal modeling of particulate air pollution in t
 
 The authors of this article state that:
 
-> "Exposure to atmospheric particulate matter (PM) remains an important public health concern,
-although it remains difficult to quantify accurately across large geographic areas with sufficiently high spatial
-resolution. Recent epidemiologic analyses have demonstrated the importance of spatially- and temporally-resolved
-exposure estimates, which show larger PM-mediated health effects as compared to nearest monitor or
-county-specific ambient concentrations." 
+> "Exposure to atmospheric particulate matter (PM) remains an important public health concern, although it remains difficult to quantify accurately across large geographic areas with sufficiently high spatial resolution. Recent epidemiologic analyses have demonstrated the importance of spatially- and temporally-resolved exposure estimates, which show larger PM-mediated health effects as compared to nearest monitor or county-specific ambient concentrations." 
 
 
 ```{r, echo = FALSE, out.width= "700 px", eval = FALSE}
@@ -198,9 +195,9 @@ We will use similar methods to predict annual air pollution levels spatially wit
 ### Learning Objectives 
 
 In this case study, we will walk you through importing data from CSV files and performing machine learning methods to predict our outcome variable of interest (in this case annual fine particle air pollution estimates). 
+
 We will especially focus on using packages and functions from the [`tidyverse`](https://www.tidyverse.org/){target="_blank"}, and more specifically the [`tidymodels`](https://cran.r-project.org/web/packages/tidymodels/tidymodels.pdf){target="_blank"} package/ecosystem primarily developed and maintained by [Max Kuhn](https://resources.rstudio.com/authors/max-kuhn){target="_blank"} and [Davis Vaughan](https://resources.rstudio.com/authors/davis-vaughan){target="_blank"}. 
-This package loads more modeling related packages like `rsample`, `recipes`, `parsnip`, `yardstick`,  and `dials`. 
-We will also briefly cover the `workflows` and `tune` packages. 
+This package loads more modeling related packages like `rsample`, `recipes`, `parsnip`, `yardstick`,  and `dials`. We will also briefly cover the `workflows` and `tune` packages. 
 
 The tidyverse is a library of packages created by RStudio. 
 While some students may be familiar with previous R programming packages, these packages make data science in R especially efficient.
@@ -210,7 +207,29 @@ While some students may be familiar with previous R programming packages, these 
 include_graphics("https://tidyverse.tidyverse.org/logo.png")
 ```
 
-```{r, out.width = "50px", echo = FALSE, fig.align ="center"}
+The skills, methods, and concepts that students will be familiar with by the end of this case study are:
+
+
+Data science skills:  
+  
+1. Familiarity with the tidymodels ecosystem
+2. Ability to evaluate correlation among predictor variables (`corrplot` and `GGally`)
+3. Ability to implement tidymodels packages such as `rsample` to split the data into traning and testing sets as well as cross validation sets.
+4. Ability to use the `recipes`, `parsnip`, and `workflows` to train and test a linear regression model and random forest model
+5. Demonstrate how to visualize geo-spatial data using `ggplot2`
+
+Statistical concepts and methods:  
+  
+1. Basic understanding the utility of machine learning for prediction and classification
+2. Understanding of the need for training and test set
+3. Understanding of the utility of cross validation
+4. Understanding of random forest
+
+
+
+
+
+```{r, out.width = "100px", echo = FALSE, fig.align ="center"}
 include_graphics("https://pbs.twimg.com/media/DkBFpSsW4AIyyIN.png")
 ```
 
@@ -226,7 +245,6 @@ library(summarytools)
 library(magrittr)
 library(corrplot)
 library(RColorBrewer)
-library(ggcorrplot)
 library(GGally)
 library(tidymodels)
 library(workflows)
@@ -254,7 +272,6 @@ library(cowplot)
 [summarytools](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data in a different style
 [magrittr](https://magrittr.tidyverse.org/articles/magrittr.html){target="_blank"}   | to use the `%<>%` pipping operator 
 [corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
-[ggcorrplot](http://www.sthda.com/english/wiki/ggcorrplot-visualization-of-a-correlation-matrix-using-ggplot2){target="_blank"} | also to make large correlation plots
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
 [tidymodels](https://www.tidymodels.org){target="_blank"} | to load in a set of packages (broom, dials, infer, parsnip, purrr, recipes, rsample, tibble, yardstick)
 [rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets; to split the training set for cross-validation  
@@ -339,6 +356,7 @@ However, air pollution **continues to contribute to health risk for Americans**,
 Thus, it is important to obtain high spatial granularity in estimates of air pollution in order to identify locations where populations are experiencing harmful levels of exposure.
 
 You can see that current air quality conditions at this [website](https://aqicn.org/city/usa/){target="_blank"} and you will notice variation across different cities.
+
 For example, here are the conditions in Topeka Kansas at the time this case study was created:
 
 ```{r, echo = FALSE}
@@ -409,6 +427,9 @@ But this kind of thinking can lead to major problems. In general good machine le
 In this case study, we want to **predict** air pollution levels. 
 To build this machine learning algorithm, our **outcome variable** is fine particulate matter (PM~2.5~) captured from air pollution monitors in the contiguous US from 2008. 
 Our **features** (or predictor variables) include data about population density, road density, urbanization levels, and NASA satellite data. 
+
+All of our data was previously collected by a [researcher](http://www.biostat.jhsph.edu/~rpeng/) at the [Johns Hopkins School of Public Health](https://www.jhsph.edu/) who studies air pollution and climate change. 
+
 Using this model, we predict air pollution in new areas where there are no monitors. 
 
 ### Our outcome variable
@@ -517,21 +538,24 @@ knitr::include_graphics(here::here("img", "regression.png"))
 
 ## **Data Import**
 ***
+All of our data was previously collected by a [researcher](http://www.biostat.jhsph.edu/~rpeng/) at the [Johns Hopkins School of Public Health](https://www.jhsph.edu/) who studies air pollution and climate change. 
 
 We have one CSV file that contains both our single **outcome variable** and all of our **features** (or predictor variables).
 
 Next, we import our data into R now so that we can explore the data further. 
 We will call our data object `pm` for particulate matter. 
 We import the data using the `read_csv()` function from the `readr` package. 
-
 ```{r}
 pm <- readr::read_csv(here("docs", "pm25_data.csv"))
 ```
+
+
 
 ## **Data Exploration and Wrangling**
 ***
 
 The first step in performing any data analysis is to explore the data. 
+
 For example, we might want to better understand the variables included in the data, as we may learn about important details about the data that we should keep in mind as we try to predict our outcome variable.
 
 First, let's just get a general sense of our data. 
@@ -558,7 +582,8 @@ pm %>%
 We can see that there are 876 monitors (rows) and that we have 50 total variables (columns) - one of which is the outcome variable. In this case, the outcome variable is called `value`. 
 
 AVOCADO: Should we link to a code book here? Like could we use this as a teaching opportunity to demonstrate the purpose of a code book so a student knows how we know the PM values are `value`?
-avocado comment: there isnt a code book related to this data, Roger wrangled it for me, but the vaping case study actually uses code books for that data. Would you like to link to a generic code book and describe that process?
+
+avocado response: there isnt a code book related to this data, Roger wrangled it for me, but the vaping case study actually uses code books for that data. Would you like to link to a generic code book and describe that process? I did however add information about Roger and how he previously collected the data.
 
 Notice that some of the variables that we would think of as factors (or categorical data) are currently of class character as indicated by the `<chr>` just to the right of the column names/variable names in the `glimpse()` output. This means that the variable values are character strings, such as words or phrases. 
 
@@ -616,15 +641,20 @@ In our data set, it looks like our data do not contain any missing data.
 Also notice how the function provides separate tables of summary statistics for each data type: character, factor and numeric. 
 
 Next, the `n_unqiue` column shows us the number of unique values for each of our columns. 
-We can see that there are 49 states represented in the data, and we know that the data should be of the contiguous states. (AVOCADO: how do we know it's only the contiguous states?)
+We can see that there are 49 states represented in the data.
+
+We can see that for many variables there are many low values as the distribution shows two peaks, one near zero and another with a higher value. 
+This is true for the `imp` variables (measures of development), the `nei` variables (measures of emission sources) and the road density variables. 
+We can also see that the range of some of the variables is very large, in particular the area and population related variables.
+
+
 Let's take a look to see which states are included:
 
-
-
-```{r, eval = FALSE}
+```{r, eval = FALSE} 
 pm %>% 
   distinct(state) 
 ```
+
 
 Scroll through the output:
 
@@ -641,346 +671,20 @@ pm %>%
 Ah, it looks like "District of Columbia" is being included as a state. 
 We can see that indeed Alaska and Hawaii are not included in the data.
 
-AVOCADO: do you think we need two summary functions or is 1 enough? 
-
-Here is another method of looking at the data using the `dfSummary()` function of the `summarytools`package. We need to copy and paste the output into the rmarkdown.
-
-```{r, eval = FALSE}
-dfSummary(pm, plain.ascii = FALSE, style = "grid", 
-          graph.magnif = 0.45,  tmp.img.dir = "tmp")
-```
-
-AVOCADO: when I go to compile the entire document, i get the following error. the files in the `/tmp` folder fo rme range from 0001 to 0100. but the figure below starts at 0101? 
-
-```
-File tmp/ds0101.png not found in resource path
-Error: pandoc document conversion failed with error 99
-In addition: There were 11 warnings (use warnings() to see them)
-Execution halted
-```
-
-<details><summary> Click here to see the dfSummary table </summary>
 
 
-**Dimensions:** 876 x 50  
-**Duplicates:** 0  
-
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| No | Variable                     | Stats / Values                           | Freqs (% of Valid)  | Graph               | Valid  | Missing |
-+====+==============================+==========================================+=====================+=====================+========+=========+
-| 1  | id\                          | 1\. 1003.001\                            | 1 ( 0.1%)\          | ![](tmp/ds0101.png) | 876\   | 0\      |
-|    | [factor]                     | 2\. 1027.0001\                           | 1 ( 0.1%)\          |                     | (100%) | (0%)    |
-|    |                              | 3\. 1033.1002\                           | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 4\. 1049.1003\                           | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 5\. 1055.001\                            | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 6\. 1069.0003\                           | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 7\. 1073.0023\                           | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 8\. 1073.1005\                           | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 9\. 1073.1009\                           | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 10\. 1073.101\                           | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | [ 866 others ]                           | 866 (98.9%)         |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 2  | value\                       | Mean (sd) : 10.8 (2.6)\                  | 875 distinct values | ![](tmp/ds0102.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 3 < 11.2 < 23.2\                         |                     |                     |        |         |
-|    |                              | IQR (CV) : 3.1 (0.2)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 3  | fips\                        | 1\. 1003\                                | 1 ( 0.1%)\          | ![](tmp/ds0103.png) | 876\   | 0\      |
-|    | [factor]                     | 2\. 1027\                                | 1 ( 0.1%)\          |                     | (100%) | (0%)    |
-|    |                              | 3\. 1033\                                | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 4\. 1049\                                | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 5\. 1055\                                | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 6\. 1069\                                | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 7\. 1073\                                | 8 ( 0.9%)\          |                     |        |         |
-|    |                              | 8\. 1089\                                | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 9\. 1097\                                | 2 ( 0.2%)\          |                     |        |         |
-|    |                              | 10\. 1101\                               | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | [ 559 others ]                           | 858 (98.0%)         |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 4  | lat\                         | Mean (sd) : 38.5 (4.6)\                  | 876 distinct values | ![](tmp/ds0104.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 25.5 < 39.3 < 48.4\                      |                     |                     |        |         |
-|    |                              | IQR (CV) : 6.6 (0.1)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 5  | lon\                         | Mean (sd) : -91.7 (15)\                  | 876 distinct values | ![](tmp/ds0105.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | -124.2 < -87.5 < -68\                    |                     |                     |        |         |
-|    |                              | IQR (CV) : 18.5 (-0.2)                   |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 6  | state\                       | 1\. California\                          | 85 ( 9.7%)\         | ![](tmp/ds0106.png) | 876\   | 0\      |
-|    | [character]                  | 2\. Ohio\                                | 44 ( 5.0%)\         |                     | (100%) | (0%)    |
-|    |                              | 3\. Illinois\                            | 38 ( 4.3%)\         |                     |        |         |
-|    |                              | 4\. Indiana\                             | 36 ( 4.1%)\         |                     |        |         |
-|    |                              | 5\. North Carolina\                      | 35 ( 4.0%)\         |                     |        |         |
-|    |                              | 6\. Pennsylvania\                        | 32 ( 3.7%)\         |                     |        |         |
-|    |                              | 7\. Michigan\                            | 30 ( 3.4%)\         |                     |        |         |
-|    |                              | 8\. Florida\                             | 29 ( 3.3%)\         |                     |        |         |
-|    |                              | 9\. Georgia\                             | 28 ( 3.2%)\         |                     |        |         |
-|    |                              | 10\. Texas\                              | 27 ( 3.1%)\         |                     |        |         |
-|    |                              | [ 39 others ]                            | 492 (56.2%)         |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 7  | county\                      | 1\. Jefferson\                           | 18 ( 2.1%)\         | ![](tmp/ds0107.png) | 876\   | 0\      |
-|    | [character]                  | 2\. Cook\                                | 12 ( 1.4%)\         |                     | (100%) | (0%)    |
-|    |                              | 3\. Hamilton\                            | 11 ( 1.3%)\         |                     |        |         |
-|    |                              | 4\. Lake\                                | 11 ( 1.3%)\         |                     |        |         |
-|    |                              | 5\. Los Angeles\                         | 10 ( 1.1%)\         |                     |        |         |
-|    |                              | 6\. Wayne\                               | 10 ( 1.1%)\         |                     |        |         |
-|    |                              | 7\. Washington\                          | 9 ( 1.0%)\          |                     |        |         |
-|    |                              | 8\. Cuyahoga\                            | 7 ( 0.8%)\          |                     |        |         |
-|    |                              | 9\. Jackson\                             | 7 ( 0.8%)\          |                     |        |         |
-|    |                              | 10\. Madison\                            | 7 ( 0.8%)\          |                     |        |         |
-|    |                              | [ 461 others ]                           | 774 (88.4%)         |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 8  | city\                        | 1\. Not in a city\                       | 103 (11.8%)\        | ![](tmp/ds0108.png) | 876\   | 0\      |
-|    | [character]                  | 2\. New York\                            | 9 ( 1.0%)\          |                     | (100%) | (0%)    |
-|    |                              | 3\. Cleveland\                           | 6 ( 0.7%)\          |                     |        |         |
-|    |                              | 4\. Baltimore\                           | 5 ( 0.6%)\          |                     |        |         |
-|    |                              | 5\. Chicago\                             | 5 ( 0.6%)\          |                     |        |         |
-|    |                              | 6\. Detroit\                             | 5 ( 0.6%)\          |                     |        |         |
-|    |                              | 7\. Milwaukee\                           | 5 ( 0.6%)\          |                     |        |         |
-|    |                              | 8\. New Haven\                           | 5 ( 0.6%)\          |                     |        |         |
-|    |                              | 9\. Philadelphia\                        | 5 ( 0.6%)\          |                     |        |         |
-|    |                              | 10\. Springfield\                        | 5 ( 0.6%)\          |                     |        |         |
-|    |                              | [ 597 others ]                           | 723 (82.5%)         |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 9  | CMAQ\                     | Mean (sd) : 8.4 (3)\                     | 601 distinct values | ![](tmp/ds0109.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 1.6 < 8.6 < 23.1\                        |                     |                     |        |         |
-|    |                              | IQR (CV) : 3.7 (0.4)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 10 | zcta\                        | 1\. 1022\                                | 1 ( 0.1%)\          | ![](tmp/ds0110.png) | 876\   | 0\      |
-|    | [factor]                     | 2\. 1103\                                | 2 ( 0.2%)\          |                     | (100%) | (0%)    |
-|    |                              | 3\. 1201\                                | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 4\. 1608\                                | 2 ( 0.2%)\          |                     |        |         |
-|    |                              | 5\. 1832\                                | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 6\. 1840\                                | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 7\. 1863\                                | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 8\. 1904\                                | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 9\. 2113\                                | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | 10\. 2119\                               | 1 ( 0.1%)\          |                     |        |         |
-|    |                              | [ 832 others ]                           | 864 (98.6%)         |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 11 | zcta_area\                   | Mean (sd) : 183173481.9 (542598878.5)\   | 842 distinct values | ![](tmp/ds0111.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 15459 < 37653560.5 < 8164820625\         |                     |                     |        |         |
-|    |                              | IQR (CV) : 145836906.5 (3)               |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 12 | zcta_pop\                    | Mean (sd) : 24227.6 (17772.2)\           | 837 distinct values | ![](tmp/ds0112.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 22014 < 95397\                       |                     |                     |        |         |
-|    |                              | IQR (CV) : 25207.8 (0.7)                 |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 13 | imp_a500\                    | Mean (sd) : 24.7 (19.3)\                 | 816 distinct values | ![](tmp/ds0113.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 25.1 < 69.6\                         |                     |                     |        |         |
-|    |                              | IQR (CV) : 36.5 (0.8)                    |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 14 | imp_a1000\                   | Mean (sd) : 24.3 (18)\                   | 860 distinct values | ![](tmp/ds0114.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 24.5 < 67.5\                         |                     |                     |        |         |
-|    |                              | IQR (CV) : 33.3 (0.7)                    |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 15 | imp_a5000\                   | Mean (sd) : 19.9 (14.7)\                 | 870 distinct values | ![](tmp/ds0115.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0.1 < 19.1 < 74.6\                       |                     |                     |        |         |
-|    |                              | IQR (CV) : 23.3 (0.7)                    |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 16 | imp_a10000\                  | Mean (sd) : 15.8 (13.8)\                 | 870 distinct values | ![](tmp/ds0116.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0.1 < 12.4 < 72.1\                       |                     |                     |        |         |
-|    |                              | IQR (CV) : 19.6 (0.9)                    |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 17 | imp_a15000\                  | Mean (sd) : 13.4 (13.1)\                 | 870 distinct values | ![](tmp/ds0117.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0.1 < 9.7 < 71.1\                        |                     |                     |        |         |
-|    |                              | IQR (CV) : 17.3 (1)                      |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 18 | county_area\                 | Mean (sd) : 3768701992.1 (6212829553.6)\ | 564 distinct values | ![](tmp/ds0118.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 33703512 < 1690826566.5 < 51947229509\   |                     |                     |        |         |
-|    |                              | IQR (CV) : 1761655911.5 (1.6)            |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 19 | county_pop\                  | Mean (sd) : 687298.4 (1293488.7)\        | 564 distinct values | ![](tmp/ds0119.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 783 < 280730.5 < 9818605\                |                     |                     |        |         |
-|    |                              | IQR (CV) : 642211 (1.9)                  |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 20 | log_dist_to_prisec\          | Mean (sd) : 6.2 (1.4)\                   | 870 distinct values | ![](tmp/ds0120.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | -1.5 < 6.4 < 10.5\                       |                     |                     |        |         |
-|    |                              | IQR (CV) : 1.7 (0.2)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 21 | log_pri_length_5000\         | Mean (sd) : 9.8 (1.1)\                   | 586 distinct values | ![](tmp/ds0121.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 8.5 < 10.1 < 12\                         |                     |                     |        |         |
-|    |                              | IQR (CV) : 2.2 (0.1)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 22 | log_pri_length_10000\        | Mean (sd) : 10.9 (1.1)\                  | 687 distinct values | ![](tmp/ds0122.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 9.2 < 11.2 < 13\                         |                     |                     |        |         |
-|    |                              | IQR (CV) : 2 (0.1)                       |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 23 | log_pri_length_15000\        | Mean (sd) : 11.5 (1.1)\                  | 726 distinct values | ![](tmp/ds0123.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 9.6 < 11.7 < 13.6\                       |                     |                     |        |         |
-|    |                              | IQR (CV) : 1.5 (0.1)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 24 | log_pri_length_25000\        | Mean (sd) : 12.2 (1.1)\                  | 787 distinct values | ![](tmp/ds0124.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 10.1 < 12.5 < 14.4\                      |                     |                     |        |         |
-|    |                              | IQR (CV) : 1.4 (0.1)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 25 | log_prisec_length_500\       | Mean (sd) : 7 (1)\                       | 382 distinct values | ![](tmp/ds0125.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 6.2 < 6.2 < 9.4\                         |                     |                     |        |         |
-|    |                              | IQR (CV) : 1.6 (0.1)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 26 | log_prisec_length_1000\      | Mean (sd) : 8.6 (0.8)\                   | 591 distinct values | ![](tmp/ds0126.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 7.6 < 8.7 < 10.5\                        |                     |                     |        |         |
-|    |                              | IQR (CV) : 1.6 (0.1)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 27 | log_prisec_length_5000\      | Mean (sd) : 11.3 (0.8)\                  | 852 distinct values | ![](tmp/ds0127.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 8.5 < 11.4 < 12.8\                       |                     |                     |        |         |
-|    |                              | IQR (CV) : 0.9 (0.1)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 28 | log_prisec_length_10000\     | Mean (sd) : 12.4 (0.7)\                  | 867 distinct values | ![](tmp/ds0128.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 9.2 < 12.5 < 13.8\                       |                     |                     |        |         |
-|    |                              | IQR (CV) : 1 (0.1)                       |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 29 | log_prisec_length_15000\     | Mean (sd) : 13 (0.7)\                    | 869 distinct values | ![](tmp/ds0129.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 9.6 < 13.1 < 14.4\                       |                     |                     |        |         |
-|    |                              | IQR (CV) : 1 (0.1)                       |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 30 | log_prisec_length_25000\     | Mean (sd) : 13.8 (0.7)\                  | 870 distinct values | ![](tmp/ds0130.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 10.1 < 13.9 < 15.2\                      |                     |                     |        |         |
-|    |                              | IQR (CV) : 1 (0.1)                       |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 31 | log_nei_2008_pm25_sum_10000\ | Mean (sd) : 4 (2.4)\                     | 828 distinct values | ![](tmp/ds0131.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 4.3 < 9.1\                           |                     |                     |        |         |
-|    |                              | IQR (CV) : 3.5 (0.6)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 32 | log_nei_2008_pm25_sum_15000\ | Mean (sd) : 4.7 (2.2)\                   | 855 distinct values | ![](tmp/ds0132.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 5 < 9.4\                             |                     |                     |        |         |
-|    |                              | IQR (CV) : 2.9 (0.5)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 33 | log_nei_2008_pm25_sum_25000\ | Mean (sd) : 5.7 (2.1)\                   | 860 distinct values | ![](tmp/ds0133.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 5.9 < 9.7\                           |                     |                     |        |         |
-|    |                              | IQR (CV) : 2.6 (0.4)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 34 | log_nei_2008_pm10_sum_10000\ | Mean (sd) : 4.3 (2.3)\                   | 829 distinct values | ![](tmp/ds0134.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 4.6 < 9.3\                           |                     |                     |        |         |
-|    |                              | IQR (CV) : 3.4 (0.5)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 35 | log_nei_2008_pm10_sum_15000\ | Mean (sd) : 5.1 (2.2)\                   | 855 distinct values | ![](tmp/ds0135.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 5.4 < 9.7\                           |                     |                     |        |         |
-|    |                              | IQR (CV) : 2.8 (0.4)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 36 | log_nei_2008_pm10_sum_25000\ | Mean (sd) : 6.1 (2)\                     | 860 distinct values | ![](tmp/ds0136.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 6.4 < 9.9\                           |                     |                     |        |         |
-|    |                              | IQR (CV) : 2.4 (0.3)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 37 | popdens_county\              | Mean (sd) : 551.8 (1711.5)\              | 564 distinct values | ![](tmp/ds0137.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0.3 < 156.7 < 26821.9\                   |                     |                     |        |         |
-|    |                              | IQR (CV) : 470 (3.1)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 38 | popdens_zcta\                | Mean (sd) : 1279.7 (2757.5)\             | 840 distinct values | ![](tmp/ds0138.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 610.3 < 30418.8\                     |                     |                     |        |         |
-|    |                              | IQR (CV) : 1281.4 (2.2)                  |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 39 | nohs\                        | Mean (sd) : 7 (7.2)\                     | 215 distinct values | ![](tmp/ds0139.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 5.1 < 100\                           |                     |                     |        |         |
-|    |                              | IQR (CV) : 6.1 (1)                       |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 40 | somehs\                      | Mean (sd) : 10.2 (6.2)\                  | 230 distinct values | ![](tmp/ds0140.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 9.4 < 72.2\                          |                     |                     |        |         |
-|    |                              | IQR (CV) : 8 (0.6)                       |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 41 | hs\                          | Mean (sd) : 30.3 (11.4)\                 | 347 distinct values | ![](tmp/ds0141.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 30.8 < 100\                          |                     |                     |        |         |
-|    |                              | IQR (CV) : 12.3 (0.4)                    |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 42 | somecollege\                 | Mean (sd) : 21.6 (8.6)\                  | 240 distinct values | ![](tmp/ds0142.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 21.3 < 100\                          |                     |                     |        |         |
-|    |                              | IQR (CV) : 7.2 (0.4)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 43 | associate\                   | Mean (sd) : 7.1 (4)\                     | 157 distinct values | ![](tmp/ds0143.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 7.1 < 71.4\                          |                     |                     |        |         |
-|    |                              | IQR (CV) : 3.9 (0.6)                     |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 44 | bachelor\                    | Mean (sd) : 14.9 (9.7)\                  | 301 distinct values | ![](tmp/ds0144.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 12.9 < 100\                          |                     |                     |        |         |
-|    |                              | IQR (CV) : 10.4 (0.7)                    |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 45 | grad\                        | Mean (sd) : 8.9 (8.6)\                   | 245 distinct values | ![](tmp/ds0145.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 6.7 < 100\                           |                     |                     |        |         |
-|    |                              | IQR (CV) : 7.1 (1)                       |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 46 | pov\                         | Mean (sd) : 15 (11.3)\                   | 345 distinct values | ![](tmp/ds0146.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 12.1 < 65.9\                         |                     |                     |        |         |
-|    |                              | IQR (CV) : 14.7 (0.8)                    |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 47 | hs_orless\                   | Mean (sd) : 47.5 (16.8)\                 | 464 distinct values | ![](tmp/ds0147.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 0 < 48.7 < 100\                          |                     |                     |        |         |
-|    |                              | IQR (CV) : 21.2 (0.4)                    |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 48 | urc2013\                     | Mean (sd) : 2.9 (1.5)\                   | 1 : 203 (23.2%)\    | ![](tmp/ds0148.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        | 2 : 163 (18.6%)\    |                     | (100%) | (0%)    |
-|    |                              | 1 < 3 < 6\                               | 3 : 228 (26.0%)\    |                     |        |         |
-|    |                              | IQR (CV) : 2 (0.5)                       | 4 : 123 (14.0%)\    |                     |        |         |
-|    |                              |                                          | 5 : 101 (11.5%)\    |                     |        |         |
-|    |                              |                                          | 6 :  58 ( 6.6%)     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 49 | urc2006\                     | Mean (sd) : 3 (1.5)\                     | 1 : 195 (22.3%)\    | ![](tmp/ds0149.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        | 2 : 162 (18.5%)\    |                     | (100%) | (0%)    |
-|    |                              | 1 < 3 < 6\                               | 3 : 221 (25.2%)\    |                     |        |         |
-|    |                              | IQR (CV) : 2 (0.5)                       | 4 : 127 (14.5%)\    |                     |        |         |
-|    |                              |                                          | 5 : 115 (13.1%)\    |                     |        |         |
-|    |                              |                                          | 6 :  56 ( 6.4%)     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-| 50 | aod\                         | Mean (sd) : 43.7 (19.6)\                 | 581 distinct values | ![](tmp/ds0150.png) | 876\   | 0\      |
-|    | [numeric]                    | min < med < max:\                        |                     |                     | (100%) | (0%)    |
-|    |                              | 5 < 40.2 < 143\                          |                     |                     |        |         |
-|    |                              | IQR (CV) : 18 (0.4)                      |                     |                     |        |         |
-+----+------------------------------+------------------------------------------+---------------------+---------------------+--------+---------+
-
-</details>
-
-We can see that for many variables there are many low values as the distribution shows two peaks, one near zero and another with a higher value. 
-This is true for the `imp` variables (measures of development), the `nei` variables (measures of emission sources) and the road density variables. 
-We can also see that the range of some of the variables is very large, in particular the area and population related variables.
 
 ### Evaluate correlation among possible predictors
 
-In prediction analyses, it is also useful to evaluate if any of the variables are correlated.
+In prediction analyses, it is also useful to evaluate if any of the variables are correlated. Why should we care about this?
 
-AVOCADO: maybe we should add an explanation of why we would care about correlated variables in a model? 
+If we are using a regression to model our data then we might run into a problem called multicolinearity which can lead us to misinterpret what is really predictive of our response variable. This phenomenon occurs when the predictor variables can actually predict one another. See [this case study](https://opencasestudies.github.io/ocs-bp-RTC-analysis/) for a deeper explanation about this. Another reason we should look out for correlation is that we dont want to include redudant variables. This can add unnecessary noise to our algorithm causing a reduction in prediction accuracy and it can cause our algroithm to be unnecessarily slower. Finally, it can also make it difficult to interpret what variables are actually predictive.
 
 Intuitively we can expect some of our variables to be correlated.
 
 Let's first take a look at all of our numeric variabels with the`corrplot` package:
 The `corrplot` package is another option to look at correlation among possible predictors, and particularly useful if we have many predictors. 
+
 First, we calculate the Pearson correlation coefficients between all features pairwise using the `cor()` function of the `stats` package (which is loaded automatically). Then we use the `corrplot::corrplot()` function. 
 
 ```{r}
@@ -991,35 +695,23 @@ The `tl.cex = 0.5` argument controls the size of the text label.
 
 We can also plot the absolute value of the Pearson correlation coefficients using the `abs()` function from base R and change the order of the columns.  
 ```{r}
-corrplot(abs(PM_cor), order = "AOE", tl.cex = 0.5, cl.lim = c(0, 1))
+corrplot(abs(PM_cor), order = "hclust", tl.cex = 0.5, cl.lim = c(0, 1))
+
 ```
-AVOCADO: I read the help file, but I'm still not sure what "AOE" means? Either, I think if we change a default parameter argument, then we should explain it here. 
+
+There are several options for ordering the variables. See [here](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html) for more options. Here we will use the "hclust" option for ordering by [hierarchical clustering](https://en.wikipedia.org/wiki/Hierarchical_clustering) - which will order the variables by how similar they are to one another.
 
 The `cl.lim = c(0, 1)` argument limits the color label to be between 0 and 1. 
 
-Next, we can change the visualization method (`method = "color"`) with colored 
-boxes, only show the upper half of the plot (`type = "upper"`) without the diagnoal 
-(`diag = FALSE), change the order of the columns (`order = "FPC"`), and change
-the color palatte using the `RColorBrewer` package. 
-
-```{r}
-corrplot(PM_cor, method = "color",  type = "upper", 
-         diag = FALSE, order = "FPC", tl.cex = 0.5,  
-         col = RColorBrewer::brewer.pal(n = 8, name = "PuOr"))
-```
-
-Also notice that none of the predictors are highly correlated with our outcome variable (`value`).
-
-The `ggcorrplot()` function from the `ggcorrplot` package is also very useful.
-```{r}
-ggcorrplot(PM_cor, hc.order = TRUE, type = "lower", tl.cex = 5)
-```
-
-AVOCADO: So I think if we introduce more than one package to do a similar task, I think we have to explain what's the adv or disadv of both. Otherwise, it feels like we are just showing the student to just show them but without clear guidance on when to use which function? 
 
 We can see that the development variables (`imp`) variables are correlated with each other as we might expect. 
 We also see that the road density variables seem to be correlated with each other, and the emission variables seem to be correlated with each other. 
-We can take a closer look  using the `ggcorr()` function and the `ggpairs()` function of the `GGally` package. 
+
+
+Also notice that none of the predictors are highly correlated with our outcome variable (`value`).
+
+We can take also take a closer look  using the `ggcorr()` function and the `ggpairs()` function of the `GGally` package. 
+
 To select our variables of interest we can use the `select()` function with the `contains()` function of the `tidyr` package. 
 
 First let's look at the `imp`/development variables. 
@@ -1097,7 +789,6 @@ select(log_nei_2008_pm25_sum_10000, log_popdens_county,
 
 Indeed this increased the correlation, but variables from each of these categories may still prove to be useful for prediction.
 
-
 Now that we have a sense of what our data are, we can get started with building a machine learning model to predict air pollution. 
 
 ## **What is machine learning?**  {#whatisml}
@@ -1161,8 +852,8 @@ While each of these components is a _technical_ problem, there has been a ton of
 
 Now that we know a bit more about machine learning, let's build a model to predict air pollution levels using the `tidymodels` framework. 
 
-## Machine learning with `tidymodels`
-
+## **Machine learning with `tidymodels`**
+***
 The goal is to build a machine learning algorithm uses the features as input and predicts a outcome variable (or air pollution levels) in the situation where we do not know the outcome variable. 
 The way we do this is to use data where we have both the input and output data to _train_ a machine learning algorithm. 
 To train a machine learning algorithm, we will use the `tidymodels` package ecosystem. 
@@ -1179,8 +870,6 @@ You may be familiar with the older packages `caret` or `mlr` which are also for 
 The tidymodels package collection, which includes parsnip, has other packages for many of these tasks, and they are designed to work together. We are working towards higher-level APIs that can replicate and extend what the current model packages can do."
 
 There are many R packages in the `tidymodels` ecosystem, which assist with various steps in the process of building a machine learning algorithm:
-
-AVOCADO: Is it possible to get a higher resolution figure here?
 
 ```{r, echo=FALSE, out.width="800px"}
 knitr::include_graphics(here::here("img","simpletidymodels.png"))
@@ -1238,6 +927,7 @@ To split the data into training and testing, we will use the `initial_split()` f
 AVOCADO: should we use "sample" or "observation"? Also, should we use "predictor" or "feature" in the figure? Could the figure be made to be more horizontal where the yellow and blue boxes are on top of each other? 
 
 ```{r, echo=FALSE, out.width="400px"}
+
 knitr::include_graphics(here::here("img","split.png"))
 ```
 
@@ -2254,7 +1944,8 @@ AVOCADO: Could we write a sentence explaining what we see at output? also about 
 
 
 
-## Data Analysis
+## **Data Analysis**
+***
 
 In the previous section, we demonstrated how to build a machine learning model (specifically a linear regression model) to predict air pollution with the `tidymodels` framework. 
 
@@ -2553,7 +2244,8 @@ test_predictions %>%
 
 
 
-## Data Visualization
+## **Data Visualization**
+***
 
 Our main question for this case study was:  
 
@@ -2727,7 +2419,7 @@ cowplot::plot_grid(truth, pred,nrow = 2 )
 dev.off()
 ```
 
-## Summary
+## **Summary**
 
 In this case study, we explored gravimetric monitoring data of fine particulate matter air pollution (outcome variable). 
 Our goal was to able to predict air pollution on monitors where we only had predictor variables (or features) without having observed a corresponding measurement of air pollution.
@@ -2736,9 +2428,10 @@ Our learning objectives were:
 
 - Introduce concepts in machine learning
 - Demonstrate how to build a machine learning model with `tidymodels`
-- Demonstrate how to visualize geo-spatial data using `ggplot`
+- Demonstrate how to visualize geo-spatial data using `ggplot2`
 
 Using the machine learning models built in this case study, we could now extend this model to be used to predict air pollution levels in areas with poor monitoring, to help identify regions where populations maybe especially at risk for the health effects of air pollution.  
+
 Analyses like the one in our case study are important for defining which groups could benefit the most from interventions, education, and policy changes when attempting to mitigate public health challenges. You can see in this [article](https://www.nejm.org/doi/full/10.1056/NEJMoa1702747){target="_blank"} that many additional considerations would be involved to adequately understand the data enough to recommend policy changes.
 
 
@@ -2755,7 +2448,7 @@ We performed the major steps of machine learning that we introduced in the begin
 
 1. Data exploration  
 
-We used packages like `skimr`, `summarytools`, `corrplot`, `ggcorrplot`, and `GGally` to better understand our data. These packages gave can tell us how many missing values each variable has (if any), the class of each variable, the distribution of values for each variable, the sparsity of each variable, and the level of correlation between variables.  
+We used packages like `skimr`, `summarytools`, `corrplot`, and `GGally` to better understand our data. These packages gave can tell us how many missing values each variable has (if any), the class of each variable, the distribution of values for each variable, the sparsity of each variable, and the level of correlation between variables.  
 
 2. Data splitting 
 
@@ -2769,9 +2462,8 @@ We used the `recipes` package to assign variable roles (such as outcome, predict
 
 We learned that the model needs to first be fit to the training data. We learned that in both classification and prediction, the model is fit to the training data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. We learned that we specify the model and its specifications using the `parnsip` package and that we also use this package to fit the model using the `fit()` function. We learned that we if just use `parsnip` to fit the model, then we need to use the pre-processed training data (output from `juice()`). We learned that we can use the raw training data if we use the `workflows` package to create a workflow that pre-processes our data for us.   
 
-We learned that if the model fits well than the estimated values will be very similar to the true outcome variable values in our training data. We learned that we can assess model performance using the `yardstick` package and the `metrics()` function. We also learned that we can use subsets of our training data (which we created with the `rsample` package) to perform cross validation to get a better estimate about the performance of our model using our training data, as we want our results to be generalizable and to perform well with other data, not just our training data. We used the `fit_resamples()` function of the tune package to fit our model on our different training data subsets and the `collect_metrics()` function (also of the `tune` package) to evaluate model performance using these subsets.  We also learned that we can potentially improve model performance by tuning aspects about the model called [hyper-parameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"} to determine the best option for model performance. We learned that we can do this using the `tune` and `dials` packages and evaluating the performance of our model with the different hyper-parameter options and our training data subsets that we used for cross validation. After we tested several different methods to model our data, we compared them to choose the best performing model as our final model.  
+We learned that if the model fits well than the estimated values will be very similar to the true outcome variable values in our training data. We learned that we can assess model performance using the `yardstick` package and the `metrics()` function. We also learned that we can use subsets of our training data (which we created with the `rsample` package) to perform cross validation to get a better estimate about the performance of our model using our training data, as we want our results to be generalizable and to perform well with other data, not just our training data. We used the `fit_resamples()` function of the tune package to fit our model on our different training data subsets and the `collect_metrics()` function (also of the `tune` package) to evaluate model performance using these subsets.  We also learned that we can potentially improve model performance by tuning aspects about the model called [hyperparameters](https://machinelearningmastery.com/difference-between-a-parameter-and-a-hyperparameter/){target="_blank"} to determine the best option for model performance. We learned that we can do this using the `tune` and `dials` packages and evaluating the performance of our model with the different hyper-parameter options and our training data subsets that we used for cross validation. After we tested several different methods to model our data, we compared them to choose the best performing model as our final model.  
 
-AVOCADO: could we use a different link instead of to data camp? 
 
 5. Overall model performance evaluation  
 
@@ -2786,6 +2478,10 @@ We first fit our model to our testing data using either just parsnip and the pre
 ### Suggested Homework
 
 Students can predict air pollution monitor values using a different algorithm and provide an explanation for how that algorithm works and why it may be a good choice for modeling this data.
+
+
+## **Additional Information**
+***
 
 ### Helpful Links
 
@@ -2818,7 +2514,7 @@ Students can predict air pollution monitor values using a different algorithm an
 [Dimensionality Reduction/Signal Extraction](https://en.wikipedia.org/wiki/Dimensionality_reduction){target="_blank"}  
 [Row Operations](https://tartarus.org/gareth/maths/Linear_Algebra/row_operations.pdf){target="_blank"}  
 [Near Zero Varaince](https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/){target="_blank"}  
-[Parameters and Hyper-parameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"}   
+[Parameters and Hyperparameters](https://machinelearningmastery.com/difference-between-a-parameter-and-a-hyperparameter/){target="_blank"}   
 [Supervised and Unspervised Learning](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}  
 [Principal Component Analysis](https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007){target="_blank"}  
 [Linear Combinations](https://www.mathbootcamps.com/linear-combinations-vectors/){target="_blank"}  
@@ -2837,7 +2533,6 @@ Students can predict air pollution monitor values using a different algorithm an
 [summarytools](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data in a different style
 [magrittr](https://magrittr.tidyverse.org/articles/magrittr.html){target="_blank"}   | to use the `%<>%` pipping operator 
 [corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
-[ggcorrplot](http://www.sthda.com/english/wiki/ggcorrplot-visualization-of-a-correlation-matrix-using-ggplot2){target="_blank"}| also to make large correlation plots
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
 [rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets and to split the training set for cross-validation  
 [recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `juice()` - extracts final pre-processed training data and `bake()` - applies recipe steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
@@ -2859,11 +2554,18 @@ Students can predict air pollution monitor values using a different algorithm an
 [rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
 [cowplot](https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html){target="_blank"} | to allow plots to be combined
 
-## Session info
-***
+
+### Session info 
+
 
 ```{r}
 sessionInfo()
 ```
 
 
+### Acknowledgements
+
+
+We would like to acknowledge [Roger Peng](http://www.biostat.jhsph.edu/~rpeng/), [Megan Latshaw](https://www.jhsph.edu/faculty/directory/profile/1708/megan-weil-latshaw), and [Kristen Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler)for assisting in framing the major direction of the case study.
+
+We would also like to acknowledge the [Bloomberg American Health Initiative](https://americanhealth.jhu.edu/) for funding this work. 
