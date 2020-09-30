@@ -935,7 +935,7 @@ Ideally, you would also want a completely independent data set to further test t
 To split the data into training and testing, we will use the `initial_split()` function in the `rsample` package to specify how we want to split our data.
 
 
-```{r, echo=FALSE, out.width="400px"}
+```{r, echo=FALSE}
 
 knitr::include_graphics(here::here("img","split.png"))
 ```
@@ -1545,7 +1545,7 @@ PM_wflow_fit
 
 <details><summary> Click here learn how this was done before the `workflows` package was developed </summary>
 
-AVOCADO: this section feels like it should either have more explanation or just deleted. To me it feels confusing because it feels like we are showing a compeltely alternative path without an explanation why you might want to do? or when you would want to do this? 
+AVOCADO:this section feels like it should either have more explanation or just deleted. To me it feels confusing because it feels like we are showing a compeltely alternative path without an explanation why you might want to do? or when you would want to do this? 
 
 If yo have previously used `Tidymodels` but are new to `workflows` it may be useful to see what is different about fitting a model with each method.
 Notice below that we use the processed training data (`juiced_train`) as opposed to the raw training data that we used with the `workflow()` we created with `workflows` above.
