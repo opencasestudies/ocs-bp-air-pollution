@@ -430,7 +430,6 @@ Our **features** (or predictor variables) include data about population density,
 
 All of our data was previously collected by a [researcher](http://www.biostat.jhsph.edu/~rpeng/) at the [Johns Hopkins School of Public Health](https://www.jhsph.edu/) who studies air pollution and climate change. 
 
-Using this model, we predict air pollution in new areas where there are no monitors. 
 
 ### Our outcome variable
 
@@ -562,7 +561,9 @@ First, let's just get a general sense of our data.
 We can do that using the `glimpse()` function of the `dplyr` package (it is also in the `tibble` package).
 
 We will also use the `%>%` pipe, which can be used to define the input for later sequential steps. 
+
 This will make more sense when we have multiple sequential steps using the same data object. 
+
 To use the pipe notation we need to install and load `dplyr` as well.
 
 For example, here we start with `pm` data object and "pipe" the object into as input into the `glimpse()` function. 
@@ -618,11 +619,10 @@ glimpse(pm)
 
 Great! Now we can see that these variables are now factors as indicated by `<fct>` after the variable name.
 
-### Packages to get a sense of the data
+### Skim package
 
 The `skim()` function of the `skimr` package is also really helpful for getting a general sense of your data.
 By design, it provies summary statistics about variables in the data set. 
-designed to provide summary statistics about variables. 
 
 
 #### {.scrollable }
@@ -635,7 +635,9 @@ skim(pm)
 ####
 
 Notice how there is a column called `n_missing` about the number of values that are missing. 
+
 This is also indicated by the `complete_rate` variable (or missing/number of observations). 
+
 In our data set, it looks like our data do not contain any missing data. 
 
 Also notice how the function provides separate tables of summary statistics for each data type: character, factor and numeric. 
@@ -644,11 +646,13 @@ Next, the `n_unqiue` column shows us the number of unique values for each of our
 We can see that there are 49 states represented in the data.
 
 We can see that for many variables there are many low values as the distribution shows two peaks, one near zero and another with a higher value. 
+
 This is true for the `imp` variables (measures of development), the `nei` variables (measures of emission sources) and the road density variables. 
+
 We can also see that the range of some of the variables is very large, in particular the area and population related variables.
 
 
-Let's take a look to see which states are included:
+Let's take a look to see which states are included using the `distinct()` function of the `dplyr` package:
 
 ```{r, eval = FALSE} 
 pm %>% 
@@ -668,17 +672,17 @@ pm %>%
 ```
 ####
 
-Ah, it looks like "District of Columbia" is being included as a state. 
-We can see that indeed Alaska and Hawaii are not included in the data.
-
-
+It looks like "District of Columbia" is being included as a state. 
+We can see that Alaska and Hawaii are not included in the data.
 
 
 ### Evaluate correlation among possible predictors
 
 In prediction analyses, it is also useful to evaluate if any of the variables are correlated. Why should we care about this?
 
-If we are using a regression to model our data then we might run into a problem called multicolinearity which can lead us to misinterpret what is really predictive of our response variable. This phenomenon occurs when the predictor variables can actually predict one another. See [this case study](https://opencasestudies.github.io/ocs-bp-RTC-analysis/) for a deeper explanation about this. Another reason we should look out for correlation is that we dont want to include redudant variables. This can add unnecessary noise to our algorithm causing a reduction in prediction accuracy and it can cause our algroithm to be unnecessarily slower. Finally, it can also make it difficult to interpret what variables are actually predictive.
+If we are using a linear regression to model our data then we might run into a problem called multicolinearity which can lead us to misinterpret what is really predictive of our outcome variable. This phenomenon occurs when the predictor variables actually predict one another. See [this case study](https://opencasestudies.github.io/ocs-bp-RTC-analysis/) for a deeper explanation about this. 
+
+Another reason we should look out for correlation is that we dont want to include redudant variables. This can add unnecessary noise to our algorithm causing a reduction in prediction accuracy and it can cause our algroithm to be unnecessarily slower. Finally, it can also make it difficult to interpret what variables are actually predictive.
 
 Intuitively we can expect some of our variables to be correlated.
 
@@ -794,11 +798,11 @@ Now that we have a sense of what our data are, we can get started with building 
 ## **What is machine learning?**  {#whatisml}
 ***
 
-You may have learned about the central dogma of statistics that you sample from a population
+You may have learned about the central dogma of statistics that you sample from a population.
 
 ![](img/cdi1.png)
 
-Then you try to guess what will happen in the population from the sample. 
+Then you use the sample to try to guess what is happening in the population.
 
 ![](img/cdi2.png)
 
@@ -806,7 +810,7 @@ For prediction we have a similar sampling problem
 
 ![](img/cdp1.png)
 
-But now we are trying to build a rule that can be used to predict a single observation's value of some characteristic using the others. 
+But now we are trying to build a rule that can be used to predict a single observation's value of some characteristic using characteristics of the other observations. 
 
 ![](img/cdp2.png)
 
@@ -820,10 +824,11 @@ If you recall from the [What are the data?](#whatarethedata) section above, when
 We will use $Y$ to denote the outcome variable and $X = (X_1, \dots, X_p)$ to denote $p$ different features (or predictor variables). 
 Because our outcome variable is **continuous** (as opposed to categorical), we are interested in a particular type of machine learning algorithm. 
 
-Our goal is to build a machine learning algorithm uses the features $X$ as input and predicts a outcome variable (or air pollution levels) in the situation where we do not know the outcome variable. 
+Our goal is to build a machine learning algorithm that uses the features $X$ as input and predicts an outcome variable (or air pollution levels) in the situation where we do not know the outcome variable. 
 
-The way we do this is to use data where we have both the features $(X_1=x_1, \dots X_p=x_p)$ and the actual outcome $Y$ data to _train_ a machine learning algorithm to predict the outcome, which we call $\hat{Y}$. 
-When we say train a machine learning algorithm we mean estimate a function $f$ that uses the predictor variables $X$ as input or $\hat{Y} = f(X)$. 
+The way we do this is to use data where we have both the features $(X_1=x_1, \dots X_p=x_p)$ and the actual outcome $Y$ data to _train_ a machine learning algorithm to predict the outcome, which we call $\hat{Y}$.  
+
+When we say train a machine learning algorithm we mean that we estimate a function $f$ that uses the predictor variables $X$ as input or $\hat{Y} = f(X)$. 
 
 ### ML as an optimization problem
 
@@ -833,6 +838,7 @@ In this way, we can think of machine learning (ML) as an optimization problem th
 
 $$d(Y - f(X))$$
 The choice of distance metric $d(\cdot)$ can be the mean of the absolute or squared difference or something more complicated. 
+
 Much of the fields of statistics and computer science are focused on defining $f$ and $d$.
 
 ### The parts of an ML problem
@@ -855,7 +861,9 @@ Now that we know a bit more about machine learning, let's build a model to predi
 ## **Machine learning with `tidymodels`**
 ***
 The goal is to build a machine learning algorithm uses the features as input and predicts a outcome variable (or air pollution levels) in the situation where we do not know the outcome variable. 
+
 The way we do this is to use data where we have both the input and output data to _train_ a machine learning algorithm. 
+
 To train a machine learning algorithm, we will use the `tidymodels` package ecosystem. 
 
 ### Overview 
@@ -869,7 +877,7 @@ You may be familiar with the older packages `caret` or `mlr` which are also for 
 > "Other packages, such as caret and mlr, help to solve the R model API issue. These packages do a lot of other things too: pre-processing, model tuning, resampling, feature selection, ensembling, and so on. In the tidyverse, we strive to make our packages modular and parsnip is designed only to solve the interface issue. It is not designed to be a drop-in replacement for caret.
 The tidymodels package collection, which includes parsnip, has other packages for many of these tasks, and they are designed to work together. We are working towards higher-level APIs that can replicate and extend what the current model packages can do."
 
-There are many R packages in the `tidymodels` ecosystem, which assist with various steps in the process of building a machine learning algorithm:
+There are many R packages in the `tidymodels` ecosystem, which assist with various steps in the process of building a machine learning algorithm. These are the main packages, but there are others.
 
 ```{r, echo=FALSE, out.width="800px"}
 knitr::include_graphics(here::here("img","simpletidymodels.png"))
@@ -904,7 +912,9 @@ This is the data that the model "learns" on.
 The testing data set will be used to evaluate the performance of our model in a more generalizable way. What do we mean by "generalizable"?
 
 Remember that our main goal is to use our model to be able to predict air pollution levels in areas where there are no gravimetric monitors. 
+
 Therefore, if our model is really good at predicting air pollution with the data that we use to build it, it might not do the best job for the areas where there are few to no monitors. 
+
 This would cause us to have really good prediction accuracy and we might assume that we were going to do a good job estimating air pollution any time we use our model, but in fact this would likely not be the case. 
 This situation is what we call **[overfitting](https://towardsdatascience.com/train-test-split-and-cross-validation-in-python-80b61beca4b6){target="_blank"} **.
 
@@ -924,7 +934,6 @@ Ideally, you would also want a completely independent data set to further test t
 
 To split the data into training and testing, we will use the `initial_split()` function in the `rsample` package to specify how we want to split our data.
 
-AVOCADO: should we use "sample" or "observation"? Also, should we use "predictor" or "feature" in the figure? Could the figure be made to be more horizontal where the yellow and blue boxes are on top of each other? 
 
 ```{r, echo=FALSE, out.width="400px"}
 
@@ -948,9 +957,9 @@ Now, you can also specify a variable to stratify by with the `strata` argument.
 This is useful if you have imbalanced categorical variables and you would like to intentionally make sure that there are similar number of samples of the rarer categories in both the testing and training sets. 
 Otherwise the split is performed randomly. 
 
-AVOCADO: Is this a quote from someone/some place? If so should we add a citation / URL? 
+According to the [documentation](https://www.rdocumentation.org/packages/rsample/versions/0.0.5/topics/initial_split) for the `rsample` package:
 
-> The strata argument causes the random sampling to be conducted within the stratification variable. The can help ensure that the number of data points in the training data is equivalent to the proportions in the original data set.
+> The strata argument causes the random sampling to be conducted within the stratification variable. This can help ensure that the number of data points in the training data is equivalent to the proportions in the original data set.
 
 In the case with our data set, perhaps we would like our training set to have similar proportions of monitors from each of the states as in the initial data. 
 This might be useful if we want our model to be generalizable across all of the states.
@@ -995,11 +1004,11 @@ count(test_pm, state)
 
 After splitting the data, the next step is to process the training and testing data so that the data are are compatible and optimized to be used with the model. 
 This involves assigning variables to specific roles within the model and pre-processing like scaling variables and removing redundant variables. 
-This process can also be called feature engineering.
+This process is also called feature engineering.
 
-To do this in `tidymodels`, we will create a what's called a "recipe" using the `recipes` package, which is a standardized format for a sequence of steps for processing the data.
+To do this in `tidymodels`, we will create what's called a "recipe" using the `recipes` package, which is a standardized format for a sequence of steps for pre-processing the data.
 This can be very useful because it makes testing out different pre-processing steps or different algorithms with the same pre-processing very easy and reproducible.
-Creating a recipe specifies **how a data frame of predictors should be created** - it specifies what  variables to be used  and the pre-processing steps, but it **does not execute these steps** or create the data frame of predictors.
+Creating a recipe specifies **how a data frame of predictors should be created** - it specifies what variables to be used and the pre-processing steps, but it **does not execute these steps** or create the data frame of predictors.
 
 #### Step 1: Specify the variables with `recipe()` function
 
@@ -1018,7 +1027,7 @@ Let's look at the first way using formula notation, which looks like this:
 
 outcome(s) ~ predictor(s)  
 
-If in the case of multiple predictors or a multivariate situation with two outcomes, use a plus sign  
+If in the case of multiple predictors or a multivariate situation with two outcomes, use a plus sign:  
 
 outcome1 + outcome2 ~ predictor1 + predictor2  
 
@@ -1030,7 +1039,7 @@ Now with our data, we will start by making a recipe for our training data.
 If you recall, the continuous outcome variable is `value` (the average annual gravimetric monitor PM~2.5~ concentration in ug/m^3^). 
 Our features (or predictor variables) are all the other variables except the monitor ID, which is an `id` variable.
 
-The reason not to include the `id` variable is because this variable includes the county number and a number designating which particular monitor the values came from of the monitors there are in that county. 
+The reason not to include the `id` variable is because this variable includes the county number and a number designating which particular monitor the values came from (of the monitors there are in that county). 
 Since this number is arbitrary and the county information is also given in the data, and the fact that each monitor only has one value in the `value` variable, nothing is gained by including this variable and it may instead introduce noise. 
 However, it is useful to keep this data to take a look at what is happening later. 
 We will show you what to do in this case in just a bit.
@@ -1065,7 +1074,7 @@ This option works well with the newer `workflows` package, however `id` variable
 
 </details>
 
-We could also specify the outcome and predictors in the same way as the id variable. 
+We could also specify the outcome and predictors in the same way as we just specified the id variable. 
 Please see [here](https://tidymodels.github.io/recipes/reference/recipe.html){target="_blank"} for examples of other roles for variables. 
 The role can be actually be any value. 
 
@@ -1136,19 +1145,9 @@ There are several ways to select what variables to apply steps to:
 
 Let's try adding some steps to our recipe.
 
-We might consider log transforming our population and area variables (that aren't densities) - let's take a look at the range of these variables.
-```{r, eval = FALSE}
-pm %>%
-  select(matches("_pop|_area")) %>%
-  map(range)
-```
 
-AVOCADO: should we explain `map()`? 
-AVOCADO: unclear why this is commented out? The next sentence suggests it was executed but I don't think the code works? 
+We might want to potentially [one hot encode](https://machinelearningmastery.com/why-one-hot-encode-data-in-machine-learning/){target="_blank"} some of our categorical variables so that they can be used with certain algorithms. 
 
-We can see that the range for each of these variables is quite large, we can log transform this data using the `step_log()` function of the `recipes` package.
-
-We would also want to potentially [one hot encode](https://machinelearningmastery.com/why-one-hot-encode-data-in-machine-learning/){target="_blank"} some of our categorical variables so that they can be used with certain algorithms. 
 We can do this with the `step_dummy()` function and the `one_hot = TRUE` argument. 
 One hot encoding means that we do not simply encode our categorical variables numerically, as our numeric assignments can be interpreted by algorithms as having a particular rank or order. 
 Instead, binary variables made of 1s and 0s are used to arbitrarily assign a numeric value that has no apparent order.
@@ -1172,15 +1171,17 @@ simple_rec %>%
 We might also want to remove variables that appear to be redundant and are highly correlated with others, as we know from our exploratory data analysis that many of our variables are correlated with one another. 
 We can do this using the `step_corr()` function.
 
+We don't want to remove some of our variables, like the `CMAQ` and `aod` variables, we can specify this using the `-` sign before the names of these variabels like so:
+
 ```{r}
 simple_rec %>%
   step_corr(all_predictors(), - CMAQ, - aod)
 ```
 
-Notice, we don't want to remove some of our variables, like the `CMAQ` and `aod` variables. 
 
 It is also a good idea to remove variables with near-zero variance, which can be done with the `step_nzv()` function. 
-Variables have low variance if all the values are very similar, the values are very sparse, or if they are highly imbalanced. 
+
+Variables have low variance if all the values are very similar, the values are very sparse, or if they are highly imbalanced. Again we dont want to remove our `CMAQ` and `aod` variables.
 
 ```{r}
 simple_rec %>%
@@ -1202,7 +1203,7 @@ Let's put all this together now.
 **Remember: it is important to add the steps to the recipe in an order that makes sense just like with a cooking recipe.**
 
 First, we are going to create numeric values for our categorical variables, then we will look at correlation and near-zero variance. 
-We do not want to remove the `CMAQ` and `aod` variables, so we can make sure they are kept in the model by excluding them from those steps. 
+Again, we do not want to remove the `CMAQ` and `aod` variables, so we can make sure they are kept in the model by excluding them from those steps. 
 If we specifically wanted to remove a predictor we could use `step_rm()`.
 
 ```{r}
@@ -1223,10 +1224,9 @@ simple_rec
 
 The next major function of the `recipes` package is `prep()`.
 This function updates the recipe object based on the training data. 
-It estimates parameters (estimating the required quantities and statistics required by the steps for the variables) for pre-processing and updates the model terms, as some of the predictors may be removed, this allows the recipe to be ready to use on other data sets. 
+It estimates parameters (estimating the required quantities and statistics required by the steps for the variables) for pre-processing and updates the variables roles, as some of the predictors may be removed, this allows the recipe to be ready to use on other data sets. 
 It **does not necessarily actually execute the pre-processing itself**, however we will specify in argument for it to do this so that we can take a look at the pre-processed data.
 
-AVOCADO: I'm not sure I get what "updates the model terms" in the paragraph above means. I didn't think a model had been specified yet? 
 
 There are some important arguments to know about:
 
@@ -1246,8 +1246,8 @@ There are also lots of useful things to checkout in the output of `prep()`.
 You can see:
 
 1. the `steps` that were run  
-2. the variable info (`var_info`)  
-3. the model (`term_info`)
+2. the original variable info (`var_info`)  
+3. the updated variable info after pre-processing (`term_info`)
 4. the new `levels` of the variables 
 5. the original levels of the variables (`orig_lvls`)
 6. info about the training data set size and completeness (`tr_info`)
@@ -1373,11 +1373,8 @@ dim(dplyr::intersect(traincities, testcities))
 
 Indeed, there are lots of different cities in our test data that are not in our training data!
 
-AVOCADO: yeah, I would remove the paragraph below. 
 
-Maybe remove this?: Thus we need to update our original recipe to include a very important step function called `step_novel()` this helps in cases like this were there are new factors in our testing set that were not in our training set. It is a good idea to include this in most of your recipes where you have a categorical variables with many distinct values. This step needs to come before we create dummy variables. However, we are also creating a dummy variable from this, which still results in a problem. 
-
-Next, let go back to our `pm` data set and modify the `city` variable to be values of `in a city` or `not in a city` using the `case_when()` function of `dplyr`.
+So, let go back to our `pm` data set and modify the `city` variable to just be values of `in a city` or `not in a city` using the `case_when()` function of `dplyr`.
 This function allows you to vectorize multiple `if_else()` statements.
 
 ```{r}
@@ -1386,12 +1383,13 @@ pm %>%
                           city != "Not in a city" ~ "In a city"))
 ```
 
-Alternatively you could create a [custom step function](https://recipes.tidymodels.org/articles/Custom_Steps.html){target="_blank"} to do this and add the step function to your recipe, but that is beyond the scope of this case study. 
+Alternatively you could create a [custom step function](https://recipes.tidymodels.org/articles/Custom_Steps.html){target="_blank"} to do this and add this to your recipe, but that is beyond the scope of this case study. 
 
 We will need to repeat all the steps (splitting the data, pre-processing, etc) as the levels of our variables have now changed. 
 
 While we are doing this, we might also have this issue for `state` and `county`. 
 So let's also do a similar thing for `state`. 
+Avocado... I dont think this got updated... at one point I did in california or not... so might want to delete this if it looks like later I didnt change anything about `state`
 The `county` variables appears to get dropped due to either correlation or near zero variance. 
 It is likely due to near zero variance because this is the more granular of these geographic categorical variables and likely sparse.
 
@@ -1405,7 +1403,6 @@ pm_split <-rsample::initial_split(data = pm, prop = 2/3)
 pm_split
  train_pm <-rsample::training(pm_split)
  test_pm <-rsample::testing(pm_split)
-
   
 novel_rec <-recipe(train_pm) %>%
     update_role(everything(), new_role = "predictor") %>%
@@ -1434,7 +1431,7 @@ glimpse(juiced_train)
 
 ####
 
-Notice, it looks like we gained the `log_prisec_length_25000` back with this recipe using the data with our changes to `state` and `city`.
+Notice, it looks like we gained the `log_prisec_length_25000` back with this recipe using the data with our changes to `state` and `city`. avocado... may need to remove state here...
 
 #### {.scrollable }
 
@@ -1475,15 +1472,16 @@ See [here](https://www.tidymodels.org/find/parsnip/){target="_blank"} for modeli
 
 
 ```{r}
-PM_model <- parsnip::linear_reg() # PM for particulate matter
+PM_model <- parsnip::linear_reg() # PM was used in the name for particulate matter
 PM_model
 ```
 
 OK. So far, all we have defined is that we want to use a linear regression...  
 Let's tell `parsnip` more about what we want.
 
-We would like to use the ordinary least squares method to fit our linear regression. 
-So we will tell `parsnip` that we want to use the `lm` package to implement our linear regression (there are many options actually such as [`rstan`](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html){target="_blank"}  [`glmnet`](https://cran.r-project.org/web/packages/glmnet/index.html){target="_blank"}, [`keras`](https://keras.rstudio.com/){target="_blank"}, and [`sparklyr`](https://therinspark.com/starting.html#starting-sparklyr-hello-world){target="_blank"}). 
+We would like to use the [ordinary least squares](https://en.wikipedia.org/wiki/Ordinary_least_squares) method to fit our linear regression. 
+So we will tell `parsnip` that we want to use the `lm` package to implement our linear regression (there are many options actually such as [`rstan`](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html){target="_blank"}  [`glmnet`](https://cran.r-project.org/web/packages/glmnet/index.html){target="_blank"}, [`keras`](https://keras.rstudio.com/){target="_blank"}, and [`sparklyr`](https://therinspark.com/starting.html#starting-sparklyr-hello-world){target="_blank"}). See [here](https://parsnip.tidymodels.org/reference/linear_reg.html) for a description of the differences and using these different engines with `parsnip`.
+
 We will do so by using the `set_engine()` function of the `parsnip` package.
 
 ```{r}
@@ -1545,11 +1543,11 @@ PM_wflow_fit
 ```
 
 
-<details><summary> Click here learn how to do this without the `workflows` package </summary>
+<details><summary> Click here learn how this was done before the `workflows` package was developed </summary>
 
 AVOCADO: this section feels like it should either have more explanation or just deleted. To me it feels confusing because it feels like we are showing a compeltely alternative path without an explanation why you might want to do? or when you would want to do this? 
 
-We could have also done this without the `workflows` package. 
+If yo have previously used `Tidymodels` but are new to `workflows` it may be useful to see what is different about fitting a model with each method.
 Notice below that we use the processed training data (`juiced_train`) as opposed to the raw training data that we used with the `workflow()` we created with `workflows` above.
 
 In this case, we actually need to write your model again! 
