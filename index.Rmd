@@ -1507,21 +1507,18 @@ lm_PM_model
 
 ### Fitting the model
 
-At the moment, there are actually a two ways to fit our model. 
+We can  use the `parsnip` package with a newer package called `workflows` to fit our model. 
 
-1. We can use the `parsnip` package and then assess our fit using the `yardstick` package. 
-2. We can also use the `parsnip` package with a newer package called `workflows` (still under development) that allows us to keep track of both our pre-processing steps and our model specification. It also allows us to implement fancier optimizations in an automated way and it is currently being developed to also handle post-processing operations. 
+The `workflows` package allows us to keep track of both our pre-processing steps and our model specification. It also allows us to implement fancier optimizations in an automated way and it can also handle post-processing operations. 
 
-AVOCADO: I feel like we should do a bit more explaining or maybe draw a figure of these two approaches? 
-
-Here we will talk about the second way to fit out model using the `workflows` and `parsnip` package. 
 
 We begin by creating a workflow using the `workflow()` function in the `workflows` package. 
+
 Next, we use `add_recipe()` (our pre-processing specifications) and we add our model with the `add_model()` function -- both functions from the `workflows` package.
 
 **Note**: We do not need to actually `prep()` our recipe before using workflows!
 
-If you recall `novel_rec` is the recipe we previously created with the `recipes` package and `lm_PM_model` is where we specified our model with the `parsnip` package.
+If you recall `novel_rec` is the recipe we previously created with the `recipes` package and `lm_PM_model` was created when we specified our model with the `parsnip` package.
 Here, we combine everything together into a `workflow()`. 
 
 ```{r}
@@ -1543,15 +1540,18 @@ PM_wflow_fit
 ```
 
 
-<details><summary> Click here learn how this was done before the `workflows` package was developed </summary>
+<details><summary> Click here to see the steps that the `workflows` package performs that used to be required </summary>
 
 AVOCADO:this section feels like it should either have more explanation or just deleted. To me it feels confusing because it feels like we are showing a compeltely alternative path without an explanation why you might want to do? or when you would want to do this? 
 
-If yo have previously used `Tidymodels` but are new to `workflows` it may be useful to see what is different about fitting a model with each method.
-Notice below that we use the processed training data (`juiced_train`) as opposed to the raw training data that we used with the `workflow()` we created with `workflows` above.
+avocado response-what do you think of how I titled this section - if you still dont like it feel free to delete
 
-In this case, we actually need to write your model again! 
-Recall that `id` and `fips` are ID variables and that `values` is our outcome of interest (the air pollution measure at each monitor). 
+hmmm avocado... the broom functions only work with this though to see the fitted and se values..
+
+Previously the processed training data (`juiced_train`) as opposed to the raw training data would be required to fit the model.
+
+In this case, we actually also needed to write your model again! 
+Recall that `id` and `fips` are ID variables and that `values` is our outcome of interest (the air pollution measure at each monitor). It is nice that `workflows` keeps track of this!
 
 ```{r}
 juiced_train_ready <- juiced_train %>% 
@@ -1565,9 +1565,11 @@ PM_fit <- lm_PM_model %>%
 
 ### Assessing the model fit
 
-After we fit our model, we can use the `broom` package allows for an easy/tidy way to look at the output from the fitted model.   
+avocado update after deciding if you are removing the older method...even if you remove older method ... need to check if these now work with workflows and if they work in a simpler way.. like do we need pull?
 
-The three functions from `broom` that we want to use are: 
+After we fit our model, we can use the `broom` package to look at the output from the fitted model in an easy/tidy.   
+
+There are three functions from `broom` that are especially helpful for this: 
 
 1. `tidy()` - returns a tidy data frame with coefficients from the model (one row per coefficient)
 2. `glance()` - summarizes the model fit
@@ -1834,114 +1836,6 @@ tune::show_best(resample_fit, metric = "rmse", "rsq")
 AVOCADO: maybe add a sentence here of what we see? 
 
 
-### Model tuning
-
-AVOCADO: maybe an intro sentence here what we mean by tuning? 
-
-Now let's try some tuning.
-
-Let's take a closer look at how the air pollution monitor values vary with the location (`loc_value`), specifically latitude (`lat`) and longitude (`lon`).
-
-```{r}
-train_pm %>% 
-  dplyr::select(value, lon, lat) %>% 
-  tidyr::pivot_longer(cols = c(lon, lat), 
-                      names_to = "predictor", values_to = "loc_value") %>% 
-  ggplot(aes(x = loc_value, value)) + 
-    geom_point(alpha = .2) + 
-    geom_smooth(se = FALSE) + 
-    facet_wrap(~ predictor, scales = "free_x")
-```
-
-We can see that there does not appear to be a linear relationship for either of these predictors. 
-Therefore, we might want to think about using  [splines](https://www.math.uh.edu/~jingqiu/math4364/spline.pdf){target="_blank"} or [natural cubic splines](https://towardsdatascience.com/numerical-interpolation-natural-cubic-spline-52c1157b98ac){target="_blank"} or just the [tune getting started guide ](https://tidymodels.github.io/tune/articles/getting_started.html){target="_blank"} to model the relationship in our training data more closely. 
-For example, in the latitude plot (left) if we had 2 lines and one break-point called a knot around 40, with the first line having a positive slope and the second with a negative slope this would fit the data more similarly to the blue line shown in the figure.
-
-AVOCADO: maybe we should explain a bit more by what we mean splines? I'm not sure just linking out to various resources would be enough here? 
-
-AVOCADO: should we explain what are knots or degrees of freedom? 
-
-We can tune for the number of knots by using a step function in the `recipes` package called `step_ns()` where `ns` stands for natural splines. 
-In order to tune for the number of knots or degrees of freedom, we can set the `deg_free` argument to `tune()`. 
-
-Let's update our `novel_rec` recipe to add this step. 
-
-```{r}
-novel_rec %<>%
-  step_ns(lon, deg_free = tune("lon df")) %>%
-  step_ns(lat,  deg_free = tune("lat df"))
-```
-
-This is helpful, because we aren't exactly sure how closely we should be following the relationship with the value and our longitude and latitude data in our training data to achieve good accuracy yet keep our model generalizable for other data.
-
-This is when our cross validation methods become really handy. 
-For example, we can test out different values for the `deg_free` argument and see how our model performance varies across our training folds to try to find the optimal value.
-
-Also, it is a good idea to do this for individual predictors, because you can name each with the `tune` argument so that you can keep track of it later. 
-We can see what we intend to tune with the `parameters()` function of the `dials` package. 
-
-```{r}
-pm_param <- dials::parameters(novel_rec)
-pm_param
-```
-
-AVOCADO: While I generally understand what's happening in the `dials::parameter()` function, i'm not sure I actually get it. Could we provide a bit more text here explaining what's happening? or what the output above (`pm_param`) is showing? 
-
-See [the tune getting started guide ](https://tidymodels.github.io/tune/articles/getting_started.html){target="_blank"} for more information about implementing this in `tidymodels`.
-
-AVOCADO: everything after this point until the start of the next section is really confusing to me. I see sometimes you have examples commented out, but i'm not sure we should include code if we aren't going to talk about it? Part of me wonders if this section should be in a "Click more here if.." down arrow? That or we need to talk about how to make this section more clear. For now 
-
-Generally you could use the `grid_*()` functions of the `dials` package to create the different combinations of degrees of freedom to test for both variables to optimize the model. 
-In our case we can visibly see that if we add more than say 4 or 5 degrees of freedom we will likely over-fit the data. 
-So instead of using these functions we will create our own grid using the base `seq()` and `expand.grid()` functions.
-
-```{r}
-#an example of what you could do:
-#spline_grid <- dials::grid_regular(pm_param, levels = 3)
-df_vals <- seq(1, 5, by = 2)
-spline_grid <- expand.grid(`lon df` = df_vals, `lat df` = df_vals)
-spline_grid
-```
-
-AVOCADO: I'm not sure what these numbers mean? 
-
-Now we will tune this hyper-parameter (degrees of freedom) for both the `lat` and `lon` variables using our cross validation folds. To do this we will use the `tune_grid()` function of the `tune` package.
-
-```{r, eval=FALSE}
-df_tuning <- 
-  lm_PM_model %>% 
-  tune::tune_grid(novel_rec, resamples = vfold_pm, 
-                  grid = spline_grid)
-
-#df_tuning <-PM_wflow %>% tune::tune_grid(resamples = vfold_pm, 
-#                                         grid = spline_grid, 
-#                                         param_set =pm_param)
-
-df_tuning
-```
-
-AVOCADO: I got this output after running the code chunk above `df_tuning`: 
-```
-> df_tuning
-#  4-fold cross-validation 
-cannot open compressed file '/Users/shicks/Documents/github/websites/opencasestudies/ocs-bp-air-pollution/.Rproj.user/shared/notebooks/4922A1-index/1/4E3CFC04439A89E6/cmq1o1r6gyahs_t/_rs_rdf_1d6f4f240c09.rdf', probable reason 'No such file or directory'Error in gzfile(file, "wb") : cannot open the connection
-```
-AVOCADO: Any idea what it means? I'm going to comment it out for now so i can compile
-
-AVOCADO: Assuming my error can get fixed, could we write a sentence explaining what we see at output? 
-
-```{r, eval=FALSE}
-df_tuning %>%
-  collect_metrics()
-
-show_best(df_tuning, metric = "rmse", n =1)
-```
-
-AVOCADO: Could we write a sentence explaining what we see at output? also about what the functions `collect_metrics()` and `show_best()` are? 
-
-
-
-
 ## **Data Analysis**
 ***
 
@@ -2015,13 +1909,12 @@ AVOCADO: if we keep this section, could it be renamed something like `resample_l
 collect_metrics(resample_fit)
 ```
 
-So we can see that our performance isn't quite as good - especially if we look at the `rmse` value.  
+So we can see that our performance isn't quite as good as what we had with the original model - especially if we look at the `rmse` value, which is much smaller for the original model.  
 
-AVOCADO: did you mean `rsq` value? I think the `rmse` is smaller for the original linear model? 
 
 ### Random Forest
 
-Now for one last recipe, we are going to predict our outcome variable (air pollution) using a decision tree method called [random forest](https://en.wikipedia.org/wiki/Random_forest){target="_blank"}.
+Now, we are going to predict our outcome variable (air pollution) using a decision tree method called [random forest](https://en.wikipedia.org/wiki/Random_forest){target="_blank"}.
 
 A [decision tree](https://medium.com/greyatom/decision-trees-a-simple-way-to-visualize-a-decision-dc506a403aeb){target="_blank"} is a tool to partition data or anything really, based on a series of sequential (often binary) decisions, where the decisions are chosen based on their ability to optimally split the data.
 
@@ -2066,9 +1959,8 @@ The `rand_forest()` function of the `parsnip` package has three important argume
 1. `mtry` - The number of predictor variables (or features) that will be randomly sampled at each split when creating the tree models. The default number for regression analyses is the number of predictors divided by 3. 
 2. `min_n` - The minimum number of data points in a node that are required for the node to be split further.
 3. `trees` - the number of trees in the ensemble
-10 and 3
 
-AVOCADO: not sure what the "10 and 3" mean? 
+We will start by trying an `mtry` value of 10 and a `min_n` value of 3.
 
 Now that we have our recipe (`RF_rec`), let's specify the model with `rand_forest()` from `parsnip` with the `mode = "regression"` argument to specify our outcome variable (air pollution) is continuous. 
 
@@ -2118,9 +2010,10 @@ RF_wflow_fit %>%
   pull_workflow_fit() %>% 
   vip(num_features = 10)
 ```
-AVOCADO: i got a different output than you did with `state` being the top, followed by `CMAQ`, then `county_area`. I'm guessing we needed to set a seed somewhere? The text below might not be right? 
+ avocado this was because I previously changed the state variable so I need to update this section about what the current diferences are
 
-Interesting, in the previous model the CMAQ values were also important, however the variable about if the monitor was located in California or not was also very predictive. 
+Interesting, in the previous model the CMAQ values were also important, however the variable about if the monitor was located in California or not was also very predictive.
+
 
 Now let's take a look at model performance by fitting the data using cross validation:
 ```{r}
@@ -2149,6 +2042,93 @@ It looks like the random forest model had the lowest `rmse` value of 1.79.
 If we tuned our random forest model based on the number of trees or the value for `mtry` (which is "The number of predictors that will be randomly sampled at each split when creating the tree models"), we might get a model with even better performance.
 
 However, our cross validated mean rmse value of 1.79 is quite good because our range of true outcome values is much larger: (`r round(range(test_pm$value),3)`).
+
+
+### Model tuning
+
+[Hyperparameters](https://machinelearningmastery.com/difference-between-a-parameter-and-a-hyperparameter/) are often things that we need to specify about a model. For example, the number of predictor variables (or features) that will be randomly sampled at each split when creating the tree models called `mtry` is a hyperparameter. The default number for regression analyses is the number of predictors divided by 3. Instead of arbitrarilly specifiying this, we can try to determine the best option for model performance by a process called tuning. 
+
+
+Now let's try some tuning.
+
+Let's take a closer look at the `mtry` and `min_n` hyperparametrs in our Random Forest model.
+
+avocado Use this: https://juliasilge.com/blog/sf-trees-random-tuning/ as a guide...
+
+We can tune for the number of each by using the `tune()` function in the `recipes` package called `step_ns()` where `ns` stands for natural splines. 
+In order to tune for the number of knots or degrees of freedom, we can set the `deg_free` argument to `tune()`. 
+
+
+This is helpful, because we aren't exactly sure what values of `mtry` and `min_n` achieve good accuracy yet keep our model generalizable for other data.
+
+This is when our cross validation methods become really handy. 
+For example, we can test out different values for the `deg_free` argument and see how our model performance varies across our training folds to try to find the optimal value.
+
+Also, it is a good idea to do this for individual predictors, because you can name each with the `tune` argument so that you can keep track of it later. 
+We can see what we intend to tune with the `parameters()` function of the `dials` package. 
+
+```{r}
+pm_param <- dials::parameters(novel_rec)
+pm_param
+```
+
+AVOCADO: While I generally understand what's happening in the `dials::parameter()` function, i'm not sure I actually get it. Could we provide a bit more text here explaining what's happening? or what the output above (`pm_param`) is showing? 
+
+See [the tune getting started guide ](https://tidymodels.github.io/tune/articles/getting_started.html){target="_blank"} for more information about implementing this in `tidymodels`.
+
+AVOCADO: everything after this point until the start of the next section is really confusing to me. I see sometimes you have examples commented out, but i'm not sure we should include code if we aren't going to talk about it? Part of me wonders if this section should be in a "Click more here if.." down arrow? That or we need to talk about how to make this section more clear. For now 
+
+Generally you could use the `grid_*()` functions of the `dials` package to create the different combinations of degrees of freedom to test for both variables to optimize the model. 
+In our case we can visibly see that if we add more than say 4 or 5 degrees of freedom we will likely over-fit the data. 
+So instead of using these functions we will create our own grid using the base `seq()` and `expand.grid()` functions.
+
+```{r, eval = FALSE}
+#an example of what you could do:
+#spline_grid <- dials::grid_regular(pm_param, levels = 3)
+df_vals <- seq(1, 5, by = 2)
+spline_grid <- expand.grid(`lon df` = df_vals, `lat df` = df_vals)
+spline_grid
+```
+
+AVOCADO: I'm not sure what these numbers mean? 
+
+Now we will tune this hyper-parameter (degrees of freedom) for both the `lat` and `lon` variables using our cross validation folds. To do this we will use the `tune_grid()` function of the `tune` package.
+
+```{r, eval=FALSE}
+df_tuning <- 
+  lm_PM_model %>% 
+  tune::tune_grid(novel_rec, resamples = vfold_pm, 
+                  grid = spline_grid)
+
+#df_tuning <-PM_wflow %>% tune::tune_grid(resamples = vfold_pm, 
+#                                         grid = spline_grid, 
+#                                         param_set =pm_param)
+
+df_tuning
+```
+
+AVOCADO: I got this output after running the code chunk above `df_tuning`: 
+```
+> df_tuning
+#  4-fold cross-validation 
+cannot open compressed file '/Users/shicks/Documents/github/websites/opencasestudies/ocs-bp-air-pollution/.Rproj.user/shared/notebooks/4922A1-index/1/4E3CFC04439A89E6/cmq1o1r6gyahs_t/_rs_rdf_1d6f4f240c09.rdf', probable reason 'No such file or directory'Error in gzfile(file, "wb") : cannot open the connection
+```
+AVOCADO: Any idea what it means? I'm going to comment it out for now so i can compile
+
+AVOCADO: Assuming my error can get fixed, could we write a sentence explaining what we see at output? 
+
+```{r, eval=FALSE}
+df_tuning %>%
+  collect_metrics()
+
+show_best(df_tuning, metric = "rmse", n =1)
+```
+
+AVOCADO: Could we write a sentence explaining what we see at output? also about what the functions `collect_metrics()` and `show_best()` are? 
+
+
+
+
 
 ### Final model performance evaluation
 
