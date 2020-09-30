@@ -2,6 +2,17 @@ li.toctree-l2:first-child {
     display: none;
 }
 
+
+.license_block {
+    margin: .2em;
+    padding: .2em;
+    border: 1px solid black;
+    border-radius: 5px;
+    background: black;
+    color: white;
+    font-weight: bold;
+}
+
 .reference_block {
     margin: .2em;
     padding: .2em;
@@ -12,12 +23,32 @@ li.toctree-l2:first-child {
     font-weight: bold;
 }
 
-.question_block {
+.think_question_block {
+    margin: .2em;
+    padding: .2em;
+    border: 1px solid black;
+    border-radius: 5px;
+    background: #808080;
+    color: white;
+    font-weight: bold;
+}
+
+.recall_code_question_block {
     margin: .2em;
     padding: .2em;
     border: 1px solid black;
     border-radius: 5px;
     background: #1E90FF;
+    color: white;
+    font-weight: bold;
+}
+
+.explain_block {
+    margin: .2em;
+    padding: .2em;
+    border: 1px solid black;
+    border-radius: 5px;
+    background: #8FBC8F;
     color: white;
     font-weight: bold;
 }
@@ -62,3 +93,9 @@ li.toctree-l2:first-child {
    display: inline-block;
 }
 
+.emphasis_block {
+    border-radius: 5px; 
+    padding: 20px;
+    background: #FFE6E6;
+    color: black;
+}

@@ -84,6 +84,7 @@ Statistical concepts and methods:
 2. Understanding of the need for training and test set
 3. Understanding of the utility of cross validation
 4. Understanding of random forest
+5. How to interpret root mean squared error (rmse) to assess performance for prediction
 
 
 ### Analysis 
@@ -96,7 +97,7 @@ The data is imported from a CSV file using the `readr` package.
 
 #### Data wrangling 
 
-This case study does not demonstrate very many data wrangling methods. However we do cover the `mutate()` and `across` functions of the `dplyr` package.
+This case study does not demonstrate very many data wrangling methods. However we do cover the `mutate()` and `across` functions of the `dplyr` package in the Data wrangling section. In the Data visualzation, some wrangling was required including combining data using the `inner_join()` function of the `dplyr` package, using the `separate` function of the `tidyr` package to make two columns out of one, and the `str_to_title()` function of the `stringr` package to change the format of some character strings. 
 
 #### Data exploration
 
@@ -180,7 +181,7 @@ We cover the basics of machine learning:
 [sf](https://r-spatial.github.io/sf/){target="_blank"}  | to convert the map data into a data frame
 [lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert the map geographical data
 [rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
-[cowplot](https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html){target="_blank"} | to allow plots to be combined
+[patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
 
 #### For users 
 

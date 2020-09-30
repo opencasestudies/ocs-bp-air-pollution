@@ -214,7 +214,7 @@ Data science skills:
   
 1. Familiarity with the tidymodels ecosystem
 2. Ability to evaluate correlation among predictor variables (`corrplot` and `GGally`)
-3. Ability to implement tidymodels packages such as `rsample` to split the data into traning and testing sets as well as cross validation sets.
+3. Ability to implement tidymodels packages such as `rsample` to split the data into training and testing sets as well as cross validation sets.
 4. Ability to use the `recipes`, `parsnip`, and `workflows` to train and test a linear regression model and random forest model
 5. Demonstrate how to visualize geo-spatial data using `ggplot2`
 
@@ -224,6 +224,7 @@ Statistical concepts and methods:
 2. Understanding of the need for training and test set
 3. Understanding of the utility of cross validation
 4. Understanding of random forest
+5. How to interpret root mean squared error (rmse) to assess performance for prediction
 
 
 
@@ -254,12 +255,12 @@ library(randomForest)
 library(ggplot2)
 library(stringr)
 library(tidyr)
-library(lwgeom) # allows 1263
+library(lwgeom)
 library(sf)
 library(maps)
 library(rnaturalearth)
 library(rgeos)
-library(cowplot)
+library(patchwork)
 ```
 
 
@@ -292,7 +293,7 @@ library(cowplot)
 [sf](https://r-spatial.github.io/sf/){target="_blank"} | to convert the map data into a data frame
 [lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert map geographical data
 [rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
-[cowplot](https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html){target="_blank"} | to allow plots to be combined
+[patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
 ___
 
 
@@ -590,7 +591,7 @@ Notice that some of the variables that we would think of as factors (or categori
 
 The other variables are of class `<dbl>`, which stands for double precision which indicates that the are numeric and that they have decimal values. In contrast, one could have integer values which would not allow for decimal numbers. Here is a [link](https://en.wikipedia.org/wiki/Double-precision_floating-point_format){target="_blank"} for more information on double precision numeric values.
 
-Another common data class is factor which is abreviated like this: `<fct>`. A factor is something that has unique levels but there is no appreciable order to the levels. For example we can have a numeric value that is just an id that we want to be interpreted as just a unique level and not as the number that it would typically indicate. This would be useful for several of our variables:
+Another common data class is factor which is abbreviated like this: `<fct>`. A factor is something that has unique levels but there is no appreciable order to the levels. For example we can have a numeric value that is just an id that we want to be interpreted as just a unique level and not as the number that it would typically indicate. This would be useful for several of our variables:
 
 1. the monitor ID (`id`)
 2. the Federal Information Processing Standard number for the county where the monitor was located (`fips`)
@@ -622,7 +623,7 @@ Great! Now we can see that these variables are now factors as indicated by `<fct
 ### Skim package
 
 The `skim()` function of the `skimr` package is also really helpful for getting a general sense of your data.
-By design, it provies summary statistics about variables in the data set. 
+By design, it provides summary statistics about variables in the data set. 
 
 
 #### {.scrollable }
@@ -682,11 +683,11 @@ In prediction analyses, it is also useful to evaluate if any of the variables ar
 
 If we are using a linear regression to model our data then we might run into a problem called multicolinearity which can lead us to misinterpret what is really predictive of our outcome variable. This phenomenon occurs when the predictor variables actually predict one another. See [this case study](https://opencasestudies.github.io/ocs-bp-RTC-analysis/) for a deeper explanation about this. 
 
-Another reason we should look out for correlation is that we dont want to include redudant variables. This can add unnecessary noise to our algorithm causing a reduction in prediction accuracy and it can cause our algroithm to be unnecessarily slower. Finally, it can also make it difficult to interpret what variables are actually predictive.
+Another reason we should look out for correlation is that we don't want to include redundant variables. This can add unnecessary noise to our algorithm causing a reduction in prediction accuracy and it can cause our algorithm to be unnecessarily slower. Finally, it can also make it difficult to interpret what variables are actually predictive.
 
 Intuitively we can expect some of our variables to be correlated.
 
-Let's first take a look at all of our numeric variabels with the`corrplot` package:
+Let's first take a look at all of our numeric variables with the`corrplot` package:
 The `corrplot` package is another option to look at correlation among possible predictors, and particularly useful if we have many predictors. 
 
 First, we calculate the Pearson correlation coefficients between all features pairwise using the `cor()` function of the `stats` package (which is loaded automatically). Then we use the `corrplot::corrplot()` function. 
@@ -1171,7 +1172,7 @@ simple_rec %>%
 We might also want to remove variables that appear to be redundant and are highly correlated with others, as we know from our exploratory data analysis that many of our variables are correlated with one another. 
 We can do this using the `step_corr()` function.
 
-We don't want to remove some of our variables, like the `CMAQ` and `aod` variables, we can specify this using the `-` sign before the names of these variabels like so:
+We don't want to remove some of our variables, like the `CMAQ` and `aod` variables, we can specify this using the `-` sign before the names of these variables like so:
 
 ```{r}
 simple_rec %>%
@@ -1181,7 +1182,7 @@ simple_rec %>%
 
 It is also a good idea to remove variables with near-zero variance, which can be done with the `step_nzv()` function. 
 
-Variables have low variance if all the values are very similar, the values are very sparse, or if they are highly imbalanced. Again we dont want to remove our `CMAQ` and `aod` variables.
+Variables have low variance if all the values are very similar, the values are very sparse, or if they are highly imbalanced. Again we don't want to remove our `CMAQ` and `aod` variables.
 
 ```{r}
 simple_rec %>%
@@ -1387,10 +1388,10 @@ Alternatively you could create a [custom step function](https://recipes.tidymode
 
 We will need to repeat all the steps (splitting the data, pre-processing, etc) as the levels of our variables have now changed. 
 
-While we are doing this, we might also have this issue for `state` and `county`. 
-So let's also do a similar thing for `state`. 
-Avocado... I dont think this got updated... at one point I did in california or not... so might want to delete this if it looks like later I didnt change anything about `state`
+While we are doing this, we might also have this issue for `county`. 
+
 The `county` variables appears to get dropped due to either correlation or near zero variance. 
+
 It is likely due to near zero variance because this is the more granular of these geographic categorical variables and likely sparse.
 
 ```{r}
@@ -1403,7 +1404,22 @@ pm_split <-rsample::initial_split(data = pm, prop = 2/3)
 pm_split
  train_pm <-rsample::training(pm_split)
  test_pm <-rsample::testing(pm_split)
-  
+```
+
+
+#### {.recall_code_question_block}
+<b><u> Question Opportunity </u></b>
+
+See if you can come up with the code for the new recipe.
+
+####
+
+***
+
+<details> <summary> Click here to reveal the code for the new recipe. </summary>
+
+
+```{r}
 novel_rec <-recipe(train_pm) %>%
     update_role(everything(), new_role = "predictor") %>%
     update_role(value, new_role = "outcome") %>%
@@ -1413,25 +1429,47 @@ novel_rec <-recipe(train_pm) %>%
     step_corr(all_numeric()) %>%
     step_nzv(all_numeric()) 
 ```
+</details>
+***
 
-Now let's retrain our training data and try baking our test data:
+```{r}
+novel_rec
+```
+
+
+
+Now let's retrain our training data and try baking our test data.
+
+
+
+#### {.recall_code_question_block}
+<b><u> Question Opportunity </u></b>
+
+Do you recall how to pre-process and extract the pre-processed training data?
+
+####
+
+***
+
+<details> <summary> Click here to reveal the answer. </summary>
 
 ```{r}
 prepped_rec <- prep(novel_rec, verbose = TRUE, retain = TRUE)
+juiced_train <- juice(prepped_rec)
 ```
+</details> 
+***
 
 
 #### {.scrollable }
 ```{r}
 # Scroll through the output!
-juiced_train <- juice(prepped_rec)
-
 glimpse(juiced_train)
 ```
 
 ####
 
-Notice, it looks like we gained the `log_prisec_length_25000` back with this recipe using the data with our changes to `state` and `city`. avocado... may need to remove state here...
+And now, let's try baking our test set to see if we still have `NA` values.
 
 #### {.scrollable }
 
@@ -1542,15 +1580,13 @@ PM_wflow_fit
 
 <details><summary> Click here to see the steps that the `workflows` package performs that used to be required </summary>
 
-AVOCADO:this section feels like it should either have more explanation or just deleted. To me it feels confusing because it feels like we are showing a compeltely alternative path without an explanation why you might want to do? or when you would want to do this? 
+AVOCADO:this section feels like it should either have more explanation or just deleted. To me it feels confusing because it feels like we are showing a completely alternative path without an explanation why you might want to do? or when you would want to do this? 
 
-avocado response-what do you think of how I titled this section - if you still dont like it feel free to delete
-
-hmmm avocado... the broom functions only work with this though to see the fitted and se values..
+avocado response-what do you think of how I titled this section - if you still don't like it feel free to delete
 
 Previously the processed training data (`juiced_train`) as opposed to the raw training data would be required to fit the model.
 
-In this case, we actually also needed to write your model again! 
+In this case, we would actually also needed to write your model again! 
 Recall that `id` and `fips` are ID variables and that `values` is our outcome of interest (the air pollution measure at each monitor). It is nice that `workflows` keeps track of this!
 
 ```{r}
@@ -1565,27 +1601,13 @@ PM_fit <- lm_PM_model %>%
 
 ### Assessing the model fit
 
-avocado update after deciding if you are removing the older method...even if you remove older method ... need to check if these now work with workflows and if they work in a simpler way.. like do we need pull?
-
 After we fit our model, we can use the `broom` package to look at the output from the fitted model in an easy/tidy.   
 
-There are three functions from `broom` that are especially helpful for this: 
+The `tidy()` function returns a tidy data frame with coefficients from the model (one row per coefficient).
 
-1. `tidy()` - returns a tidy data frame with coefficients from the model (one row per coefficient)
-2. `glance()` - summarizes the model fit
-3. `augment()` - shows the data, the fitted values (`.fitted`), the standard error (`.se.fit`) for each value and more 
+Many other `broom` functions currently only work with `parsnip` objects, not raw `workflows` objects. 
 
-These `broom` functions currently only work with `parsnip` objects, not raw `workflows` objects. 
-Here, we will use the `PM_fit` using `parsnip`. 
-
-```{r}
-broom::tidy(PM_fit) %>% 
-  arrange(p.value)
-broom::glance(PM_fit[["fit"]])
-broom::augment(PM_fit[["fit"]])  
-```
-
-However, we can use the `broom` functions (e.g. `tidy()`) with `workflows`, but we first need to use the `pull_workflow_fit()` function.
+However, we can use the `tidy` function if we first use the `pull_workflow_fit()` function.
 
 ```{r}
 wflowoutput <- PM_wflow_fit %>% 
@@ -1593,10 +1615,9 @@ wflowoutput <- PM_wflow_fit %>%
   broom::tidy() 
 ```
 
-We can see that the output is identical using `workflows` to fit the model or using the output from `parsnip`
 
 ```{r}
-identical(tidy(PM_fit), wflowoutput)
+wflowoutput
 ```
 
 We have fit our model on our training data, which means we have created a model to predict values of air pollution based on the predictors that we have included. Yay!
@@ -1604,8 +1625,11 @@ We have fit our model on our training data, which means we have created a model 
 One last thing before we leave this section. 
 We often are interested in getting a sense of which variables are the most important in our model. 
 We can explore the variable importance using the `vip()` function of the `vip` package. 
-This function create a bar plot of  variable importance scores for each predictor variable (or feature) in a model. 
+This function create a bar plot of variable importance scores for each predictor variable (or feature) in a model. 
 The bar plot is ordered by importance (highest to smallest). 
+
+
+Notice again that we need to use the `pull_workflow_fit()` function.
 
 Let's take a look at the top 10 contributing variables:
 
@@ -1615,7 +1639,7 @@ PM_wflow_fit %>%
   vip(num_features = 10)
 ```
 
-
+The state in which the monitor was located and the CMAQ model and the aod satellite information appear to be the most important for predicting the air pollution at a given monitor.
 
 ### Model performance
 
@@ -1630,25 +1654,6 @@ As our goal in this section is to assess overall model performance, we will now 
 
 First, let's pull out our predicted outcome values $\hat{Y} = f(X)$ from the models we fit (using different approaches). 
 
-Using the `parsnip` package, we can grab the predicted outcome values (or fitted values) like this: 
-
-```{r}
-parsnip_fitted_values <- fitted(PM_fit[["fit"]])
-
-head(parsnip_fitted_values)
-```
-
-Alternatively, we can get the fitted values using the `augment()` function using the output from `parsnip`: 
-
-```{r}
-parsnip_fitted_values <- 
-  augment(PM_fit[["fit"]], data = juiced_train) %>% 
-  select(value, .fitted:.std.resid)
-
-head(parsnip_fitted_values)
-```
-
-Alternatively, we can use the output from `workflows`:
 
 ```{r}
 wf_fit <- PM_wflow_fit %>% 
@@ -1658,20 +1663,26 @@ wf_fitted_values <- fitted(wf_fit[["fit"]])
 head(wf_fitted_values)
 ```
 
-Alternatively, we can get the fitted values using the `augment()` function using the output from `workflows`: 
+Alternatively, we can get the fitted values using the `augment()` function of the `broom` package using the output from `workflows`: 
 
 ```{r}
 wf_fitted_values <- 
-  augment(wf_fit[["fit"]], data = juiced_train) %>% 
+  broom::augment(wf_fit[["fit"]], data = juiced_train) %>% 
   select(value, .fitted:.std.resid)
 
 head(wf_fitted_values)
+
 ```
 
-Either way, this gives us the same fitted values
+Note that becuase we use the actual workflow here, we can (and actually need to) use the raw data instead of the pre-processed data.
 
 ```{r}
-identical(parsnip_fitted_values, wf_fitted_values)
+values_pred_train <- 
+  predict(PM_wflow_fit, train_pm) %>% 
+  bind_cols(train_pm %>% select(value, fips, county, id)) 
+
+values_pred_train
+
 ```
 
 #### Visualizing model performance
@@ -1724,7 +1735,6 @@ $$RMSE = \sqrt{\frac{\sum_{i=1}^{n}{(\hat{y_t}- y_t)}^2}{n}}$$
 
 
 
-AVOCADO: could we add the distance metrics themselves here? avocado comment(I added the formulas... is that what you meant?)
 
 One way to calculate these metrics within the `tidymodels` framework is to use the `yardstick` package using the `metrics()` function. 
 
@@ -1766,11 +1776,9 @@ Here, we will use a very popular method called either [k-fold or v-fold cross va
 
 This method involves essentially preforming the hold out method iteratively with the training data. 
 
-AVOCADO: why $k$ (or $v$) instead of just one? 
+First, the training set is divided into $v$ (or often called called $k$) equally sized smaller pieces. 
 
-First, the training set is divided into $k$ (or $v$) equally sized smaller pieces. 
-
-Next, the model is trained on the model on $k$-1 or $v$-1 subsets of the data iteratively (removing a different $v$ or $k$ until all possible $k$-1 or $v$-1 sets have been evaluated) to get a sense of the performance of the model. 
+Next, the model is trained on the model on $v$-1 subsets of the data iteratively (removing a different $v$ until all possible $v$-1 sets have been evaluated) to get a sense of the performance of the model. 
 This is really useful for fine tuning specific aspects of the model in a process called model tuning, which we will learn about in the next section. 
 
 Here is a visualization of how the folds are created:
@@ -1783,7 +1791,7 @@ knitr::include_graphics(here::here("img", "vfold.png"))
 
 #### Creating the $v$-folds using `rsample`
 
-The [`vfold_cv()`](https://tidymodels.github.io/rsample/reference/vfold_cv.html){target="_blank"} function of the `rsample` package can be used to parse the training data into folds for $k$-fold/$v$-fold cross validation.
+The [`vfold_cv()`](https://tidymodels.github.io/rsample/reference/vfold_cv.html){target="_blank"} function of the `rsample` package can be used to parse the training data into folds for $v$-fold cross validation.
 
 - The `v` argument specifies the number of folds to create.
 - The `repeats` argument specifies if any samples should be repeated across folds - default is `FALSE`
@@ -1797,16 +1805,10 @@ We are going to use 4 for the sake of expediency.
 set.seed(1234)
 vfold_pm <- rsample::vfold_cv(data = train_pm, v = 4)
 vfold_pm
+pull(vfold_pm, splits)
 ```
 
-AVOCADO: maybe add a sentence explaining what we see? 
-
-```{r}
-vfold_pm$splits$`1`
-vfold_pm$splits$`2`
-```
-
-AVOCADO: not sure how to interpret the above output? or what it means? 
+Now we can see that we have created 4 folds of the data and we can see how many values were set aside for testing (called assessing for cross validation sets) and training (called analysis for cross validation sets) within each fold.
 
 Once the folds are created they can be used to evaluate performance by fitting the model to each of the re-samples that we created:
 
@@ -1819,10 +1821,8 @@ knitr::include_graphics(here::here("img", "cross_validation.png"))
 We can fit the model to our cross validation folds using the `fit_resamples()` function of the `tune` package, by specifying our `workflow` object and the cross validation fold object we just created. 
 See [here](https://tidymodels.github.io/tune/reference/fit_resamples.html){target="_blank"} for more information.
 
-AVOCADO: what is `control_resamples()` doing? 
 
 ```{r}
-control <- control_resamples(save_pred = TRUE)
 resample_fit <- tune::fit_resamples(PM_wflow, vfold_pm)
 ```
 
@@ -1830,10 +1830,10 @@ We can now take a look at various performance metrics based on the fit of our cr
 To do this we will use the `show_best()` function of the `tune` package.
 
 ```{r}
-tune::show_best(resample_fit, metric = "rmse", "rsq")
+tune::show_best(resample_fit, metric = "rmse")
 ```
 
-AVOCADO: maybe add a sentence here of what we see? 
+Here we can see the mean `RMSE` value across all four folds. The function is called `show_best()` because it is also used for model tuning and it will show the parameter combination with the best performance, we will discuss this more later in the case study.
 
 
 ## **Data Analysis**
@@ -1841,75 +1841,7 @@ AVOCADO: maybe add a sentence here of what we see?
 
 In the previous section, we demonstrated how to build a machine learning model (specifically a linear regression model) to predict air pollution with the `tidymodels` framework. 
 
-In the next few sections, we will demonstrate a few other machine learning models. 
-
-### Linear Regression Model with PCA
-
-AVOCADO: I think we should take out this section (Linear Regression Model with PCA). My sense is we would need to do quite a bit more explanation of what is PCA and I'm hestitant to make this case study longer... happy to hear your thoughts on this though. For now I'm not going to edit it until we have a chance to talk. 
-
-We can create another workflow to see how model performance compares using a different model. In this case we are going to perform something called [Principal Component Analysis or PCA](https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007){target="_blank"}. 
-
-So what is PCA?
-
-PCA is a widely used dimensionality reduction method (a form of unsupervised machine learning). It creates new variables that capture the most variation within the data, yet reduce the data down to just a number of principal components. It does so by transforming the data using [orthogonal](https://en.wikipedia.org/wiki/Orthogonality#:~:text=In%20mathematics%2C%20orthogonality%20is%20the,u%2C%20v)%20%3D%200.){target="_blank"} linear transformation. In other words, it creates new variables that are [linear combinations](https://www.mathbootcamps.com/linear-combinations-vectors/){target="_blank"} of the variables within the data. Importantly these new variables are orthogonal, meaning that the new variables have zero covariance. In simpler terms, we are expressing unique types of variation within the data as new variables.
-
-Check out this [video](https://youtu.be/_UVHneBUBW0){target="_blank"} for more information.
-
-```{r}
-lm_PCA_rec <-recipe(train_pm) %>%
-    update_role(everything(), new_role = "predictor")%>%
-    update_role(value, new_role = "outcome")%>%
-    update_role(id, new_role = "id variable") %>%
-    update_role("fips", new_role = "county id") %>%
-    step_dummy(state, county, city, zcta) %>%
-    step_pca(all_predictors()) 
-```
-
-Let's take a look to see what the `step_pca` function does to our predictors. To do so recall that we need to use the `prep` and `juice`  functions of the `recipes` package  on our recipe.
-
-```{r}
-prepped_rec <- prep(lm_PCA_rec, verbose = TRUE, retain = TRUE )
-juiced_train<- juice(prepped_rec)
-glimpse(juiced_train)
-```
-
-We still want to use the `lm` package for our regression so we can use the same model object as before:
-```{r}
-lm_PM_model
-```
-
-
-
-```{r}
-pca_wflow <- 
-  workflows::workflow() %>%
-  workflows::add_recipe(lm_PCA_rec) %>%
-  workflows::add_model(lm_PM_model)
-pca_wflow
-```
-
-Remember that using `workflows` we don't actually need to prep our recipe, we can just fit our model directly. 
-
-Fit the cross validation samples:
-
-```{r}
-resample_pca_fit <- tune::fit_resamples(pca_wflow, vfold_pm)
-```
-
-Look at the performance:
-```{r}
-collect_metrics(resample_pca_fit)
-```
-
-And we can compare this with our previous performance using the linear model:
-
-AVOCADO: if we keep this section, could it be renamed something like `resample_lm_fit`? 
-
-```{r}
-collect_metrics(resample_fit)
-```
-
-So we can see that our performance isn't quite as good as what we had with the original model - especially if we look at the `rmse` value, which is much smaller for the original model.  
+In the next few section, we will demonstrate another machine learning model. 
 
 
 ### Random Forest
@@ -1935,9 +1867,15 @@ knitr::include_graphics("https://miro.medium.com/max/1400/0*f_qQPFpdofWGLQqc.png
 ```
 
 
-In our case, the random forest algorithm that we are working with does not work well when there are categorical variables with more than 53 levels, so we will need to remove the `zcta` variable.
+In our case, we are going to use the random forest method of the the `randomForest` package. 
 
-AVOCADO: why the specific number 53 levels? 
+This package is currently not compatible with categorical variables that have more than 53 levels. See [here](https://cran.r-project.org/web/packages/randomForest/NEWS) for the documentation about when this was updated from 25 levels. Thus we will to remove the `zcta`  and `county` variables.
+
+Note that the `step_novel()` function is necessary here for `state` to get all cross validation folds to work, because there will be different levels included in each fold test and training sets, thus there are new levels for some of the test sets which will result in an error.  
+
+According to the [documentation](https://www.rdocumentation.org/packages/recipes/versions/0.1.13/topics/step_novel) for the `recipes` package:
+
+> step_novel creates a specification of a recipe step that will assign a previously unseen factor level to a new value.
 
 ```{r}
 RF_rec <- recipe(train_pm) %>%
@@ -1945,10 +1883,9 @@ RF_rec <- recipe(train_pm) %>%
     update_role(value, new_role = "outcome")%>%
     update_role(id, new_role = "id variable") %>%
     update_role("fips", new_role = "county id") %>%
+    step_novel("state") %>%
     step_string2factor("state", "county", "city") %>%
     step_rm("county") %>%
-    step_rm("id") %>%
-    step_rm("fips")%>%
     step_rm("zcta") %>%
     step_corr(all_numeric())%>%
     step_nzv(all_numeric())
@@ -1971,8 +1908,17 @@ PMtree_model <-
 PMtree_model
 ```
 
-Next, we set the engine and mode
+Next, we set the engine and mode:
+
+Note that you could also use the `ranger` or `spark` packages instead of `randomForest`.
+If you were to use the `ranger` package to implement the random forest analysis you would need to specify an `importance` argument to be able to evaluate predictor importance.  The options are `impurity` or `permutation`.
+
+These other packages have different advantages and disadvantages- for example `ranger` and `spark` are not as limiting for the number of categories for categorical variables. For more information see their documentation: [here](https://cran.r-project.org/web/packages/ranger/ranger.pdf) for ranger, [here](http://spark.apache.org/docs/latest/mllib-ensembles.html#random-forests) for `spark`, and [here](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf) for `randomForest`.
+
+See [here](https://parsnip.tidymodels.org/reference/rand_forest.html) for more documentation about implementing these engine options with tidymodels. Note that there are also [other](https://www.linkedin.com/pulse/different-random-forest-packages-r-madhur-modi/) R packages for implementing random forest algorithms, but these three packages (`ranger`, `spark`, and `randomForest`) are currently compatible with `tidymodels`.
+
 ```{r}
+
 RF_PM_model <- 
   PMtree_model %>%
   set_engine("randomForest") %>%
@@ -1983,244 +1929,298 @@ RF_PM_model
 
 Then, we put this all together into a `workflow`: 
 
+#### {.recall_code_question_block}
+<b><u> Question Opportunity </u></b>
+
+See if you can come up with the code to do this.
+
+####
+
+***
+<details> <summary> Click here to reveal the answer. </summary>
+
 ```{r}
 RF_wflow <- workflows::workflow() %>%
             workflows::add_recipe(RF_rec) %>%
             workflows::add_model(RF_PM_model)
+
+```
+</details> 
+***
+
+```{r}
 RF_wflow
 ```
 
-Finally, we fit the data to the model using either just `parsnip` 
 
-```{r}
-RF_fit <- RF_PM_model %>% 
-  parsnip::fit(value ~., data =juiced_train_ready)
-```
+Finally, we fit the data to the model:
+#### {.recall_code_question_block}
+<b><u> Question Opportunity </u></b>
 
-Or using `workflows`: 
+Do you recall how to do this?
+
+####
+
+***
+<details> <summary> Click here to reveal the answer. </summary>
+
 ```{r}
 RF_wflow_fit <- parsnip::fit(RF_wflow, data = train_pm)
+```
+</details> 
+***
+
+```{r}
 RF_wflow_fit
 ```
 
+
 Let's take a look at the top 10 contributing variables:
+
+
+#### {.recall_code_question_block}
+<b><u> Question Opportunity </u></b>
+
+See if you can recall how to do this.
+
+####
+
+```{r, echo = FALSE}
+RF_wflow_fit %>% 
+  pull_workflow_fit() %>% 
+  vip(num_features = 10)
+
+```
+
+
+***
+<details> <summary> Click here to reveal the answer. </summary>
 
 ```{r}
 RF_wflow_fit %>% 
   pull_workflow_fit() %>% 
   vip(num_features = 10)
 ```
- avocado this was because I previously changed the state variable so I need to update this section about what the current diferences are
+</details>
+***
 
-Interesting, in the previous model the CMAQ values were also important, however the variable about if the monitor was located in California or not was also very predictive.
+
+Interesting! In the previous model the CMAQ values and the state where the monitor was located were also the top two most important, however predictors about education levels of the communities where the monitor was located was among the top most important. Now we see that population density and proximity to sources of emissions and roads are among the top ten.
 
 
 Now let's take a look at model performance by fitting the data using cross validation:
-```{r}
+
+#### {.recall_code_question_block}
+<b><u> Question Opportunity </u></b>
+
+See if you can recall how to do this.
+
+####
+
+***
+<details> <summary> Click here to reveal the answer. </summary>
+
+```{r, eval = FALSE}
+set.seed(456)
 resample_RF_fit <- tune::fit_resamples(RF_wflow, vfold_pm)
 collect_metrics(resample_RF_fit)
 ```
 
-Now let's compare the performance of this model with the others:
+</details>
+***
 
-```{r, eval=FALSE}
-# our initial linear regression model:
-collect_metrics(resample_fit)
-# our initial linear regression model with lat/lon degrees of freedom tuning:
-show_best(df_tuning, metric = "rmse", n =1)
-# our PCA model:
-collect_metrics(resample_pca_fit)
+```{r, echo = FALSE}
+set.seed(456)
+resample_RF_fit <- tune::fit_resamples(RF_wflow, vfold_pm)
+collect_metrics(resample_RF_fit)
 ```
 
-OK, so our first model had a mean `rmse` value of 2.18.
-The model with the lat/long degrees of freedom  tuning had a mean rmse value of 2.02, thus showing some improvement.
-The PCA model had a mean rmse value of 2.76.
+Now let's compare the performance of this model with our linear regression model:
 
-It looks like the random forest model had the lowest `rmse` value of 1.79.
+```{r}
+# our initial linear regression model:
+collect_metrics(resample_fit)
+```
 
+OK, so our first model had a mean `rmse` value of 2.17.
+It looks like the random forest model had  a much lower `rmse` value of 1.72.
+
+
+#### {.think_question_block}
+<b><u> Question Opportunity </u></b>
+
+Do you recall how the RMSE is calculated?
+####
+
+***
+
+<details> <summary> Click here to reveal the answer. </summary>
+$$RMSE = \sqrt{\frac{\sum_{i=1}^{n}{(\hat{y_t}- y_t)}^2}{n}}$$
+</details> 
 
 If we tuned our random forest model based on the number of trees or the value for `mtry` (which is "The number of predictors that will be randomly sampled at each split when creating the tree models"), we might get a model with even better performance.
 
-However, our cross validated mean rmse value of 1.79 is quite good because our range of true outcome values is much larger: (`r round(range(test_pm$value),3)`).
+However, our cross validated mean rmse value of 1.72 is quite good because our range of true outcome values is much larger: (`r round(range(test_pm$value),3)`).
 
 
 ### Model tuning
 
-[Hyperparameters](https://machinelearningmastery.com/difference-between-a-parameter-and-a-hyperparameter/) are often things that we need to specify about a model. For example, the number of predictor variables (or features) that will be randomly sampled at each split when creating the tree models called `mtry` is a hyperparameter. The default number for regression analyses is the number of predictors divided by 3. Instead of arbitrarilly specifiying this, we can try to determine the best option for model performance by a process called tuning. 
+[Hyperparameters](https://machinelearningmastery.com/difference-between-a-parameter-and-a-hyperparameter/) are often things that we need to specify about a model. For example, the number of predictor variables (or features) that will be randomly sampled at each split when creating the tree models called `mtry` is a hyperparameter. The default number for regression analyses is the number of predictors divided by 3. Instead of arbitrarily specifying this, we can try to determine the best option for model performance by a process called tuning. 
 
 
 Now let's try some tuning.
 
 Let's take a closer look at the `mtry` and `min_n` hyperparametrs in our Random Forest model.
 
-avocado Use this: https://juliasilge.com/blog/sf-trees-random-tuning/ as a guide...
+We aren't exactly sure what values of `mtry` and `min_n` achieve good accuracy yet keep our model generalizable for other data.
 
-We can tune for the number of each by using the `tune()` function in the `recipes` package called `step_ns()` where `ns` stands for natural splines. 
-In order to tune for the number of knots or degrees of freedom, we can set the `deg_free` argument to `tune()`. 
+This is when our cross validation methods become really handy because now we can test out different values for each of these hyperparameters to assess what values seem to work best for model performance on these resamples of our training set data.
 
+Previously we specified our model like so:
+```{r}
+RF_PM_model <- 
+  parsnip::rand_forest(mtry = 10, min_n = 3, 
+                       mode = "regression") %>%
+  set_engine("randomForest") %>%
+  set_mode("regression")
 
-This is helpful, because we aren't exactly sure what values of `mtry` and `min_n` achieve good accuracy yet keep our model generalizable for other data.
-
-This is when our cross validation methods become really handy. 
-For example, we can test out different values for the `deg_free` argument and see how our model performance varies across our training folds to try to find the optimal value.
-
-Also, it is a good idea to do this for individual predictors, because you can name each with the `tune` argument so that you can keep track of it later. 
-We can see what we intend to tune with the `parameters()` function of the `dials` package. 
+RF_PM_model
+```
+Now instead of specifying a value for the `mtry` and `min_n` arguments, we can use the `tune()` function of the `tune` package like so: `mtry = tune()`. This indicates that these hyperparameters are to be tuned. 
 
 ```{r}
-pm_param <- dials::parameters(novel_rec)
-pm_param
+
+tune_RF_model <- rand_forest(mtry = tune(), min_n = tune(),
+                             mode = "regression") %>%
+  set_engine("randomForest") %>%
+  set_mode("regression")
+    
+
+tune_RF_model
+
 ```
 
-AVOCADO: While I generally understand what's happening in the `dials::parameter()` function, i'm not sure I actually get it. Could we provide a bit more text here explaining what's happening? or what the output above (`pm_param`) is showing? 
+
+Again we will add this to a workflow, the only difference here is that we are using a different model specification with `tune_RF_model` instead of `RF_model`:
+
+```{r}
+
+RF_tune_wflow <- workflows::workflow() %>%
+            workflows::add_recipe(RF_rec) %>%
+            workflows::add_model(tune_RF_model)
+RF_tune_wflow
+
+```
+
+
+Now we can use the `tune_grid()` function of the `tune` package to evaluate different combinations of values for `mtry` and `min_n` using our cross validation samples of our training set (`vfold_pm`) to see what combination of values performs best.
+
+To use this function we will specify the workflow using the `object` argument  and the samples to use using the `resamples` argument. The `grid` argument specifies how many possible options for each argument should be attempted.
+
+By default 10 different values will be attempted for each hyperparameter that is being tuned.
+
+We can use the `doParallel` package to allow us to fit all these models to our cross validation samples faster. So if you were performing this on a computer with multiple cores or processors, then different models with different hyperparameter values can be fit to the cross validation samples simultaneously across different cores or processors. 
+
+We need to use `set.seed()` here because the values chosen for `mtry` and `min_n` may vary if we preform this evaluation again because they are chosen semi-randomly (meaning that they are within a range of reasonable values but still random).
+
+Note: this step will take some time.
+
+```{r}
+doParallel::registerDoParallel()
+set.seed(123)
+tune_RF_results <- tune_grid(object = RF_tune_wflow, resamples = vfold_pm, grid = 20)
+tune_RF_results
+```
+
 
 See [the tune getting started guide ](https://tidymodels.github.io/tune/articles/getting_started.html){target="_blank"} for more information about implementing this in `tidymodels`.
 
-AVOCADO: everything after this point until the start of the next section is really confusing to me. I see sometimes you have examples commented out, but i'm not sure we should include code if we aren't going to talk about it? Part of me wonders if this section should be in a "Click more here if.." down arrow? That or we need to talk about how to make this section more clear. For now 
+If you wanted more control over this process you could specify how the different possible options for `mtry` and `min_n` in the `tune_grid()` function using the grid_*()` functions of the `dials` package to create a more specific grid.
 
-Generally you could use the `grid_*()` functions of the `dials` package to create the different combinations of degrees of freedom to test for both variables to optimize the model. 
-In our case we can visibly see that if we add more than say 4 or 5 degrees of freedom we will likely over-fit the data. 
-So instead of using these functions we will create our own grid using the base `seq()` and `expand.grid()` functions.
+Be default the values for the hyperparameters being tuned are chosen semi-randomly (meaning that they are within a range of reasonable values but still random)..
 
-```{r, eval = FALSE}
-#an example of what you could do:
-#spline_grid <- dials::grid_regular(pm_param, levels = 3)
-df_vals <- seq(1, 5, by = 2)
-spline_grid <- expand.grid(`lon df` = df_vals, `lat df` = df_vals)
-spline_grid
-```
 
-AVOCADO: I'm not sure what these numbers mean? 
+Now we can use the `collect_metrics()` function again to take a look at what happened with our cross validation tests. We can see the different values chosen for `mtry` and `min_n` and the mean rmse and rsq values across the cross validation samples.
 
-Now we will tune this hyper-parameter (degrees of freedom) for both the `lat` and `lon` variables using our cross validation folds. To do this we will use the `tune_grid()` function of the `tune` package.
-
-```{r, eval=FALSE}
-df_tuning <- 
-  lm_PM_model %>% 
-  tune::tune_grid(novel_rec, resamples = vfold_pm, 
-                  grid = spline_grid)
-
-#df_tuning <-PM_wflow %>% tune::tune_grid(resamples = vfold_pm, 
-#                                         grid = spline_grid, 
-#                                         param_set =pm_param)
-
-df_tuning
-```
-
-AVOCADO: I got this output after running the code chunk above `df_tuning`: 
-```
-> df_tuning
-#  4-fold cross-validation 
-cannot open compressed file '/Users/shicks/Documents/github/websites/opencasestudies/ocs-bp-air-pollution/.Rproj.user/shared/notebooks/4922A1-index/1/4E3CFC04439A89E6/cmq1o1r6gyahs_t/_rs_rdf_1d6f4f240c09.rdf', probable reason 'No such file or directory'Error in gzfile(file, "wb") : cannot open the connection
-```
-AVOCADO: Any idea what it means? I'm going to comment it out for now so i can compile
-
-AVOCADO: Assuming my error can get fixed, could we write a sentence explaining what we see at output? 
-
-```{r, eval=FALSE}
-df_tuning %>%
+```{r}
+tune_RF_results%>%
   collect_metrics()
-
-show_best(df_tuning, metric = "rmse", n =1)
 ```
 
-AVOCADO: Could we write a sentence explaining what we see at output? also about what the functions `collect_metrics()` and `show_best()` are? 
+We can now use the `show_best()` function as it was truly intended, to see what values for `min_n` and `mtry` resulted in the best performance.
 
-
-
+```{r}
+show_best(tune_RF_results, metric = "rmse", n =1)
+```
+There we have it... looks like an `mtry` of 17 and `min_n` of 4 had the best `rmse` value. You can verify this in the above output, but it is easier to just pull this row out using this function. We can see that the mean `rmse` value across the cross validation sets was 1.720. Before tuning it was 1.725  with a similar `std_err` so the performance was very slightly improved.
 
 
 ### Final model performance evaluation
 
-Now that we have decided that we have reasonable performance with our training data, we could stop here and use the `yardstick` package (and `tune` if using `workflows` to fit our model) to evaluate performance with our testing data. 
+Now that we have decided that we have reasonable performance with our training data, we can stop building our model and evaluate performance with our testing data. 
 
-Here, we will use the random forest model that we built to predict values for the monitors in the testing data.
+Here, we will use the random forest model that we built to predict values for the monitors in the testing data and we will use the values for `mtry` and `min_n` that we just determined based on our tuning analysis to achieve the best performance.
 
-Using `parsnip` we would need to use the baked data testing data. With the `workflows` package, we could use the raw testing data.
+So, first we need to specify these values in a workflow. We can use the `select_best()` function of the `tune` package to grab the values that were determined to be best for `mtry` and `min_n`.
 
-AVOCADO: maybe remind readers what is baked testing data? 
 
-Importantly, ID variables are not dealt with as nicely as with the `workflows` package so we would need to remove them. 
-We did this above when created the processed training data for this model, the `juiced_train` data as well.
 
-First, let's extract the predicted outcome values on the testing data. 
+```{r}
 
-```{r,eval=FALSE}
-baked_test_pm_ready <- 
-  baked_test_pm %>% 
-  select( -"id", -"fips")
-
-values_pred_parsnip <- predict(RF_fit, baked_test_pm_ready)
-values_pred_parsnip
+tuned_RF_values<- select_best(tune_RF_results, "rmse")
+tuned_RF_values
 ```
 
-AVOCADO: I'm getting the following output: 
+Now we can finalize the model/workflow that we we used for tuning with these values.
 
-```
-Error in predict.randomForest(object = object$fit, newdata = new_data) : missing values in newdata
-```
 
-AVOCADO: any ideas on what i should do? 
-
-AVOCADO: Setting the rest of the code chunks to `eval=FALSE` for now
-
-Alternatively, you can also do this with `workflows`: 
-```{r,eval=FALSE}
-values_pred_wfs <- 
-  predict(RF_wflow_fit, test_pm) %>% 
-  bind_cols(test_pm %>% select(value, fips, county, id)) 
-values_pred_wfs
+```{r}
+RF_tuned_wflow <-RF_tune_wflow %>%
+  tune::finalize_workflow(tuned_RF_values)
 ```
 
-Next we calculate the performance metrics with `yardstick`
-```{r,eval=FALSE}
-yardstick::metrics(values_pred_wfs, 
-                   truth = value, estimate = .pred)
-```
-Awesome! We can see that our rmse of 1.49 is quite similar with our testing data. We achieved quite good performance, which suggests that we would could predict other locations with more sparse monitoring based on our predictors with reasonable accuracy.
 
-We could also use the `last_fit()` function of the `tune` package to look at performance if we chose to create a workflow using the `workflows` package.
+With the `workflows` package, we can use the splitting information for our original data `pm_split` to fit the final model on the full training set and also on the testing data using the `last_fit()` function of the `tune` package. No pre-processing steps are required.
 
-```{r,eval=FALSE}
-overallfit <-tune::last_fit(RF_wflow, pm_split)
+The results will show the performance using the testing data.
+
+
+```{r}
+overallfit <-tune::last_fit(RF_tuned_wflow, pm_split)
  # or
 overallfit <-RF_wflow %>%
   tune::last_fit(pm_split)
-
-overallfit$.metrics[[1]]
 ```
 
-We could check out test performance using the `collect_metrics()` function of the `tune` package.
+The `overallfit` output has a lot of really useful information about how the model, the data test and training split, and the predictions for the testing data.
 
-
-```{r,eval=FALSE}
-test_performance <- 
-  overallfit %>% 
-  tune::collect_metrics()
-
-test_performance
+To see the performance on the test data we can use the `collect_metrics()` function like we did before.
+```{r}
+  collect_metrics(overallfit)
+ 
 ```
 
-Here you can see the predictions for the test set (the 292 rows with predictions out of the 876 original monitor values) also using the `tune` package with the `collect_predictions()` function.
+Awesome! We can see that our rmse of 1.44 is quite similar with our testing data cross validation sets. We achieved quite good performance, which suggests that we would could predict other locations with more sparse monitoring based on our predictors with reasonable accuracy.
 
+Now if you wanted to take a look at the predicted values for the test set (the 292 rows with predictions out of the 876 original monitor values) you can use the  `collect_predictions()` function of the `tune()` package:
 
+```{r}
+test_predictions <-collect_predictions(overallfit)
+```
 
-```{r,eval=FALSE}
-test_predictions <- 
-  overallfit %>% 
-  tune::collect_predictions()
+```{r, eval = FALSE}
+test_predictions
 ```
 
 #### {.scrollable }
-
-```{r, eval =FALSE, echo =FALSE}
+```{r, echo =FALSE}
 test_predictions %>%
   print(n = 1e3)
 ```
 
 ####
 
-
+Nice!
 
 ## **Data Visualization**
 ***
@@ -2236,55 +2236,86 @@ Now, let's make a plot of our predicted outcome values ($\hat{Y}$) and actual ou
 First, let's start by making a plot of our monitors. 
 To do this, we will use the following packages to create a map of the US:
 
-AVOCADO: maybe remind readers what each package does by copying and pasting text from when you originally introduced the packages? that or link to the section? 
+1. `sf` - the simple features package helps to convert geographical coordinates into `geometry` variables which are useful for making 2D plots
+2. `maps` - this package contains geographical outlines and plotting functions to create plots with maps 
+3. `rnaturalearth`- this allows for easy interaction with map data from [Natural Earth](http://www.naturalearthdata.com/) which is a public domain map dataset
+4. `rgeos` - this package interfaces with the Geometry Engine-Open Source (`GEOS`) which is also helpful for coordinate conversion
 
-1. `sf`
-2. `maps`
-3. `rnaturalearth`
-4. `rgeos`
+We will start with getting an outline of the US with the `ne_countries()` function of the `rnaturalearth` package which will return polygons of the countries in the [Natural Earth](http://www.naturalearthdata.com/) dataset.
 
-According to this [link on wikipedia](https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States#Westernmost){target="_blank"}, these are the latitude and longitude bounds of the continental US.
+AVOCADO: So I definitely have the `rnaturalearthdata` package installed, but for someone reason every time I go to run the code below it says that I need to install the package. Just curious -- what version of R are you using?avocado response - the end of the case study shows this.. hopefully this works now :/ please let me know and I will figure it out
+
+```{r}
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+glimpse(world)
+
+```
+
+
+Here you can see the data about the countries in the world. Notice the `geometry` variable. This is used to create the outlines that we want. 
+
+Now we can use the `geom_sf()` function of the `ggplot2` package to create a visual of simple feature (the geometry coordinates found in the `geometry` variable).
+
+```{r}
+ggplot(data = world) +
+    geom_sf() 
+
+```
+
+So now we can see that we have outlines of all the countries in the world.
+
+We want to limit this just to the coordinates for the US. We will do this based on the coordinates we found on Wikipedia. According to this [link](https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States#Westernmost){target="_blank"}, these are the latitude and longitude bounds of the continental US:
 
 - top = 49.3457868 # north lat
 - left = -124.7844079 # west long
 - right = -66.9513812 # east long
 - bottom =  24.7433195 # south lat
 
-AVOCADO: maybe add a sentence about what the `ne_countries()` function does? 
-
-We will start with getting an outline of the US with the `ne_countries()` function of the `rnaturalearth` package.
-
-AVOCADO: So I definitely have the `rnaturalearthdata` package installed, but for someone reason every time I go to run the code below it says that I need to install the package. Just curious -- what version of R are you using? Setting the code chunks to false for now. 
-
-```{r, eval=FALSE}
-library("rgeos")
-
-world <- ne_countries(scale = "medium", returnclass = "sf")
+```{r}
 
 ggplot(data = world) +
     geom_sf() +
-    geom_point(data = pm, aes(x = lon, y = lat), size = 2, 
-               shape = 23, fill = "darkred") +
     coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), 
              expand = FALSE)
 ```
+Now we just have a plot that is mostly limited to the outline of the US.
+
+Now we will use the `geom_point()` function of the `ggplot` package to add scatter plot on top of the map. We want to show where the monitors are located based on the latitude and longitude values in the data.
+
+```{r}
+ggplot(data = world) +
+    geom_sf() +
+    coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), 
+             expand = FALSE)+
+    geom_point(data = pm, aes(x = lon, y = lat), size = 2, 
+               shape = 23, fill = "darkred")
+
+```
+Nice!
 
 Now let's add county lines.
 
 County graphical data is available from the `maps` package. 
-The `sf` package which is short for simple features creates a data frame about this graphical data so that we can work with it.
+The `sf` package which again is short for simple features creates a data frame about this graphical data so that we can work with it.
 
-```{r, eval=FALSE}
+```{r}
 counties <- 
   sf::st_as_sf(maps::map("county", plot = FALSE, 
                          fill = TRUE))
 
+counties
+```
+
+Now we will use this data within the `geom_sf()` function to add this to our plot.  We will also add a title using the `ggtitle()` function, as well as remove axis ticks and titles using the `theme()` function of the `ggplot2` package.
+
+```{r}
 monitors <- ggplot(data = world) +
     geom_sf(data = counties, fill = NA, color = gray(.5))+
+      coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), 
+             expand = FALSE) +
     geom_point(data = pm, aes(x = lon, y = lat), size = 2, 
                shape = 23, fill = "darkred") +
-    coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), 
-             expand = FALSE) +
     ggtitle("Monitor Locations") +
     theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
@@ -2296,29 +2327,66 @@ monitors <- ggplot(data = world) +
 monitors
 ```
 
-Now, let's add a fill at the county level for the true monitor values of air pollution.
-First, we need to get the data for county to look the same for both our data and the county map data.
+Great!
 
-```{r, eval=FALSE}
+Now, let's add a fill at the county-level for the true monitor values of air pollution.
+
+First, we need to get the county map data that we just got and our air pollution data to have similarly formatted county names so that we can combine the datasets together.
+
+We can see that in the `county` data the counties are listed after the state name and a comma. In addition they are all lower case.
+
+
+```{r}
 head(counties)
+```
 
-pm <- readr::read_csv(here("docs", "pm25_data.csv"))
+In contrast, our air pollution `pm` data shows counties as titles with the first letter as upper case. 
 
+```{r}
+dplyr::pull(pm, county) %>%
+  head()
+```
+
+We can use the `separate()` function of the `tidyr` package to separate the `ID` variable of our `counties` data into two `variables` based on the comma as a separator.
+
+```{r}
 counties %<>% 
   tidyr::separate(ID, into = c("state", "county"), sep = ",")
 
+head(counties)
+```
+Now we just need to make these names in the new `county` variable of the `counties` data to be in title format. We can use the `str_to_title()` function of the `stringr` package to do this. 
+```{r}
 counties[["county"]] <- stringr::str_to_title(counties[["county"]])
+```
 
-map_data <-inner_join(counties, pm, by = "county")
+Great! Now the county information is the same for the `counties` and `pm` data.
+
+We can use the `inner_join()` function of the `dplyr` package to join the datasets together based on the `county` variables in each. This function will keep all rows that are in both datasets.
+
+```{r}
+map_data <-dplyr::inner_join(counties, pm, by = "county")
+
+glimpse(map_data)
+
+```
+Nice! we can see that we have add a `geom` variable to the `pm` data.
+
+Now we can use this to color the counties in our plot based on the `value` variable of our `pm` data, which you may recall is the actual monitor data for fine particulate air pollution at each monitor. 
+
+WE can do so using the `scale_fill_gradientn()` function of the `ggplot2` package which creates color gradient based on a variable. In this case it is the variable that was specified as the `fill` in the `aes` function of the `geom_sf()` function. We specified that it would be the `value` variable of the `pm` data.
+
+This `scale_fill_gradientn()` function  also allows you to specify the colors, what to do about NA values (should they be a specific color or transparent) and the breaks, limits, labels and name/title on the legend for the color gradient. 
+
+```{r}
 
 truth <-ggplot(data = world) +
-    geom_sf() +
+  coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
     geom_sf(data = map_data, aes(fill = value)) +
-        coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
-  scale_fill_gradientn(colours=topo.colors(7),na.value = "transparent",
+  scale_fill_gradientn(colours=topo.colors(7), na.value = "transparent",
                            breaks=c(0,10,20),labels=c(0,10,20),
-                           limits=c(0,23.5), name = "PM ug/m3")+
-  ggtitle("True PM 2.5 levels")+
+                           limits=c(0,23.5), name = "PM ug/m3") +
+  ggtitle("True PM 2.5 levels") +
     theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
@@ -2329,39 +2397,71 @@ truth <-ggplot(data = world) +
 truth
 
 ```
-
+Nice!
 
 Now let's do the same with our predicted outcome values.
 
 Let's grab both the testing and training predicted outcome values so that we have as much data as possible. 
-In this case, the output structure for the training data fit is slightly different using `randomForest`. 
-The fitted values are called `predicted` and the `broom` functions like `tidy()` and `augment()` will not work. 
-So we will manually grab the predicted training data values.
 
-```{r, eval=FALSE}
-#test data
-values_pred_wfs
+First we need to fit our training data with our final model to be able to get the predictions for the monitors included in the training set. We did this using the `last_fit()` function, but the output of this makes it difficult to grab the predicted values for the training data, and it is also difficult to get the id variables for the testing data. 
 
-#training data
-training_RF_estimates <- RF_fit[["fit"]][["predicted"]]
-training_RF_estimates <- 
-  tibble(".pred" = training_RF_estimates,
-         value= train_pm$value, 
-         fips = train_pm$fips, 
-         county = train_pm$county, id =train_pm$id)
 
-all_pred <- bind_rows(values_pred_wfs, training_RF_estimates)
+Thus we will use the parsnip `fit()` and  `predict()` functions to do this outside of the `workflows` package like so:
+
+#### {.think_question_block}
+<b><u> Question Opportunity </u></b>
+
+Why do we not need pre-processed data?
+
+####
+
+***
+
+<details> <summary> Click here to reveal the answer. </summary>
+
+Since we are using a workflow, the data will be pre-processed when it is fit as well.
+
+</details>
+***
+
+
+```{r}
+
+RF_final_train_fit <- parsnip::fit(RF_tuned_wflow, data = train_pm)
+RF_final_test_fit <- parsnip::fit(RF_tuned_wflow, data = test_pm)
+
+
+values_pred_train <- 
+  predict(RF_final_train_fit, train_pm) %>% 
+  bind_cols(train_pm %>% select(value, fips, county, id)) 
+
+values_pred_train
+
+values_pred_test <- 
+  predict(RF_final_test_fit, test_pm) %>% 
+  bind_cols(test_pm %>% select(value, fips, county, id)) 
+
+values_pred_test
 ```
 
+Now we can combine this data for the predictions for all monitors using the `bind_rows()` function of the `dplyr` package, which will essentially append the second dataset to the first.
 
-```{r, eval=FALSE}
+```{r}
+all_pred <- bind_rows(values_pred_test, values_pred_train)
+
+all_pred
+```
+
+Great! as we can see there are 876 values like we would expect for all of the monitors. We can use the `county` variable to combine this with the `counties` data like we did with the `pm` data previously so that we can use the `value` variable as a color scheme for our map.
+
+
+```{r}
 map_data <- inner_join(counties, all_pred, by = "county")
 
 pred <- ggplot(data = world) +
-    geom_sf() +
-    geom_sf(data = map_data, aes(fill = .pred)) +
-        coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), 
+          coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), 
                  expand = FALSE) +
+    geom_sf(data = map_data, aes(fill = .pred)) +
   scale_fill_gradientn(colours=topo.colors(7), na.value = "transparent",
                        breaks=c(0,10,20),labels=c(0,10,20),
                        limits=c(0,23.5), name = "PM ug/m3") +
@@ -2376,28 +2476,33 @@ pred <- ggplot(data = world) +
 pred
 ```
 
+Now we will use the `patchwork` package to combine our last two plots. This allows us to combine plots using the `+` or the `/` . The `+` will place plots side by side and the `/` will place plots top to bottom.
 
 
-```{r, eval=FALSE}
-cowplot::plot_grid(monitors, truth, pred)
-```
-
-
-```{r, eval=FALSE}
-cowplot::plot_grid(truth, pred,nrow = 2 )
+Now let's just combine the truth plot and the prediction plots together:
+```{r}
+truth/pred
 
 ```
 
-AVOCADO: I would suggest adding more text in between the plots above in this section explaining what we see. 
+We can see that the predicted fine particle air pollution values in (ug/m3) are quite similar to the true values measured by the actual gravimetric monitors. We can also see that southern California has some large counties with worse pollution (as they are yellow and thus have much higher particulate matter levels).
+
+Let's add some text to our plot to explain it a bit more.
+
+```{r}
+truth/pred + plot_annotation(title = "Random forest model predicts fine particulate matter (PM 2.5) \nair pollution based on data about road proximity, population density,\nand other predictors reasonably well")
+
+```
+
 
 ```{r, echo = FALSE, message=FALSE, eval=FALSE}
 png(here::here("img", "main_plot_maps.png"), 
     height = 1500, width = 2000, res = 300)
-cowplot::plot_grid(truth, pred,nrow = 2 )
+truth/pred + plot_annotation(title = "Random forest model predicts fine particulate matter (PM 2.5) \nair pollution based on data about road proximity, population density,\nand other predictors reasonably well")
 dev.off()
 ```
 
-## **Summary**
+## **Synopsis**
 
 In this case study, we explored gravimetric monitoring data of fine particulate matter air pollution (outcome variable). 
 Our goal was to able to predict air pollution on monitors where we only had predictor variables (or features) without having observed a corresponding measurement of air pollution.
@@ -2417,9 +2522,15 @@ Analyses like the one in our case study are important for defining which groups 
 <details><summary> Click here for more on what we learned with `tidymodels` </summary>
 
 Here, we provide an overview of the `tidymodels` framework. 
+avocado... two options:
 
 ```{r, echo=FALSE, out.width="800px"}
 knitr::include_graphics(here::here("img","ecosystem.png"))
+```
+
+
+```{r, echo=FALSE, out.width="800px"}
+knitr::include_graphics(here::here("img","new_tidymodels_ecosystem.png"))
 ```
 
 We performed the major steps of machine learning that we introduced in the beginning of the data analysis:  
@@ -2440,14 +2551,14 @@ We used the `recipes` package to assign variable roles (such as outcome, predict
 
 We learned that the model needs to first be fit to the training data. We learned that in both classification and prediction, the model is fit to the training data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. We learned that we specify the model and its specifications using the `parnsip` package and that we also use this package to fit the model using the `fit()` function. We learned that we if just use `parsnip` to fit the model, then we need to use the pre-processed training data (output from `juice()`). We learned that we can use the raw training data if we use the `workflows` package to create a workflow that pre-processes our data for us.   
 
-We learned that if the model fits well than the estimated values will be very similar to the true outcome variable values in our training data. We learned that we can assess model performance using the `yardstick` package and the `metrics()` function. We also learned that we can use subsets of our training data (which we created with the `rsample` package) to perform cross validation to get a better estimate about the performance of our model using our training data, as we want our results to be generalizable and to perform well with other data, not just our training data. We used the `fit_resamples()` function of the tune package to fit our model on our different training data subsets and the `collect_metrics()` function (also of the `tune` package) to evaluate model performance using these subsets.  We also learned that we can potentially improve model performance by tuning aspects about the model called [hyperparameters](https://machinelearningmastery.com/difference-between-a-parameter-and-a-hyperparameter/){target="_blank"} to determine the best option for model performance. We learned that we can do this using the `tune` and `dials` packages and evaluating the performance of our model with the different hyper-parameter options and our training data subsets that we used for cross validation. After we tested several different methods to model our data, we compared them to choose the best performing model as our final model.  
+We learned that if the model fits well than the estimated values will be very similar to the true outcome variable values in our training data. We learned that we can assess model performance using the `yardstick` package with the `metrics` functio or the `tune` package and the `collect_metrics()` function (required if using cross validation or tuning). We also learned that we can use subsets of our training data (which we created with the `rsample` package) to perform cross validation to get a better estimate about the performance of our model using our training data, as we want our results to be generalizable and to perform well with other data, not just our training data. We used the `fit_resamples()` function of the tune package to fit our model on our different training data subsets and the `collect_metrics()` function (also of the `tune` package) to evaluate model performance using these subsets.  We also learned that we can potentially improve model performance by tuning aspects about the model called [hyperparameters](https://machinelearningmastery.com/difference-between-a-parameter-and-a-hyperparameter/){target="_blank"} to determine the best option for model performance. We learned that we can do this using the `tune` and `dials` packages and evaluating the performance of our model with the different hyperparameter options and our training data subsets that we used for cross validation. After we tested several different methods to model our data, we compared them to choose the best performing model as our final model.  
 
 
 5. Overall model performance evaluation  
 
-Once we chose our final model, we evaluated the final model performance using the testing data. This gives us a better estimate about how well the model will predict or classify the outcome variable of interest with new independent data. Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources. 
+Once we chose our final model, we evaluated the final model performance using the testing data using the `last_fit()` function of the `tune` package. This gives us a better estimate about how well the model will predict or classify the outcome variable of interest with new independent data. Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources. 
 
-We first fit our model to our testing data using either just parsnip and the pre-processed testing data (using the `bake()` recipes function), or our raw testing data if we used a workflow. We used the same performance evaluation functions (`yardstick::metrics()`  and `tune::collect_metrics()`(when using cross validation)). We also learned how we can use the `last_fit()` function of the `tune` package if we used a workflow to get the test data performance using the initial data and the testing/training split information.
+We also saw that we can use the `collect_predictions()` function of the `tune` package to get the predictions for our test data. We saw that we can get more detailed prediction data using the `predict()` function of the `parsnip` package.
 
 </details>
 
@@ -2530,7 +2641,7 @@ Students can predict air pollution monitor values using a different algorithm an
 [sf](https://r-spatial.github.io/sf/){target="_blank"}  | to convert the map data into a data frame
 [lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert the map geographical data
 [rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
-[cowplot](https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html){target="_blank"} | to allow plots to be combined
+[patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
 
 
 ### Session info 
