@@ -312,34 +312,38 @@ prediction and classification 2) the importance of training and testing
 <td>to perform the random forest analysis</td>
 </tr>
 <tr class="even">
+<td><a href="https://cran.r-project.org/web/packages/doParallel/doParallel.pdf">doParallel</a></td>
+<td>to fit cross validation samples in parallel</td>
+</tr>
+<tr class="odd">
 <td><a href="https://stringr.tidyverse.org/articles/stringr.html" target="_blank">stringr</a></td>
 <td>to manipulate the text the map data</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="https://tidyr.tidyverse.org/" target="_blank">tidyr</a></td>
 <td>to separate data within a column into multiple columns</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="https://cran.r-project.org/web/packages/rnaturalearth/README.html" target="_blank">rnaturalearth</a></td>
 <td>to get the geometry data for the earth to plot the US</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="https://cran.r-project.org/web/packages/maps/maps.pdf" target="_blank">maps</a></td>
 <td>to get map database data about counties to draw them on our US map</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="https://r-spatial.github.io/sf/" target="_blank">sf</a></td>
 <td>to convert the map data into a data frame</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf" target="_blank">lwgeom</a></td>
 <td>to use the <code>sf</code> function to convert the map geographical data</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="https://cran.r-project.org/web/packages/rgeos/rgeos.pdf" target="_blank">rgeos</a></td>
 <td>to use geometry data</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="https://cran.r-project.org/web/packages/patchwork/patchwork.pdf" target="_blank">patchwork</a></td>
 <td>to allow plots to be combined</td>
 </tr>

@@ -56,7 +56,7 @@ This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 [
 ####
 
 
-## **Motivation**
+# **Motivation**
 ***
 A variety of different sources contribute different types of pollutants to what we call air pollution. 
 
@@ -68,7 +68,7 @@ Some sources are natural while others are anthropogenic (human derived):
 
 ##### [[source]](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.nps.gov%2Fsubjects%2Fair%2Fsources.htm&psig=AOvVaw2v7AVxSF8ZSAPEhNudVtbN&ust=1585770966217000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCPDN66q_xegCFQAAAAAdAAAAABAD){target="_blank"}
 
-#### Major types of air pollutants
+### Major types of air pollutants
 
 1) **Gaseous** - Carbon Monoxide (CO), Ozone (O~3~), Nitrogen Oxides(NO, NO~2~), Sulpher Dioxide (SO~2~)
 2) **Particulate** - small liquids and solids suspended in the air (includes lead- can include certain types of dust)
@@ -78,7 +78,7 @@ Some sources are natural while others are anthropogenic (human derived):
 See [here](http://www.redlogenv.com/worker-safety/part-1-dust-and-particulate-matter) for more detail on the types of pollutants in the air.
 
 
-#### Particulate pollution 
+### Particulate pollution 
 
 Air pollution particulates are generally described by their **size**.
 
@@ -130,7 +130,7 @@ knitr::include_graphics(here::here("img", "pm2.5_scale_graphic-color_2.jpg"))
 ##### [[source]](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full){target="_blank"}
 
 
-#### Negative impact of particulate exposure on health 
+### Negative impact of particulate exposure on health 
 
 Exposure to air pollution is associated with higher rates of [mortality](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5783186/){target="_blank"} in older adults and is known to be a risk factor for many diseases and conditions including but not limited to:
 
@@ -142,7 +142,7 @@ Exposure to air pollution is associated with higher rates of [mortality](https:/
 
 See this [review article](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full){target="_blank"} for more information about sources of air pollution and the influence of air pollution on health.
 
-#### Sparse monitoring is problematic for Public Health
+### Sparse monitoring is problematic for Public Health
 
 Historically, epidemiological studies would assess the influence of air pollution on health outcomes by relying on a number of monitors located around the country. 
 However, as can be seen in the following figure, these monitors are relatively sparse in certain regions of the country. 
@@ -157,7 +157,7 @@ Furthermore, dramatic differences in pollution rates can be seen even within the
 This lack of granularity in air pollution monitoring has hindered our ability to discern the full impact of air pollution on health and to identify at-risk locations. 
 
 
-#### Machine learning offers a solution
+### Machine learning offers a solution
 
 An [article](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63){target="_blank"} published in the *Environmental Health* journal dealt with this issue by using data, including population density, road density, among other features, to model or predict air pollution levels at a more localized scale using machine learning (ML) methods. 
 
@@ -183,7 +183,8 @@ The article above demonstrates that machine learning methods can be used to pred
 We will use similar methods to predict annual air pollution levels spatially within the US.
 
 
-### Main Question
+## Main Question
+***
 
 #### {.main_question_block}
 <b><u> Our main question: </u></b>
@@ -192,12 +193,13 @@ We will use similar methods to predict annual air pollution levels spatially wit
 
 ####
 
-### Learning Objectives 
+## Learning Objectives
+***
 
 In this case study, we will walk you through importing data from CSV files and performing machine learning methods to predict our outcome variable of interest (in this case annual fine particle air pollution estimates). 
 
 We will especially focus on using packages and functions from the [`tidyverse`](https://www.tidyverse.org/){target="_blank"}, and more specifically the [`tidymodels`](https://cran.r-project.org/web/packages/tidymodels/tidymodels.pdf){target="_blank"} package/ecosystem primarily developed and maintained by [Max Kuhn](https://resources.rstudio.com/authors/max-kuhn){target="_blank"} and [Davis Vaughan](https://resources.rstudio.com/authors/davis-vaughan){target="_blank"}. 
-This package loads more modeling related packages like `rsample`, `recipes`, `parsnip`, `yardstick`,  and `dials`. We will also briefly cover the `workflows` and `tune` packages. 
+This package loads more modeling related packages like `rsample`, `recipes`, `parsnip`, `yardstick`, `workflows`, and `tune` packages. 
 
 The tidyverse is a library of packages created by RStudio. 
 While some students may be familiar with previous R programming packages, these packages make data science in R especially efficient.
@@ -225,8 +227,6 @@ Statistical concepts and methods:
 3. Understanding of the utility of cross validation
 4. Understanding of random forest
 5. How to interpret root mean squared error (rmse) to assess performance for prediction
-
-
 
 
 
@@ -301,7 +301,8 @@ The first time we use a function, we will use the `::` to indicate which package
 Unless we have overlapping function names, this is not necessary, but we will include it here to be informative about where the functions we will use come from.
 
 
-### Context
+## Context
+***
 
 The [State of Global Air](https://www.stateofglobalair.org/){target="_blank"} is a report released every year to communicate the impact of air pollution on public health. 
 
@@ -385,7 +386,8 @@ Specifically, these methods can be used to estimate air pollution in these low m
 
 This is what we aim to achieve in this case study.
 
-### Limitations
+## Limitations
+***
 
 There are some important considerations regarding the data analysis in this case study to keep in mind: 
 
@@ -396,7 +398,7 @@ There are some important considerations regarding the data analysis in this case
 3. Our analysis will use annual mean estimates of pollution levels, but these can vary greatly by season, day and even hour. There are data sources that have finer levels of temporal data, however we are interested in long term exposures, as these appear to be the most influential for health outcomes, so we chose to use annual level data. 
 
 
-## **What are the data?** {#whatarethedata}
+# **What are the data?** {#whatarethedata}
 ***
 
 When using machine learning for prediction, there are two main types of data of interest:
@@ -536,8 +538,9 @@ knitr::include_graphics(here::here("img", "regression.png"))
 
 
 
-## **Data Import**
+# **Data Import**
 ***
+
 All of our data was previously collected by a [researcher](http://www.biostat.jhsph.edu/~rpeng/) at the [Johns Hopkins School of Public Health](https://www.jhsph.edu/) who studies air pollution and climate change. 
 
 We have one CSV file that contains both our single **outcome variable** and all of our **features** (or predictor variables).
@@ -551,7 +554,7 @@ pm <- readr::read_csv(here("docs", "pm25_data.csv"))
 
 
 
-## **Data Exploration and Wrangling**
+# **Data Exploration and Wrangling**
 ***
 
 The first step in performing any data analysis is to explore the data. 
@@ -677,7 +680,7 @@ It looks like "District of Columbia" is being included as a state.
 We can see that Alaska and Hawaii are not included in the data.
 
 
-### Evaluate correlation among possible predictors
+## Evaluate correlation
 
 In prediction analyses, it is also useful to evaluate if any of the variables are correlated. Why should we care about this?
 
@@ -796,7 +799,7 @@ Indeed this increased the correlation, but variables from each of these categori
 
 Now that we have a sense of what our data are, we can get started with building a machine learning model to predict air pollution. 
 
-## **What is machine learning?**  {#whatisml}
+# **What is machine learning?**  {#whatisml}
 ***
 
 You may have learned about the central dogma of statistics that you sample from a population.
@@ -831,7 +834,7 @@ The way we do this is to use data where we have both the features $(X_1=x_1, \do
 
 When we say train a machine learning algorithm we mean that we estimate a function $f$ that uses the predictor variables $X$ as input or $\hat{Y} = f(X)$. 
 
-### ML as an optimization problem
+## ML as an optimization problem
 
 If we are doing a good job, then our predicted outcome $\hat{Y}$ should closely match our actual outcome $Y$ that we observed. 
 
@@ -842,7 +845,7 @@ The choice of distance metric $d(\cdot)$ can be the mean of the absolute or squa
 
 Much of the fields of statistics and computer science are focused on defining $f$ and $d$.
 
-### The parts of an ML problem
+## The parts of an ML problem
 
 To set up a machine learning (ML) problem, we need a few components.
 To solve a (standard) machine learning problem you need: 
@@ -859,7 +862,7 @@ While each of these components is a _technical_ problem, there has been a ton of
 
 Now that we know a bit more about machine learning, let's build a model to predict air pollution levels using the `tidymodels` framework. 
 
-## **Machine learning with `tidymodels`**
+# **Machine learning with `tidymodels`**
 ***
 The goal is to build a machine learning algorithm uses the features as input and predicts a outcome variable (or air pollution levels) in the situation where we do not know the outcome variable. 
 
@@ -867,9 +870,9 @@ The way we do this is to use data where we have both the input and output data t
 
 To train a machine learning algorithm, we will use the `tidymodels` package ecosystem. 
 
-### Overview 
+## Overview 
 
-#### The tidymodels ecosystem
+### The tidymodels ecosystem
 
 To perform our analysis we will be using the `tidymodels` suite of packages. 
 You may be familiar with the older packages `caret` or `mlr` which are also for machine learning and modeling but are not a part of the `tidyverse`. 
@@ -890,7 +893,7 @@ This is a schematic of how these packages work together to build a machine learn
 knitr::include_graphics(here::here("img","MachineLearning.png"))
 ```
 
-#### Benefits of tidymodels  
+### Benefits of tidymodels  
 
 The two major benefits of `tidymodels` are: 
 
@@ -904,7 +907,7 @@ Modifying a piece of the overall process is now easier than before because many 
 
 
 
-### Splitting the data
+## Splitting the data
 
 The first step after data exploration in machine learning analysis is to [split the data](https://towardsdatascience.com/train-validation-and-test-sets-72cb40cba9e7){target="_blank"} into **training** and **testing** data sets. 
 
@@ -1001,7 +1004,7 @@ count(test_pm, state)
 
 
 
-### Pre-processing the data
+## Preparring for pre-processing the data
 
 After splitting the data, the next step is to process the training and testing data so that the data are are compatible and optimized to be used with the model. 
 This involves assigning variables to specific roles within the model and pre-processing like scaling variables and removing redundant variables. 
@@ -1011,7 +1014,7 @@ To do this in `tidymodels`, we will create what's called a "recipe" using the `r
 This can be very useful because it makes testing out different pre-processing steps or different algorithms with the same pre-processing very easy and reproducible.
 Creating a recipe specifies **how a data frame of predictors should be created** - it specifies what variables to be used and the pre-processing steps, but it **does not execute these steps** or create the data frame of predictors.
 
-#### Step 1: Specify the variables with `recipe()` function
+### Step 1: Specify variables roles with `recipe()` function
 
 The first thing to do to create a recipe is to specify which variables we will be using as our outcome and predictors using the `recipe()` function. 
 In terms of the metaphor of baking, we can think of this as listing our ingredients. 
@@ -1110,7 +1113,7 @@ knitr::include_graphics(here::here("img","Starting_a_recipe_recipes1.png"))
 ```
 
 
-#### Step 2: Specify the pre-processing steps with `step*()` functions
+### Step 2: Specify the pre-processing steps with `step*()` functions
 
 Next, we use the `step*()` functions from the `recipe` package to specify pre-processing steps. 
 
@@ -1219,9 +1222,9 @@ simple_rec
 
 
 
-### Running the pre-processing
+## Running the pre-processing
 
-#### Step 1: Update the recipe with training data using `prep()`
+### Step 1: Update the recipe with training data using `prep()`
 
 The next major function of the `recipes` package is `prep()`.
 This function updates the recipe object based on the training data. 
@@ -1256,7 +1259,7 @@ You can see:
 **Note**: You may see the `prep.recipe()` function in material that you read about the `recipes` package. This is referring to the `prep()` function of the `recipes` package.
 
 
-#### Step 2: Extracting pre-processed training data using `juice()`
+### Step 2: Extract pre-processed training data using `juice()`
 
 Since we retained our pre-processed training data (i.e. `prep(retain=TRUE)`), we can take a look at it like by using the `juice()` function of the `recipes` package like this:
 
@@ -1328,7 +1331,7 @@ pm %>% count(city) %>%
 
 **Note**: Recall that you must specify `retain = TRUE` argument of the `prep()` function to use `juice()`.
 
-#### Step 3: Extracting pre-processed testing data using `bake()`
+### Step 3: Extract pre-processed testing data using `bake()`
 
 According to the `tidymodels` documentation:
 
@@ -1489,7 +1492,7 @@ Great now we no longer have `NA` values! :)
 `bake()` will not necessarily conduct these steps on the new data.
 
 
-### Specifying the model
+## Specifying the model
 
 So far we have used the packages `rsample` to split the data and `recipes` to assign variable types, and to specify and prep our pre-processing (as well as to optionally extract the pre-processed data).
 
@@ -1543,7 +1546,7 @@ lm_PM_model <-
 lm_PM_model
 ```
 
-### Fitting the model
+## Fitting the model
 
 We can  use the `parsnip` package with a newer package called `workflows` to fit our model. 
 
@@ -1599,7 +1602,7 @@ PM_fit <- lm_PM_model %>%
 
 </details>
 
-### Assessing the model fit
+## Assessing the model fit
 
 After we fit our model, we can use the `broom` package to look at the output from the fitted model in an easy/tidy.   
 
@@ -1641,7 +1644,7 @@ PM_wflow_fit %>%
 
 The state in which the monitor was located and the CMAQ model and the aod satellite information appear to be the most important for predicting the air pollution at a given monitor.
 
-### Model performance
+## Model performance
 
 In this next section, our goal is to assess the overall model performance. 
 The way we do this is to compare the similarity between the predicted estimates of the outcome variable produced by the model and the true outcome variable values. 
@@ -1685,7 +1688,7 @@ values_pred_train
 
 ```
 
-#### Visualizing model performance
+### Visualizing model performance
 
 Now, we can compare the predicted outcome values (or fitted values) $\hat{Y}$ to the actual outcome values $Y$ that we observed: 
 
@@ -1700,7 +1703,7 @@ wf_fitted_values %>%
 OK, so our range of the predicted outcome values appears to be smaller than the real values. 
 We could probably do a bit better.
 
-#### Quantifying model performance 
+### Quantifying model performance 
 
 Next, let's use different distance functions $d(\cdot)$ to assess how far off our predicted outcome $\hat{Y} = f(X)$ and actual outcome $Y$ values are from each other: 
 
@@ -1750,7 +1753,7 @@ yardstick::mae(wf_fitted_values,
                truth = value, estimate = .fitted)
 ```
 
-### Cross validation
+## Cross validation
 
 Until now we have used everything in our "training" dataset (and have not touched the "testing" dataset) from the `rsample` package to build our machine learning (ML) model $\hat{Y} = f(X)$ (or to estimate $f$ using the features or predictor variable $X$). 
 
@@ -1789,7 +1792,7 @@ knitr::include_graphics(here::here("img", "vfold.png"))
 
 **Note**: People typically ignore spatial dependence with cross validation of air pollution monitoring data in the air pollution field, so we will do the same.  However, it might make sense to leave out blocks of monitors rather than  random individual monitors to help account for some spatial dependence.
 
-#### Creating the $v$-folds using `rsample`
+### Creating the $v$-folds using `rsample`
 
 The [`vfold_cv()`](https://tidymodels.github.io/rsample/reference/vfold_cv.html){target="_blank"} function of the `rsample` package can be used to parse the training data into folds for $v$-fold cross validation.
 
@@ -1816,7 +1819,7 @@ Once the folds are created they can be used to evaluate performance by fitting t
 knitr::include_graphics(here::here("img", "cross_validation.png"))
 ```
 
-#### Assessing model performance on $v$-folds using `tune`
+### Assessing model performance on $v$-folds using `tune`
 
 We can fit the model to our cross validation folds using the `fit_resamples()` function of the `tune` package, by specifying our `workflow` object and the cross validation fold object we just created. 
 See [here](https://tidymodels.github.io/tune/reference/fit_resamples.html){target="_blank"} for more information.
@@ -1836,7 +1839,7 @@ tune::show_best(resample_fit, metric = "rmse")
 Here we can see the mean `RMSE` value across all four folds. The function is called `show_best()` because it is also used for model tuning and it will show the parameter combination with the best performance, we will discuss this more later in the case study.
 
 
-## **Data Analysis**
+# **Data Analysis**
 ***
 
 In the previous section, we demonstrated how to build a machine learning model (specifically a linear regression model) to predict air pollution with the `tidymodels` framework. 
@@ -1844,7 +1847,7 @@ In the previous section, we demonstrated how to build a machine learning model (
 In the next few section, we will demonstrate another machine learning model. 
 
 
-### Random Forest
+## Random Forest
 
 Now, we are going to predict our outcome variable (air pollution) using a decision tree method called [random forest](https://en.wikipedia.org/wiki/Random_forest){target="_blank"}.
 
@@ -2063,7 +2066,7 @@ If we tuned our random forest model based on the number of trees or the value fo
 However, our cross validated mean rmse value of 1.72 is quite good because our range of true outcome values is much larger: (`r round(range(test_pm$value),3)`).
 
 
-### Model tuning
+## Model tuning
 
 [Hyperparameters](https://machinelearningmastery.com/difference-between-a-parameter-and-a-hyperparameter/) are often things that we need to specify about a model. For example, the number of predictor variables (or features) that will be randomly sampled at each split when creating the tree models called `mtry` is a hyperparameter. The default number for regression analyses is the number of predictors divided by 3. Instead of arbitrarily specifying this, we can try to determine the best option for model performance by a process called tuning. 
 
@@ -2155,7 +2158,7 @@ show_best(tune_RF_results, metric = "rmse", n =1)
 There we have it... looks like an `mtry` of 17 and `min_n` of 4 had the best `rmse` value. You can verify this in the above output, but it is easier to just pull this row out using this function. We can see that the mean `rmse` value across the cross validation sets was 1.720. Before tuning it was 1.725  with a similar `std_err` so the performance was very slightly improved.
 
 
-### Final model performance evaluation
+## Final model performance evaluation
 
 Now that we have decided that we have reasonable performance with our training data, we can stop building our model and evaluate performance with our testing data. 
 
@@ -2222,7 +2225,7 @@ test_predictions %>%
 
 Nice!
 
-## **Data Visualization**
+# **Data Visualization**
 ***
 
 Our main question for this case study was:  
@@ -2502,7 +2505,10 @@ truth/pred + plot_annotation(title = "Random forest model predicts fine particul
 dev.off()
 ```
 
-## **Synopsis**
+# **Summary**
+***
+
+## Synopsis
 
 In this case study, we explored gravimetric monitoring data of fine particulate matter air pollution (outcome variable). 
 Our goal was to able to predict air pollution on monitors where we only had predictor variables (or features) without having observed a corresponding measurement of air pollution.
@@ -2516,7 +2522,6 @@ Our learning objectives were:
 Using the machine learning models built in this case study, we could now extend this model to be used to predict air pollution levels in areas with poor monitoring, to help identify regions where populations maybe especially at risk for the health effects of air pollution.  
 
 Analyses like the one in our case study are important for defining which groups could benefit the most from interventions, education, and policy changes when attempting to mitigate public health challenges. You can see in this [article](https://www.nejm.org/doi/full/10.1056/NEJMoa1702747){target="_blank"} that many additional considerations would be involved to adequately understand the data enough to recommend policy changes.
-
 
 
 <details><summary> Click here for more on what we learned with `tidymodels` </summary>
@@ -2564,15 +2569,15 @@ We also saw that we can use the `collect_predictions()` function of the `tune` p
 
 
 
-### Suggested Homework
+## Suggested Homework
 
 Students can predict air pollution monitor values using a different algorithm and provide an explanation for how that algorithm works and why it may be a good choice for modeling this data.
 
 
-## **Additional Information**
+# **Additional Information**
 ***
 
-### Helpful Links
+## Helpful Links
 
 1. A review of [tidymodels](https://rviews.rstudio.com/2019/06/19/a-gentle-intro-to-tidymodels/){target="_blank"}  
 2. A [course on tidymodels](https://juliasilge.com/blog/tidymodels-ml-course/){target="_blank"} by Julia Silge  
@@ -2644,7 +2649,7 @@ Students can predict air pollution monitor values using a different algorithm an
 [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
 
 
-### Session info 
+## Session info 
 
 
 ```{r}
@@ -2652,7 +2657,7 @@ sessionInfo()
 ```
 
 
-### Acknowledgements
+## Acknowledgements
 
 
 We would like to acknowledge [Roger Peng](http://www.biostat.jhsph.edu/~rpeng/), [Megan Latshaw](https://www.jhsph.edu/faculty/directory/profile/1708/megan-weil-latshaw), and [Kristen Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler)for assisting in framing the major direction of the case study.
