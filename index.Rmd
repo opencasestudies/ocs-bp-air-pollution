@@ -252,6 +252,7 @@ library(workflows)
 library(vip)
 library(tune)
 library(randomForest)
+library(doParallel)
 library(ggplot2)
 library(stringr)
 library(tidyr)
@@ -286,6 +287,7 @@ library(patchwork)
 [workflows](https://www.rdocumentation.org/packages/workflows/versions/0.1.1){target="_blank"}| to create modeling workflow to streamline the modeling process
 [vip](https://cran.r-project.org/web/packages/vip/vip.pdf){target="_blank"} | to create variable importance plots
 [randomForest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf){target="_blank"} | to perform the random forest analysis
+[doParallel](https://cran.r-project.org/web/packages/doParallel/doParallel.pdf) | to fit cross validation samples in parallel 
 [stringr](https://stringr.tidyverse.org/articles/stringr.html){target="_blank"}    | to manipulate the text the map data
 [tidyr](https://tidyr.tidyverse.org/){target="_blank"}      | to separate data within a column into multiple columns
 [rnaturalearth](https://cran.r-project.org/web/packages/rnaturalearth/README.html){target="_blank"} | to get the geometry data for the earth to plot the US
@@ -1004,7 +1006,7 @@ count(test_pm, state)
 
 
 
-## Preparring for pre-processing the data
+## Preparing for pre-processing the data
 
 After splitting the data, the next step is to process the training and testing data so that the data are are compatible and optimized to be used with the model. 
 This involves assigning variables to specific roles within the model and pre-processing like scaling variables and removing redundant variables. 
@@ -2639,6 +2641,7 @@ Students can predict air pollution monitor values using a different algorithm an
 [workflows](https://www.rdocumentation.org/packages/workflows/versions/0.1.1){target="_blank"} | to create modeling workflow to streamline the modeling process
 [vip](https://cran.r-project.org/web/packages/vip/vip.pdf){target="_blank"} | to create variable importance plots
 [randomForest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf){target="_blank"} | to perform the random forest analysis
+[doParallel](https://cran.r-project.org/web/packages/doParallel/doParallel.pdf) | to fit cross validation samples in parallel 
 [stringr](https://stringr.tidyverse.org/articles/stringr.html){target="_blank"}    | to manipulate the text the map data
 [tidyr](https://tidyr.tidyverse.org/){target="_blank"}      | to separate data within a column into multiple columns
 [rnaturalearth](https://cran.r-project.org/web/packages/rnaturalearth/README.html){target="_blank"} | to get the geometry data for the earth to plot the US
