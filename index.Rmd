@@ -1,5 +1,5 @@
 ---
-title: "Open Case Studies: Predicting Annual Air Pollution "
+title: "Open Case Studies: Predicting Annual Air Pollution"
 css: style.css
 output:
   html_document:
@@ -587,10 +587,6 @@ pm %>%
 ####
 
 We can see that there are 876 monitors (rows) and that we have 50 total variables (columns) - one of which is the outcome variable. In this case, the outcome variable is called `value`. 
-
-AVOCADO: Should we link to a code book here? Like could we use this as a teaching opportunity to demonstrate the purpose of a code book so a student knows how we know the PM values are `value`?
-
-avocado response: there isnt a code book related to this data, Roger wrangled it for me, but the vaping case study actually uses code books for that data. Would you like to link to a generic code book and describe that process? I did however add information about Roger and how he previously collected the data.
 
 Notice that some of the variables that we would think of as factors (or categorical data) are currently of class character as indicated by the `<chr>` just to the right of the column names/variable names in the `glimpse()` output. This means that the variable values are character strings, such as words or phrases. 
 
@@ -1585,13 +1581,9 @@ PM_wflow_fit
 
 <details><summary> Click here to see the steps that the `workflows` package performs that used to be required </summary>
 
-AVOCADO:this section feels like it should either have more explanation or just deleted. To me it feels confusing because it feels like we are showing a completely alternative path without an explanation why you might want to do? or when you would want to do this? 
+Previously, the processed training data (`juiced_train`), as opposed to the raw training data, would be required to fit the model.
 
-avocado response-what do you think of how I titled this section - if you still don't like it feel free to delete
-
-Previously the processed training data (`juiced_train`) as opposed to the raw training data would be required to fit the model.
-
-In this case, we would actually also needed to write your model again! 
+In this case, we would actually also need to write the model again! 
 Recall that `id` and `fips` are ID variables and that `values` is our outcome of interest (the air pollution measure at each monitor). It is nice that `workflows` keeps track of this!
 
 ```{r}
@@ -1959,6 +1951,7 @@ RF_wflow
 
 
 Finally, we fit the data to the model:
+
 #### {.recall_code_question_block}
 <b><u> Question Opportunity </u></b>
 
@@ -1979,9 +1972,7 @@ RF_wflow_fit <- parsnip::fit(RF_wflow, data = train_pm)
 RF_wflow_fit
 ```
 
-
 Let's take a look at the top 10 contributing variables:
-
 
 #### {.recall_code_question_block}
 <b><u> Question Opportunity </u></b>
@@ -2050,11 +2041,11 @@ collect_metrics(resample_fit)
 OK, so our first model had a mean `rmse` value of 2.17.
 It looks like the random forest model had  a much lower `rmse` value of 1.72.
 
-
 #### {.think_question_block}
 <b><u> Question Opportunity </u></b>
 
 Do you recall how the RMSE is calculated?
+
 ####
 
 ***
@@ -2126,12 +2117,20 @@ By default 10 different values will be attempted for each hyperparameter that is
 
 We can use the `doParallel` package to allow us to fit all these models to our cross validation samples faster. So if you were performing this on a computer with multiple cores or processors, then different models with different hyperparameter values can be fit to the cross validation samples simultaneously across different cores or processors. 
 
+You can see how many cores you have access to on your system using the `detectCores()` function in the `parallel` package. 
+
+```{r}
+parallel::detectCores()
+```
+
+The `registerDoParallel()` function will use the number for cores specified using the `cores=` arguement, or it will assign it automatically to one-half of the number of cores detected by the `parallel` package. 
+
 We need to use `set.seed()` here because the values chosen for `mtry` and `min_n` may vary if we preform this evaluation again because they are chosen semi-randomly (meaning that they are within a range of reasonable values but still random).
 
 Note: this step will take some time.
 
 ```{r}
-doParallel::registerDoParallel()
+doParallel::registerDoParallel(cores=2)
 set.seed(123)
 tune_RF_results <- tune_grid(object = RF_tune_wflow, resamples = vfold_pm, grid = 20)
 tune_RF_results
@@ -2247,8 +2246,6 @@ To do this, we will use the following packages to create a map of the US:
 4. `rgeos` - this package interfaces with the Geometry Engine-Open Source (`GEOS`) which is also helpful for coordinate conversion
 
 We will start with getting an outline of the US with the `ne_countries()` function of the `rnaturalearth` package which will return polygons of the countries in the [Natural Earth](http://www.naturalearthdata.com/) dataset.
-
-AVOCADO: So I definitely have the `rnaturalearthdata` package installed, but for someone reason every time I go to run the code below it says that I need to install the package. Just curious -- what version of R are you using?avocado response - the end of the case study shows this.. hopefully this works now :/ please let me know and I will figure it out
 
 ```{r}
 
@@ -2530,6 +2527,8 @@ Analyses like the one in our case study are important for defining which groups 
 
 Here, we provide an overview of the `tidymodels` framework. 
 avocado... two options:
+
+AVOCADO response: oh I greatly prefer the first! it's awesome. However, in ppt whenever you take a screenshot, there are little red lines that appear under words that are not recognized by the dictionary. Instead, could you down the slide or take a screenshot from "presenter mode". that way there wont be any of the red lines underneath? 
 
 ```{r, echo=FALSE, out.width="800px"}
 knitr::include_graphics(here::here("img","ecosystem.png"))
