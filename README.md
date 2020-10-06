@@ -25,11 +25,11 @@ United States License.
 
 ### Citation
 
-To cite this case study:
+To cite this case study please use:
 
 Wright, Carrie and Jager, Leah and Taub, Margaret and Hicks, Stephanie.
-(2020, February 28). opencasestudies/ocs-bp-air-pollution: Exploring
-urban and rural obesity across time (Version v1.0.0). Zenodo.
+(2020). <https://www.opencasestudies.org/ocs-bp-air-pollution/>.
+Predicting Annual Air Pollution (Version v1.0.0).
 
 ### Acknowledgements
 
@@ -37,8 +37,8 @@ We would like to acknowledge [Roger
 Peng](http://www.biostat.jhsph.edu/~rpeng/), [Megan
 Latshaw](https://www.jhsph.edu/faculty/directory/profile/1708/megan-weil-latshaw),
 and [Kristen
-Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler)for
-assisting in framing the major direction of the case study.
+Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler)
+for assisting in framing the major direction of the case study.
 
 We would also like to acknowledge the [Bloomberg American Health
 Initiative](https://americanhealth.jhu.edu/) for funding this work.
@@ -105,7 +105,10 @@ pollution and climate change.
 
 #### Learning Objectives
 
-Data science skills:
+The skills, methods, and concepts that students will be familiar with by
+the end of this case study are:
+
+<u>**Data Science Learning Objectives:**</u>
 
 1.  Familiarity with the tidymodels ecosystem
 2.  Ability to evaluate correlation among predictor variables
@@ -117,11 +120,11 @@ Data science skills:
     and test a linear regression model and random forest model
 5.  Demonstrate how to visualize geo-spatial data using `ggplot2`
 
-Statistical concepts and methods:
+<u>**Statistical Learning Objectives:**</u>
 
 1.  Basic understanding the utility of machine learning for prediction
     and classification
-2.  Understanding of the need for training and test set
+2.  Understanding of the need for training and test sets
 3.  Understanding of the utility of cross validation
 4.  Understanding of random forest
 5.  How to interpret root mean squared error (rmse) to assess
@@ -221,7 +224,7 @@ prediction and classification 2) the importance of training and testing
 <a href="https://medium.com/greyatom/decision-trees-a-simple-way-to-visualize-a-decision-dc506a403aeb" target="_blank">Decision Tree</a>  
 <a href="https://towardsdatascience.com/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9" target="_blank">Random Forest</a>
 
-<u>Packages used in this case study: </u>
+<u>**Packages used in this case study:** </u>
 
 <table>
 <colgroup>
@@ -231,7 +234,7 @@ prediction and classification 2) the importance of training and testing
 <thead>
 <tr class="header">
 <th>Package</th>
-<th>Use</th>
+<th>Use in this case study</th>
 </tr>
 </thead>
 <tbody>

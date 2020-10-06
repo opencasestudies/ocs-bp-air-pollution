@@ -44,10 +44,11 @@ knitr::include_graphics(here::here("img", "main_plot_maps.png"))
 
 ####
 
-## {.disclaimer_block}
+#### {.disclaimer_block}
 
-**Disclaimer**: The purpose of the [Open Case Studies](https://opencasestudies.github.io){target="_blank"} project is **to demonstrate the use of various data science methods, tools, and software in the context of messy, real-world data**. 
-A given case study does not cover all aspects of the research process, is not claiming to be the most appropriate way to analyze a given data set, and should not be used in the context of making policy decisions without external consultation from scientific experts. 
+**Disclaimer**: The purpose of the [Open Case Studies](https://opencasestudies.github.io){target="_blank"} project is **to demonstrate the use of various data science methods, tools, and software in the context of messy, real-world data**. A given case study does not cover all aspects of the research process, is not claiming to be the most appropriate way to analyze a given data set, and should not be used in the context of making policy decisions without external consultation from scientific experts. 
+
+####
 
 #### {.license_block}
 
@@ -55,6 +56,13 @@ This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 [
 
 ####
 
+#### {.reference_block}
+
+To cite this case study please use:
+
+Wright, Carrie and Jager, Leah and Taub, Margaret and Hicks, Stephanie. (2020). [https://www.opencasestudies.org/ocs-bp-air-pollution/](https://www.opencasestudies.org/ocs-bp-air-pollution/). Predicting Annual Air Pollution (Version v1.0.0).
+
+####
 
 # **Motivation**
 ***
@@ -183,7 +191,7 @@ The article above demonstrates that machine learning methods can be used to pred
 We will use similar methods to predict annual air pollution levels spatially within the US.
 
 
-## Main Question
+# **Main Question**
 ***
 
 #### {.main_question_block}
@@ -193,7 +201,7 @@ We will use similar methods to predict annual air pollution levels spatially wit
 
 ####
 
-## Learning Objectives
+# **Learning Objectives**
 ***
 
 In this case study, we will walk you through importing data from CSV files and performing machine learning methods to predict our outcome variable of interest (in this case annual fine particle air pollution estimates). 
@@ -202,7 +210,7 @@ We will especially focus on using packages and functions from the [`tidyverse`](
 This package loads more modeling related packages like `rsample`, `recipes`, `parsnip`, `yardstick`, `workflows`, and `tune` packages. 
 
 The tidyverse is a library of packages created by RStudio. 
-While some students may be familiar with previous R programming packages, these packages make data science in R especially efficient.
+While some students may be familiar with previous R programming packages, these packages make data science in R especially legible and intuitive.
 
 
 ```{r, out.width = "20%", echo = FALSE, fig.align ="center"}
@@ -212,7 +220,7 @@ include_graphics("https://tidyverse.tidyverse.org/logo.png")
 The skills, methods, and concepts that students will be familiar with by the end of this case study are:
 
 
-Data science skills:  
+<u>**Data Science Learning Objectives:**</u> 
   
 1. Familiarity with the tidymodels ecosystem
 2. Ability to evaluate correlation among predictor variables (`corrplot` and `GGally`)
@@ -220,10 +228,10 @@ Data science skills:
 4. Ability to use the `recipes`, `parsnip`, and `workflows` to train and test a linear regression model and random forest model
 5. Demonstrate how to visualize geo-spatial data using `ggplot2`
 
-Statistical concepts and methods:  
+<u>**Statistical Learning Objectives:**</u>  
   
 1. Basic understanding the utility of machine learning for prediction and classification
-2. Understanding of the need for training and test set
+2. Understanding of the need for training and test sets
 3. Understanding of the utility of cross validation
 4. Understanding of random forest
 5. How to interpret root mean squared error (rmse) to assess performance for prediction
@@ -265,7 +273,9 @@ library(patchwork)
 ```
 
 
- Package   | Use                                                                         
+ <u>**Packages used in this case study:** </u>
+
+Package   | Use in this case study                                                                      
 ---------- |-------------
 [here](https://github.com/jennybc/here_here){target="_blank"}       | to easily load and save data
 [readr](https://readr.tidyverse.org/){target="_blank"}      | to import CSV files
@@ -303,7 +313,7 @@ The first time we use a function, we will use the `::` to indicate which package
 Unless we have overlapping function names, this is not necessary, but we will include it here to be informative about where the functions we will use come from.
 
 
-## Context
+# **Context**
 ***
 
 The [State of Global Air](https://www.stateofglobalair.org/){target="_blank"} is a report released every year to communicate the impact of air pollution on public health. 
@@ -388,7 +398,7 @@ Specifically, these methods can be used to estimate air pollution in these low m
 
 This is what we aim to achieve in this case study.
 
-## Limitations
+# **Limitations**
 ***
 
 There are some important considerations regarding the data analysis in this case study to keep in mind: 
@@ -2610,9 +2620,9 @@ Students can predict air pollution monitor values using a different algorithm an
 [Random Forest](https://towardsdatascience.com/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9){target="_blank"}  
 
 
-<u>Packages used in this case study: </u>
+ <u>**Packages used in this case study:** </u>
 
- Package   | Use                                                                         
+Package   | Use in this case study                                                                      
 ---------- |-------------
 [here](https://github.com/jennybc/here_here){target="_blank"}       | to easily load and save data
 [readr](https://readr.tidyverse.org/){target="_blank"}      | to import the CSV file data
@@ -2655,6 +2665,6 @@ sessionInfo()
 ## Acknowledgements
 
 
-We would like to acknowledge [Roger Peng](http://www.biostat.jhsph.edu/~rpeng/), [Megan Latshaw](https://www.jhsph.edu/faculty/directory/profile/1708/megan-weil-latshaw), and [Kristen Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler)for assisting in framing the major direction of the case study.
+We would like to acknowledge [Roger Peng](http://www.biostat.jhsph.edu/~rpeng/), [Megan Latshaw](https://www.jhsph.edu/faculty/directory/profile/1708/megan-weil-latshaw), and [Kristen Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler) for assisting in framing the major direction of the case study.
 
 We would also like to acknowledge the [Bloomberg American Health Initiative](https://americanhealth.jhu.edu/) for funding this work. 
