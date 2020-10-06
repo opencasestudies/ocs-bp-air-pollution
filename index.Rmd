@@ -2489,10 +2489,10 @@ truth/pred
 
 We can see that the predicted fine particle air pollution values in (ug/m3) are quite similar to the true values measured by the actual gravimetric monitors. We can also see that southern California has some large counties with worse pollution (as they are yellow and thus have much higher particulate matter levels).
 
-Let's add some text to our plot to explain it a bit more.
+Let's add some text to our plot to explain it a bit more. We can do so using the `plot_annotation()` function of the `patchwork` package. The `theme` argument of this function takes the same theme information using the `theme()` function of the `ggplot2` package as when creating `ggplot2`plots.
 
 ```{r}
-truth/pred + plot_annotation(title = "Random forest model predicts fine particulate matter (PM 2.5) \nair pollution based on data about road proximity, population density,\nand other predictors reasonably well")
+(truth/pred) + plot_annotation(title = "A random forest model predicts true monitored levels of fine \nparticulate matter (PM 2.5) air pollution based on data about\npopulation density and other predictors reasonably well, thus\nbetter enabling prediction of pollution in places with poor\nmonitoring", theme = theme(title = element_text(size = 10)))
 
 ```
 
@@ -2500,7 +2500,7 @@ truth/pred + plot_annotation(title = "Random forest model predicts fine particul
 ```{r, echo = FALSE, message=FALSE, eval=FALSE}
 png(here::here("img", "main_plot_maps.png"), 
     height = 1500, width = 2000, res = 300)
-truth/pred + plot_annotation(title = "Random forest model predicts fine particulate matter (PM 2.5) \nair pollution based on data about road proximity, population density,\nand other predictors reasonably well")
+(truth/pred) + plot_annotation(title = "A random forest model predicts true monitored levels of fine \nparticulate matter (PM 2.5) air pollution based on data about\npopulation density and other predictors reasonably well, thus\nbetter enabling prediction of pollution in places with poor\nmonitoring", theme = theme(title = element_text(size = 10)))
 dev.off()
 ```
 
