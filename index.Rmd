@@ -2408,7 +2408,7 @@ Let's grab both the testing and training predicted outcome values so that we hav
 First we need to fit our training data with our final model to be able to get the predictions for the monitors included in the training set. We did this using the `last_fit()` function, but the output of this makes it difficult to grab the predicted values for the training data, and it is also difficult to get the id variables for the testing data. 
 
 
-Thus we will use the parsnip `fit()` and  `predict()` functions to do this outside of the `workflows` package like so:
+Thus we will use the parsnip `fit()` and `predict()` functions of the `parsnip` package to do this like so:
 
 #### {.think_question_block}
 <b><u> Question Opportunity </u></b>
@@ -2526,18 +2526,11 @@ Analyses like the one in our case study are important for defining which groups 
 <details><summary> Click here for more on what we learned with `tidymodels` </summary>
 
 Here, we provide an overview of the `tidymodels` framework. 
-avocado... two options:
-
-AVOCADO response: oh I greatly prefer the first! it's awesome. However, in ppt whenever you take a screenshot, there are little red lines that appear under words that are not recognized by the dictionary. Instead, could you down the slide or take a screenshot from "presenter mode". that way there wont be any of the red lines underneath? 
 
 ```{r, echo=FALSE, out.width="800px"}
 knitr::include_graphics(here::here("img","ecosystem.png"))
 ```
 
-
-```{r, echo=FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","new_tidymodels_ecosystem.png"))
-```
 
 We performed the major steps of machine learning that we introduced in the beginning of the data analysis:  
 
