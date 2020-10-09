@@ -2502,7 +2502,7 @@ We can see that the predicted fine particle air pollution values in (ug/m3) are 
 Let's add some text to our plot to explain it a bit more. We can do so using the `plot_annotation()` function of the `patchwork` package. The `theme` argument of this function takes the same theme information using the `theme()` function of the `ggplot2` package as when creating `ggplot2`plots.
 
 ```{r}
-(truth/pred) + plot_annotation(title = "A random forest model predicts true monitored levels of fine \nparticulate matter (PM 2.5) air pollution based on data about\npopulation density and other predictors reasonably well, thus\nbetter enabling prediction of pollution in places with poor\nmonitoring", theme = theme(title = element_text(size = 10)))
+(truth/pred) + plot_annotation(title = "Machine Learning Methods Allow for Prediction of Air Pollution", subtitle = "A random forest model predicts true monitored levels of fine particulate matter (PM 2.5) air pollution based on\ndata about population density and other predictors reasonably well, thus suggesting that we can predict levels\nof pollution in places with poor monitoring", theme = theme(plot.title = element_text(size =12, face = "bold"), plot.subtitle = element_text(size = 8)))
 
 ```
 
@@ -2510,7 +2510,7 @@ Let's add some text to our plot to explain it a bit more. We can do so using the
 ```{r, echo = FALSE, message=FALSE, eval=FALSE}
 png(here::here("img", "main_plot_maps.png"), 
     height = 1500, width = 2000, res = 300)
-(truth/pred) + plot_annotation(title = "A random forest model predicts true monitored levels of fine \nparticulate matter (PM 2.5) air pollution based on data about\npopulation density and other predictors reasonably well, thus\nbetter enabling prediction of pollution in places with poor\nmonitoring", theme = theme(title = element_text(size = 10)))
+(truth/pred) + plot_annotation(title = "Machine Learning Methods Allow for Prediction of Air Pollution", subtitle = "A random forest model predicts true monitored levels of fine particulate matter (PM 2.5) air pollution based on\ndata about population density and other predictors reasonably well, thus suggesting that we can predict levels\nof pollution in places with poor monitoring", theme = theme(plot.title = element_text(size =12, face = "bold"), plot.subtitle = element_text(size = 8)))
 dev.off()
 ```
 
