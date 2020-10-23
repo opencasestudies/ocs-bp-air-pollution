@@ -36,7 +36,7 @@ Predicting Annual Air Pollution (Version v1.0.0).
 We would like to acknowledge [Roger
 Peng](http://www.biostat.jhsph.edu/~rpeng/), [Megan
 Latshaw](https://www.jhsph.edu/faculty/directory/profile/1708/megan-weil-latshaw),
-and [Kristen
+and [Kirsten
 Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler)
 for assisting in framing the major direction of the case study.
 
