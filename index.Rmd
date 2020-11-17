@@ -175,7 +175,7 @@ An [article](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-6
 knitr::include_graphics(here::here("img", "thepaper.png"))
 ```
 
-##### [[source]](sourcehttps://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63)
+##### [[source]](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63){target="_blank"}
 
 #### {.reference_block}
 Yanosky, J. D. et al. Spatio-temporal modeling of particulate air pollution in the conterminous United States using geographic and meteorological predictors. *Environ Health* 13, 63 (2014).
@@ -186,7 +186,7 @@ The authors of this article state that:
 
 > "Exposure to atmospheric particulate matter (PM) remains an important public health concern, although it remains difficult to quantify accurately across large geographic areas with sufficiently high spatial resolution. Recent epidemiologic analyses have demonstrated the importance of spatially- and temporally-resolved exposure estimates, which show larger PM-mediated health effects as compared to nearest monitor or county-specific ambient concentrations." 
 
-
+##### [[source]](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63){target="_blank"}
 
 The article above demonstrates that machine learning methods can be used to predict air pollution levels when traditional monitoring systems are not available in a particular area or when there is not enough spatial granularity with current monitoring systems. 
 We will use similar methods to predict annual air pollution levels spatially within the US.
@@ -349,7 +349,7 @@ The [State of Global Air 2018 report](https://www.stateofglobalair.org/sites/def
 knitr::include_graphics(here::here("img","2017mortality.png"))
 ```
 
-##### [[source]](https://www.stateofglobalair.org/sites/default/files/soga-2018-report.pdf)
+##### [[source]](https://www.stateofglobalair.org/sites/default/files/soga-2018-report.pdf){target="_blank"}
 
 The 2019 report shows that the highest levels of fine particulate pollution occurs in Africa and Asia and that:
 
@@ -380,7 +380,7 @@ For example, here are the conditions in Topeka Kansas at the time this case stud
 knitr::include_graphics(here::here("img", "Kansas.png"))
 ```
 
-##### [[source]](https://aqicn.org/city/usa/)
+##### [[source]](https://aqicn.org/city/usa/){target="_blank"}
 
 It reports particulate values using what is called the [Air Quality Index](https://www.airnow.gov/index.cfm?action=aqibasics.aqi){target="_blank"} (AQI).
 This [calculator](https://airnow.gov/index.cfm?action=airnow.calculator){target="_blank"} indicates that 114 AQI is equivalent to 40.7 ug/m^3^ and is considered unhealthy for sensitive individuals.
@@ -459,7 +459,7 @@ The monitor data that we will be using comes from **[gravimetric monitors](https
 knitr::include_graphics(here::here("img","monitor.png"))
 ```
 
-#####[image curtesy of [Kirsten Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler)]
+##### [image curtesy of [Kirsten Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler)]
 
 These monitors use a filtration system to specifically capture fine particulate matter. 
 
@@ -1945,12 +1945,11 @@ The `rand_forest()` function of the `parsnip` package has three important argume
 
 We will start by trying an `mtry` value of 10 and a `min_n` value of 3.
 
-Now that we have our recipe (`RF_rec`), let's specify the model with `rand_forest()` from `parsnip` with the `mode = "regression"` argument to specify our outcome variable (air pollution) is continuous. 
+Now that we have our recipe (`RF_rec`), let's specify the model with `rand_forest()` from `parsnip`.
 
 ```{r}
 PMtree_model <- 
-  parsnip::rand_forest(mtry = 10, min_n = 3, 
-                       mode = "regression")
+  parsnip::rand_forest(mtry = 10, min_n = 3)
 PMtree_model
 ```
 
@@ -1962,6 +1961,8 @@ If you were to use the `ranger` package to implement the random forest analysis 
 These other packages have different advantages and disadvantages- for example `ranger` and `spark` are not as limiting for the number of categories for categorical variables. For more information see their documentation: [here](https://cran.r-project.org/web/packages/ranger/ranger.pdf) for ranger, [here](http://spark.apache.org/docs/latest/mllib-ensembles.html#random-forests) for `spark`, and [here](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf) for `randomForest`.
 
 See [here](https://parsnip.tidymodels.org/reference/rand_forest.html) for more documentation about implementing these engine options with tidymodels. Note that there are also [other](https://www.linkedin.com/pulse/different-random-forest-packages-r-madhur-modi/) R packages for implementing random forest algorithms, but these three packages (`ranger`, `spark`, and `randomForest`) are currently compatible with `tidymodels`.
+
+We also need to specify with the `set_mode()` function that our outcome variable (air pollution) is continuous. 
 
 ```{r}
 
@@ -2124,8 +2125,7 @@ This is when our cross validation methods become really handy because now we can
 Previously we specified our model like so:
 ```{r}
 RF_PM_model <- 
-  parsnip::rand_forest(mtry = 10, min_n = 3, 
-                       mode = "regression") %>%
+  parsnip::rand_forest(mtry = 10, min_n = 3) %>%
   set_engine("randomForest") %>%
   set_mode("regression")
 
@@ -2135,8 +2135,7 @@ Now instead of specifying a value for the `mtry` and `min_n` arguments, we can u
 
 ```{r}
 
-tune_RF_model <- rand_forest(mtry = tune(), min_n = tune(),
-                             mode = "regression") %>%
+tune_RF_model <- rand_forest(mtry = tune(), min_n = tune()) %>%
   set_engine("randomForest") %>%
   set_mode("regression")
     
@@ -2571,6 +2570,23 @@ Using the machine learning models built in this case study, we could now extend 
 
 Analyses like the one in our case study are important for defining which groups could benefit the most from interventions, education, and policy changes when attempting to mitigate public health challenges. You can see in this [article](https://www.nejm.org/doi/full/10.1056/NEJMoa1702747){target="_blank"} that many additional considerations would be involved to adequately understand the data enough to recommend policy changes.
 
+Here are some visual summaries about what we learned about using `tidymodels` to perform prediction analyses.
+
+First the minimal steps required:
+
+```{r, echo=FALSE, out.width="800px"}
+knitr::include_graphics(here::here("img","tidymodelsBasics.png"))
+```
+
+
+Here is a guide for more advanced analyses involving preprocessing, cross validation, or tuning:
+
+```{r, echo=FALSE, out.width="800px"}
+knitr::include_graphics(here::here("img","full_tidymodels_overview.png"))
+```
+
+
+
 
 <details><summary> Click here for more on what we learned with `tidymodels` </summary>
 
@@ -2585,7 +2601,7 @@ We performed the major steps of machine learning that we introduced in the begin
 
 1. Data exploration  
 
-We used packages like `skimr`, `summarytools`, `corrplot`, and `GGally` to better understand our data. These packages gave can tell us how many missing values each variable has (if any), the class of each variable, the distribution of values for each variable, the sparsity of each variable, and the level of correlation between variables.  
+We used packages like `skimr`, `summarytools`, `corrplot`, and `GGally` to better understand our data. These packages can tell us how many missing values each variable has (if any), the class of each variable, the distribution of values for each variable, the sparsity of each variable, and the level of correlation between variables.  
 
 2. Data splitting 
 
