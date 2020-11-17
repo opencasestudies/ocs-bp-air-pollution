@@ -92,13 +92,13 @@ Air pollution particulates are generally described by their **size**.
 
 There are 3 major categories:
 
-1) **Large Coarse** Particulate Mater - has diameter of >10 micrometers (10 µm) 
+1) **Large Coarse** Particulate Matter - has diameter of >10 micrometers (10 µm) 
 
-2) **Coarse** Particulate Mater (called **PM~10-2.5~**) - has diameter of between 2.5 µm and 10 µm
+2) **Coarse** Particulate Matter (called **PM~10-2.5~**) - has diameter of between 2.5 µm and 10 µm
 
-3) **Fine** Particulate Mater (called **PM~2.5~**) - has diameter of < 2.5 µm 
+3) **Fine** Particulate Matter (called **PM~2.5~**) - has diameter of < 2.5 µm 
 
-**PM~10~** includes any particulate mater <10 µm (both coarse and fine particulate mater)
+**PM~10~** includes any particulate matter <10 µm (both coarse and fine particulate matter)
 
 Here you can see how these sizes compare with a human hair:
 
@@ -153,8 +153,10 @@ See this [review article](https://www.frontiersin.org/articles/10.3389/fpubh.202
 ### Sparse monitoring is problematic for Public Health
 
 Historically, epidemiological studies would assess the influence of air pollution on health outcomes by relying on a number of monitors located around the country. 
-However, as can be seen in the following figure, these monitors are relatively sparse in certain regions of the country. 
-Furthermore, dramatic differences in pollution rates can be seen even within the same city.
+
+However, as can be seen in the following figure, these monitors are relatively sparse in certain regions of the country and are not necessarily located near pollution sources. We will see later when we evaluate the data, that even in certain relatively large cities there is only  one monitor!
+
+Furthermore, dramatic differences in pollution rates can be seen even within the same city. In fact, the term micro-environments describes environment within cities or counties which may vary greatly from one block to another.
 
 <p align="center">
   <img width="400" src="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4137272/bin/1476-069X-13-63-1.jpg">
@@ -173,6 +175,8 @@ An [article](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-6
 knitr::include_graphics(here::here("img", "thepaper.png"))
 ```
 
+##### [[source]](sourcehttps://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63)
+
 #### {.reference_block}
 Yanosky, J. D. et al. Spatio-temporal modeling of particulate air pollution in the conterminous United States using geographic and meteorological predictors. *Environ Health* 13, 63 (2014).
 
@@ -183,9 +187,6 @@ The authors of this article state that:
 > "Exposure to atmospheric particulate matter (PM) remains an important public health concern, although it remains difficult to quantify accurately across large geographic areas with sufficiently high spatial resolution. Recent epidemiologic analyses have demonstrated the importance of spatially- and temporally-resolved exposure estimates, which show larger PM-mediated health effects as compared to nearest monitor or county-specific ambient concentrations." 
 
 
-```{r, echo = FALSE, out.width= "700 px", eval = FALSE}
-knitr::include_graphics(here::here("img", "deaths.png"))
-```
 
 The article above demonstrates that machine learning methods can be used to predict air pollution levels when traditional monitoring systems are not available in a particular area or when there is not enough spatial granularity with current monitoring systems. 
 We will use similar methods to predict annual air pollution levels spatially within the US.
@@ -348,6 +349,8 @@ The [State of Global Air 2018 report](https://www.stateofglobalair.org/sites/def
 knitr::include_graphics(here::here("img","2017mortality.png"))
 ```
 
+##### [[source]](https://www.stateofglobalair.org/sites/default/files/soga-2018-report.pdf)
+
 The 2019 report shows that the highest levels of fine particulate pollution occurs in Africa and Asia and that:
 
 > More than **90%** of people worldwide live in areas **exceeding** the World Health Organization (WHO) **Guideline** for healthy air. More than half live in areas that do not even meet WHO's least-stringent air quality target.
@@ -377,12 +380,14 @@ For example, here are the conditions in Topeka Kansas at the time this case stud
 knitr::include_graphics(here::here("img", "Kansas.png"))
 ```
 
+##### [[source]](https://aqicn.org/city/usa/)
+
 It reports particulate values using what is called the [Air Quality Index](https://www.airnow.gov/index.cfm?action=aqibasics.aqi){target="_blank"} (AQI).
 This [calculator](https://airnow.gov/index.cfm?action=airnow.calculator){target="_blank"} indicates that 114 AQI is equivalent to 40.7 ug/m^3^ and is considered unhealthy for sensitive individuals.
 Thus, some areas exceed the WHO annual exposure guideline (10 ug/m^3^) and this may adversely affect the health of people living in these locations.
 
 Adverse health effects have been associated with populations experiencing higher pollution exposure despite the levels being below suggested guidelines. 
-Also, it appears that the composition of the particulate mater and the influence of other demographic factors may make specific populations more at risk for adverse health effects due to air pollution. 
+Also, it appears that the composition of the particulate matter and the influence of other demographic factors may make specific populations more at risk for adverse health effects due to air pollution. 
 For example, see this [article](https://www.nejm.org/doi/full/10.1056/NEJMoa1702747){target="_blank"} for more details.
 
 The monitor data that we will use in this case study come from a system of monitors in which roughly 90% are located within cities. 
@@ -403,7 +408,7 @@ This is what we aim to achieve in this case study.
 
 There are some important considerations regarding the data analysis in this case study to keep in mind: 
 
-1. The data do not include information about the composition of particulate mater. Different types of particulates may be more benign or deleterious for health outcomes.
+1. The data do not include information about the composition of particulate matter. Different types of particulates may be more benign or deleterious for health outcomes.
 
 2. Outdoor pollution levels are not necessarily an indication of individual exposures. People spend differing amounts of time indoors and outdoors and are exposed to different pollution levels indoors. Researchers are now developing personal monitoring systems to track air pollution levels on the personal level.
 
@@ -448,11 +453,13 @@ All of our data was previously collected by a [researcher](http://www.biostat.jh
 
 ### Our outcome variable
 
-The monitor data that we will be using comes from **[gravimetric monitors](https://publiclab.org/wiki/filter-pm){target="_blank"}** (see picture below) operated by the US [Enivornmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}.
+The monitor data that we will be using comes from **[gravimetric monitors](https://publiclab.org/wiki/filter-pm){target="_blank"}** (see picture below) operated by the US [Environmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}.
 
 ```{r, echo = FALSE, out.width="100px"}
 knitr::include_graphics(here::here("img","monitor.png"))
 ```
+
+#####[image curtesy of [Kirsten Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler)]
 
 These monitors use a filtration system to specifically capture fine particulate matter. 
 
@@ -476,13 +483,13 @@ Gravimetric analysis is considered to be among the most accurate methods for mea
 </details>
 
 In our data set, the `value` column indicates the PM~2.5~ monitor average for 2008 in mass of fine particles/volume of air for 876 gravimetric monitors. 
-The units are micrograms of fine particulate mater (PM) that is less than 2.5 micrometers in diameter per cubic meter of air - mass concentration (ug/m^3^).
+The units are micrograms of fine particulate matter (PM) that is less than 2.5 micrometers in diameter per cubic meter of air - mass concentration (ug/m^3^).
 Recall the WHO exposure guideline is < 10 ug/m^3^ on average annually for PM~2.5~.
 
 ### Our features (predictor variables) 
 
 There are 48 features with values for each of the 876 monitors (observations). 
-The data comes from the US [Enivornmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}, the [National Aeronautics and Space Administration (NASA)](https://www.nasa.gov/){target="_blank"}, the US [Census](https://www.census.gov/about/what/census-at-a-glance.html){target="_blank"}, and the [National Center for Health Statistics (NCHS)](https://www.cdc.gov/nchs/about/index.htm){target="_blank"}.
+The data comes from the US [Environmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}, the [National Aeronautics and Space Administration (NASA)](https://www.nasa.gov/){target="_blank"}, the US [Census](https://www.census.gov/about/what/census-at-a-glance.html){target="_blank"}, and the [National Center for Health Statistics (NCHS)](https://www.cdc.gov/nchs/about/index.htm){target="_blank"}.
 
 <details><summary> Click here to see a table about the set of features </summary>
 
@@ -534,7 +541,7 @@ Variable   | Details
 **grad** | Percentage of people in zcta area where the monitor whose highest formal educational attainment was a **graduate degree** <br> -- Data from the Census 
 **pov** | Percentage of people in zcta area where the monitor is that lived in [**poverty**](https://aspe.hhs.gov/2008-hhs-poverty-guidelines) in 2008 - or would it have been 2007 guidelines??https://aspe.hhs.gov/2007-hhs-poverty-guidelines <br> -- Data from the Census  
 **hs_orless** |  Percentage of people in zcta area where the monitor whose highest formal educational attainment was a **high school degree or less** (sum of nohs, somehs, and hs)  
-**urc2013** | [2013 Urban-rural classification](https://www.cdc.gov/nchs/data/series/sr_02/sr02_166.pdf){target="_blank"} of the county where the monitor is located <br> -- 6 category variable - 1 is totally urban 6 is completely rural <br>  -- Data from the National Center for Health Statistics](https://www.cdc.gov/nchs/index.htm){target="_blank"}     
+**urc2013** | [2013 Urban-rural classification](https://www.cdc.gov/nchs/data/series/sr_02/sr02_166.pdf){target="_blank"} of the county where the monitor is located <br> -- 6 category variable - 1 is totally urban 6 is completely rural <br>  -- Data from the [National Center for Health Statistics](https://www.cdc.gov/nchs/index.htm){target="_blank"}     
 **urc2006** | [2006 Urban-rural classification](https://www.cdc.gov/nchs/data/series/sr_02/sr02_154.pdf){target="_blank"} of the county where the monitor is located <br> -- 6 category variable - 1 is totally urban 6 is completely rural <br> -- Data from the [National Center for Health Statistics](https://www.cdc.gov/nchs/index.htm){target="_blank"}     
 **aod** | Aerosol Optical Depth measurement from a NASA satellite <br> -- based on the diffraction of a laser <br> -- used as a proxy of particulate pollution <br> -- unit-less - higher value indicates more pollution <br> -- Data from NASA  
 
@@ -631,6 +638,8 @@ glimpse(pm)
 
 Great! Now we can see that these variables are now factors as indicated by `<fct>` after the variable name.
 
+
+
 ### Skim package
 
 The `skim()` function of the `skimr` package is also really helpful for getting a general sense of your data.
@@ -641,7 +650,7 @@ By design, it provides summary statistics about variables in the data set.
 
 ```{r}
 # Scroll through the output!
-skim(pm)
+skimr::skim(pm)
 ```
 
 ####
@@ -668,7 +677,7 @@ Let's take a look to see which states are included using the `distinct()` functi
 
 ```{r, eval = FALSE} 
 pm %>% 
-  distinct(state) 
+  dplyr::distinct(state) 
 ```
 
 
@@ -686,6 +695,36 @@ pm %>%
 
 It looks like "District of Columbia" is being included as a state. 
 We can see that Alaska and Hawaii are not included in the data.
+
+Let's also take a look to see how many monitors there are in a few cities. We can use the `filter()` function of the `dplyr` package to do so. For example, let's look at Albuquerque, New Mexico. 
+
+```{r}
+pm %>% dplyr::filter(city == "Albuquerque")
+
+```
+
+We can see that there were only two monitors in the city of Albuquerque in 2006. Let's compare this with Baltimore.
+
+```{r}
+pm %>% dplyr::filter(city == "Baltimore")
+
+```
+
+There were in contrast five monitors for the city of Baltimore, despite the fact that if we take a look at the land area and population of the counties for Blatimore City and Albuquerque, we can see that they had very similar land area and populations.
+
+```{r}
+pm %>% 
+  dplyr::filter(city == "Baltimore") %>% 
+  select(county_area:county_pop)
+pm %>% 
+  dplyr::filter(city == "Albuquerque") %>%
+  select(county_area:county_pop)
+
+```
+
+In fact, the county containing Albuerque had a larger population. Thus the measurements for Albuquerque were not as thorough as they were for Baltimore.
+
+This may be due to the fact that the monitor values were lower in Albuquerque. It is interesting to note here that the CMAQ values are quite similar for both cities.
 
 
 ## Evaluate correlation
@@ -995,7 +1034,7 @@ count(pm, state) %>%
 
 If our data set were large enough it might be nice then to stratify by state using the `strata = "state"` argument in `initial_split()`, but our data is unfortunately not large enough. 
 
-Importantly the `initial_split` function only determines what rows of our `pm` data frame should be assigned for training or testing, it does not actually split the data. 
+Importantly the `initial_split()` function only determines what rows of our `pm` data frame should be assigned for training or testing, it does not actually split the data. 
 
 To extract the testing and training data we can use the `training()` and `testing()` functions also of the `rsample` package.
 
@@ -1300,7 +1339,7 @@ glimpse(pm)
 Notice how we only have 36 variables now instead of 50! 
 Two of these are our ID variables (`fips` and the actual monitor ID (`id`)) and one is our outcome (`value`). 
 Thus we only have 33 predictors now. 
-We can also see that variables that we no longer have any categorical variables. 
+We can also see that we no longer have any categorical variables. 
 Variables like `state` are gone and only `state_California` remains as it was the only state identity to have nonzero variance.
 We can also see that there were more monitors listed as `"Not in a city"` than any city. 
 
@@ -1344,7 +1383,7 @@ pm %>% count(city) %>%
 According to the `tidymodels` documentation:
 
 > `bake()` takes a trained recipe and applies the operations to a data set to create a design matrix.
- For example: it applies the centering to new data sets using these means used to create the recipe
+ For example: it applies the centering to new data sets using these means used to create the recipe.
 
 Therefore, if you wanted to look at the pre-processed testing data you would use the `bake()` function of the `recipes` package.
 (You generally want to leave your testing data alone, but it is good to look for issues like the introduction of NA values).
@@ -1493,7 +1532,7 @@ glimpse(baked_test_pm)
 
 ####
 
-Great now we no longer have `NA` values! :)
+Great, now we no longer have `NA` values! :)
 
 **Note**: if you use the skip option for some of the pre-processing steps, be careful. 
 `juice()` will show all of the results ignoring `skip = TRUE`. 
@@ -1568,7 +1607,7 @@ Next, we use `add_recipe()` (our pre-processing specifications) and we add our m
 **Note**: We do not need to actually `prep()` our recipe before using workflows!
 
 If you recall `novel_rec` is the recipe we previously created with the `recipes` package and `lm_PM_model` was created when we specified our model with the `parsnip` package.
-Here, we combine everything together into a `workflow()`. 
+Here, we combine everything together into a workflow. 
 
 ```{r}
 PM_wflow <-workflows::workflow() %>%
@@ -1608,7 +1647,7 @@ PM_fit <- lm_PM_model %>%
 
 ## Assessing the model fit
 
-After we fit our model, we can use the `broom` package to look at the output from the fitted model in an easy/tidy.   
+After we fit our model, we can use the `broom` package to look at the output from the fitted model in an easy/tidy way.   
 
 The `tidy()` function returns a tidy data frame with coefficients from the model (one row per coefficient).
 
@@ -1632,7 +1671,7 @@ We have fit our model on our training data, which means we have created a model 
 One last thing before we leave this section. 
 We often are interested in getting a sense of which variables are the most important in our model. 
 We can explore the variable importance using the `vip()` function of the `vip` package. 
-This function create a bar plot of variable importance scores for each predictor variable (or feature) in a model. 
+This function creates a bar plot of variable importance scores for each predictor variable (or feature) in a model. 
 The bar plot is ordered by importance (highest to smallest). 
 
 
@@ -1876,9 +1915,9 @@ knitr::include_graphics("https://miro.medium.com/max/1400/0*f_qQPFpdofWGLQqc.png
 
 In our case, we are going to use the random forest method of the the `randomForest` package. 
 
-This package is currently not compatible with categorical variables that have more than 53 levels. See [here](https://cran.r-project.org/web/packages/randomForest/NEWS) for the documentation about when this was updated from 25 levels. Thus we will to remove the `zcta`  and `county` variables.
+This package is currently not compatible with categorical variables that have more than 53 levels. See [here](https://cran.r-project.org/web/packages/randomForest/NEWS) for the documentation about when this was updated from 25 levels. Thus we will remove the `zcta`  and `county` variables.
 
-Note that the `step_novel()` function is necessary here for `state` to get all cross validation folds to work, because there will be different levels included in each fold test and training sets, thus there are new levels for some of the test sets which will result in an error.  
+Note that the `step_novel()` function is necessary here for the `state` variable to get all cross validation folds to work, because there will be different levels included in each fold test and training sets. The new levels for some of the test sets would otherwise result in an error.
 
 According to the [documentation](https://www.rdocumentation.org/packages/recipes/versions/0.1.13/topics/step_novel) for the `recipes` package:
 
@@ -2149,7 +2188,7 @@ tune_RF_results
 
 See [the tune getting started guide ](https://tidymodels.github.io/tune/articles/getting_started.html){target="_blank"} for more information about implementing this in `tidymodels`.
 
-If you wanted more control over this process you could specify how the different possible options for `mtry` and `min_n` in the `tune_grid()` function using the grid_*()` functions of the `dials` package to create a more specific grid.
+If you wanted more control over this process you could specify how the different possible options for `mtry` and `min_n` in the `tune_grid()` function using the `grid_*()` functions of the `dials` package to create a more specific grid.
 
 Be default the values for the hyperparameters being tuned are chosen semi-randomly (meaning that they are within a range of reasonable values but still random)..
 
@@ -2166,7 +2205,7 @@ We can now use the `show_best()` function as it was truly intended, to see what 
 ```{r}
 show_best(tune_RF_results, metric = "rmse", n =1)
 ```
-There we have it... looks like an `mtry` of 17 and `min_n` of 4 had the best `rmse` value. You can verify this in the above output, but it is easier to just pull this row out using this function. We can see that the mean `rmse` value across the cross validation sets was 1.720. Before tuning it was 1.725  with a similar `std_err` so the performance was very slightly improved.
+There we have it... looks like an `mtry` of 17 and `min_n` of 4 had the best `rmse` value. You can verify this in the above output, but it is easier to just pull this row out using this function. We can see that the mean `rmse` value across the cross validation sets was 1.712. Before tuning it was 1.725  with a similar `std_err` so the performance was very slightly improved.
 
 
 ## Final model performance evaluation
@@ -2206,7 +2245,7 @@ overallfit <-RF_wflow %>%
   tune::last_fit(pm_split)
 ```
 
-The `overallfit` output has a lot of really useful information about how the model, the data test and training split, and the predictions for the testing data.
+The `overallfit` output has a lot of really useful information about the model, the testing and training data split, and the predictions for the testing data.
 
 To see the performance on the test data we can use the `collect_metrics()` function like we did before.
 ```{r}
@@ -2520,7 +2559,7 @@ dev.off()
 ## Synopsis
 
 In this case study, we explored gravimetric monitoring data of fine particulate matter air pollution (outcome variable). 
-Our goal was to able to predict air pollution on monitors where we only had predictor variables (or features) without having observed a corresponding measurement of air pollution.
+Our goal was to able to predict air pollution where we only had predictor variables (or features) without having observed a corresponding measurement of air pollution.
 
 Our learning objectives were: 
 
