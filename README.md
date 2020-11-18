@@ -276,7 +276,7 @@ prediction and classification 2) the importance of training and testing
 </tr>
 <tr class="even">
 <td><a href="https://tidymodels.github.io/recipes/" target="_blank">recipes</a></td>
-<td>to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are <code>recipe()</code> , <code>prep()</code> and various transformation <code>step_*()</code> functions, as well as <code>juice()</code> - extracts final pre-processed training data and <code>bake()</code> - applies recipe steps to testing data). See <a href="https://cran.r-project.org/web/packages/recipes/recipes.pdf" target="_blank">here</a> for more info.</td>
+<td>to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are <code>recipe()</code> , <code>prep()</code> and various transformation <code>step_*()</code> functions, as well as <code>bake</code> which extracts pre-processed training data (used to require <code>juice()</code>) and applies recipe preprocessing steps to testing data). See <a href="https://cran.r-project.org/web/packages/recipes/recipes.pdf" target="_blank">here</a> for more info.</td>
 </tr>
 <tr class="odd">
 <td><a href="https://tidymodels.github.io/parsnip/" target="_blank">parsnip</a></td>

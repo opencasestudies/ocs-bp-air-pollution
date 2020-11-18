@@ -115,25 +115,25 @@ knitr::include_graphics(here::here("img", "pm2.5_scale_graphic-color_2.jpg"))
 
 <u>The following plot and table show the relative sizes of these different pollutants in micrometers (µm):</u>
 
-<p align="center">
-  <img width="600" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Airborne-particulate-size-chart.svg/800px-Airborne-particulate-size-chart.svg.png">
-</p>
+```{r, echo = FALSE, out.width= "800 px"}
+knitr::include_graphics(here::here("img", "particulate-size-chart.png"))
+```
 
 ##### [[source]](https://en.wikipedia.org/wiki/Particulates){target="_blank"}
 
 
-<p align="center">
-  <img width="500" src="https://www.frontiersin.org/files/Articles/505570/fpubh-08-00014-HTML/image_m/fpubh-08-00014-t002.jpg">
-</p>
+```{r, echo = FALSE, out.width= "800 px"}
+knitr::include_graphics(here::here("img", "particulate_types.jpg"))
+```
 
 ##### [[source]](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full){target="_blank"}
 
 
 <u>This table shows how deeply some of the smaller fine particles can penetrate within the human body:</u>
 
-<p align="center">
-  <img width="500" src="https://www.frontiersin.org/files/Articles/505570/fpubh-08-00014-HTML/image_m/fpubh-08-00014-t001.jpg">
-</p>
+```{r, echo = FALSE, out.width= "800 px"}
+knitr::include_graphics(here::here("img", "sizes.jpg"))
+```
 
 ##### [[source]](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full){target="_blank"}
 
@@ -158,9 +158,9 @@ However, as can be seen in the following figure, these monitors are relatively s
 
 Furthermore, dramatic differences in pollution rates can be seen even within the same city. In fact, the term micro-environments describes environment within cities or counties which may vary greatly from one block to another.
 
-<p align="center">
-  <img width="400" src="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4137272/bin/1476-069X-13-63-1.jpg">
-</p>
+```{r, echo = FALSE, out.width= "800 px"}
+knitr::include_graphics(here::here("img", "map_of_monitors.jpg"))
+```
 
 ##### [[source]](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63){target="_blank"}
 
@@ -288,7 +288,7 @@ Package   | Use in this case study
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
 [tidymodels](https://www.tidymodels.org){target="_blank"} | to load in a set of packages (broom, dials, infer, parsnip, purrr, recipes, rsample, tibble, yardstick)
 [rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets; to split the training set for cross-validation  
-[recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `juice()` - extracts final pre-processed training data and `bake()` - applies recipe steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
+[recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()`, `prep()` and various transformation `step_*()` functions, as well as `bake` which extracts pre-processed training data (used to require `juice()`) and applies recipe preprocessing steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
 [parsnip](https://tidymodels.github.io/parsnip/){target="_blank"}   | an interface to create models (major functions are `fit()`, `set_engine()`)
 [yardstick](https://tidymodels.github.io/yardstick/){target="_blank"}   | to evaluate the performance of models
 [broom](https://www.tidyverse.org/blog/2018/07/broom-0-5-0/){target="_blank"} | to get tidy output for our model fit and performance
@@ -1306,25 +1306,27 @@ You can see:
 **Note**: You may see the `prep.recipe()` function in material that you read about the `recipes` package. This is referring to the `prep()` function of the `recipes` package.
 
 
-### Step 2: Extract pre-processed training data using `juice()`
+### Step 2: Extract pre-processed training data using `bake()`
 
-Since we retained our pre-processed training data (i.e. `prep(retain=TRUE)`), we can take a look at it like by using the `juice()` function of the `recipes` package like this:
+Since we retained our pre-processed training data (i.e. `prep(retain=TRUE)`), we can take a look at it like by using the `bake()` function of the `recipes` package like this:
 
 ```{r, echo=FALSE, out.width="400px"}
 knitr::include_graphics(here::here("img","training_preprocessing_recipes3.png"))
 ```
 
-Let's juice! 
+Let's bake! 
 
+Since we don't have new data (we aren't looking at the testing data), we need to specify this with `new_data = NULL`.
 
 #### {.scrollable }
 ```{r}
 # Scroll through the output!
-juiced_train <- juice(prepped_rec)
-glimpse(juiced_train)
+baked_train <- bake(prepped_rec, new_data = NULL)
+glimpse(baked_train)
 ```
 ####
 
+**Note**- this process used to require the `juice()` function.
 
 For easy comparison sake - here is our original data:
 
@@ -1376,7 +1378,7 @@ pm %>% count(city) %>%
 
 ####
 
-**Note**: Recall that you must specify `retain = TRUE` argument of the `prep()` function to use `juice()`.
+**Note**: Recall that you must specify `retain = TRUE` argument of the `prep()` function to use `bake()`.
 
 ### Step 3: Extract pre-processed testing data using `bake()`
 
@@ -1505,7 +1507,7 @@ Do you recall how to pre-process and extract the pre-processed training data?
 
 ```{r}
 prepped_rec <- prep(novel_rec, verbose = TRUE, retain = TRUE)
-juiced_train <- juice(prepped_rec)
+baked_train <- bake(prepped_rec, new_data = NULL)
 ```
 </details> 
 ***
@@ -1514,7 +1516,7 @@ juiced_train <- juice(prepped_rec)
 #### {.scrollable }
 ```{r}
 # Scroll through the output!
-glimpse(juiced_train)
+glimpse(baked_train)
 ```
 
 ####
@@ -1535,7 +1537,7 @@ glimpse(baked_test_pm)
 Great, now we no longer have `NA` values! :)
 
 **Note**: if you use the skip option for some of the pre-processing steps, be careful. 
-`juice()` will show all of the results ignoring `skip = TRUE`. 
+`juice()` will show all of the results ignoring `skip = TRUE` (as you can still use this function if you perfer it to `bake()`).
 `bake()` will not necessarily conduct these steps on the new data.
 
 
@@ -1630,17 +1632,17 @@ PM_wflow_fit
 
 <details><summary> Click here to see the steps that the `workflows` package performs that used to be required </summary>
 
-Previously, the processed training data (`juiced_train`), as opposed to the raw training data, would be required to fit the model.
+Previously, the processed training data (`baked_train`), as opposed to the raw training data, would be required to fit the model.
 
 In this case, we would actually also need to write the model again! 
 Recall that `id` and `fips` are ID variables and that `values` is our outcome of interest (the air pollution measure at each monitor). It is nice that `workflows` keeps track of this!
 
 ```{r}
-juiced_train_ready <- juiced_train %>% 
+baked_train_ready <- baked_train %>% 
   select(-id, -fips)
 
 PM_fit <- lm_PM_model %>% 
-  parsnip::fit(value ~., data = juiced_train_ready)
+  parsnip::fit(value ~., data = baked_train_ready)
 ```
 
 </details>
@@ -1713,7 +1715,7 @@ Alternatively, we can get the fitted values using the `augment()` function of th
 
 ```{r}
 wf_fitted_values <- 
-  broom::augment(wf_fit[["fit"]], data = juiced_train) %>% 
+  broom::augment(wf_fit[["fit"]], data = baked_train) %>% 
   select(value, .fitted:.std.resid)
 
 head(wf_fitted_values)
@@ -2609,11 +2611,11 @@ We used the `rsample` package to first perform an initial split of our data into
 
 3. Variable assignment and pre-processing   
 
-We used the `recipes` package to assign variable roles (such as outcome, predictor, and id variable). We also used this package to create a recipe for pre-processing our training and testing data. This involved steps such as: ` step_dummy` to create dummy numeric encodings of our categorical variables, `step_corr` to remove highly correlated variables, `step_nzv` to remove near zero variance variables that would contribute little to our model and potentially add noise.  We learned that once our recipe was created and prepped using `prep()`we could extract the pre-processed training data using `juice()` or our pre-processed testing data using `bake()`. We also learned that if we used the newer workflows package that we did not need to the `prep()`, `juice()`, or `bake()` functions, but that it is still useful to know how to do so if we want to look at our data and how the recipe is influencing it more deeply.  
+We used the `recipes` package to assign variable roles (such as outcome, predictor, and id variable). We also used this package to create a recipe for pre-processing our training and testing data. This involved steps such as: ` step_dummy` to create dummy numeric encodings of our categorical variables, `step_corr` to remove highly correlated variables, `step_nzv` to remove near zero variance variables that would contribute little to our model and potentially add noise.  We learned that once our recipe was created and prepped using `prep()`we could extract the pre-processed training data or our pre-processed testing data using `bake()`. We also learned that if we used the newer workflows package that we did not need to use the `prep()` or `bake()` functions, but that it is still useful to know how to do so if we want to look at our data and how the recipe is influencing it more deeply.  
 
 4. Model specification, fitting, tuning and performance evaluation using the training data  
 
-We learned that the model needs to first be fit to the training data. We learned that in both classification and prediction, the model is fit to the training data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. We learned that we specify the model and its specifications using the `parnsip` package and that we also use this package to fit the model using the `fit()` function. We learned that we if just use `parsnip` to fit the model, then we need to use the pre-processed training data (output from `juice()`). We learned that we can use the raw training data if we use the `workflows` package to create a workflow that pre-processes our data for us.   
+We learned that the model needs to first be fit to the training data. We learned that in both classification and prediction, the model is fit to the training data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. We learned that we specify the model and its specifications using the `parnsip` package and that we also use this package to fit the model using the `fit()` function. We learned that if we just use `parsnip` to fit the model, then we need to use the pre-processed training data (output from `bake()`). We learned that we can use the raw training data if we use the `workflows` package to create a workflow that pre-processes our data for us.   
 
 We learned that if the model fits well than the estimated values will be very similar to the true outcome variable values in our training data. We learned that we can assess model performance using the `yardstick` package with the `metrics` functio or the `tune` package and the `collect_metrics()` function (required if using cross validation or tuning). We also learned that we can use subsets of our training data (which we created with the `rsample` package) to perform cross validation to get a better estimate about the performance of our model using our training data, as we want our results to be generalizable and to perform well with other data, not just our training data. We used the `fit_resamples()` function of the tune package to fit our model on our different training data subsets and the `collect_metrics()` function (also of the `tune` package) to evaluate model performance using these subsets.  We also learned that we can potentially improve model performance by tuning aspects about the model called [hyperparameters](https://machinelearningmastery.com/difference-between-a-parameter-and-a-hyperparameter/){target="_blank"} to determine the best option for model performance. We learned that we can do this using the `tune` and `dials` packages and evaluating the performance of our model with the different hyperparameter options and our training data subsets that we used for cross validation. After we tested several different methods to model our data, we compared them to choose the best performing model as our final model.  
 
@@ -2688,7 +2690,7 @@ Package   | Use in this case study
 [corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
 [rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets and to split the training set for cross-validation  
-[recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `juice()` - extracts final pre-processed training data and `bake()` - applies recipe steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
+[recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `bake` which extracts pre-processed training data (used to require `juice()`) and applies recipe preprocessing steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
 [parsnip](https://tidymodels.github.io/parsnip/){target="_blank"}   | an interface to create models (major functions are  `fit()`, `set_engine()`)
 [yardstick](https://tidymodels.github.io/yardstick/){target="_blank"}   | to evaluate the performance of models
 [broom](https://www.tidyverse.org/blog/2018/07/broom-0-5-0/){target="_blank"} | to get tidy output for our model fit and performance
