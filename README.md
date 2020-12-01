@@ -28,7 +28,7 @@ United States License.
 To cite this case study please use:
 
 Wright, Carrie and Jager, Leah and Taub, Margaret and Hicks, Stephanie.
-(2020). <https://www.opencasestudies.org/ocs-bp-air-pollution/>.
+(2020). <https://github.com//opencasestudies/ocs-bp-air-pollution>.
 Predicting Annual Air Pollution (Version v1.0.0).
 
 ### Acknowledgements

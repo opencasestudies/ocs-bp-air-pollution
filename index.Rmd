@@ -18,7 +18,7 @@ output:
 ---
 <style>
 #TOC {
-  background: url("https://opencasestudies.github.io/img/logo.jpg");
+  background: url("https://opencasestudies.github.io/img/icon-bahi.png");
   background-size: contain;
   padding-top: 240px !important;
   background-repeat: no-repeat;
@@ -60,7 +60,7 @@ This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 [
 
 To cite this case study please use:
 
-Wright, Carrie and Jager, Leah and Taub, Margaret and Hicks, Stephanie. (2020). [https://www.opencasestudies.org/ocs-bp-air-pollution/](https://www.opencasestudies.org/ocs-bp-air-pollution/). Predicting Annual Air Pollution (Version v1.0.0).
+Wright, Carrie and Jager, Leah and Taub, Margaret and Hicks, Stephanie. (2020). [https://github.com//opencasestudies/ocs-bp-air-pollution](https://github.com//opencasestudies/ocs-bp-air-pollution/). Predicting Annual Air Pollution (Version v1.0.0).
 
 ####
 
@@ -727,7 +727,8 @@ In fact, the county containing Albuerque had a larger population. Thus the measu
 This may be due to the fact that the monitor values were lower in Albuquerque. It is interesting to note here that the CMAQ values are quite similar for both cities.
 
 
-## Evaluate correlation
+## **Evaluate correlation**
+***
 
 In prediction analyses, it is also useful to evaluate if any of the variables are correlated. Why should we care about this?
 
@@ -881,7 +882,7 @@ The way we do this is to use data where we have both the features $(X_1=x_1, \do
 
 When we say train a machine learning algorithm we mean that we estimate a function $f$ that uses the predictor variables $X$ as input or $\hat{Y} = f(X)$. 
 
-## ML as an optimization problem
+## **ML as an optimization problem**
 
 If we are doing a good job, then our predicted outcome $\hat{Y}$ should closely match our actual outcome $Y$ that we observed. 
 
@@ -892,7 +893,7 @@ The choice of distance metric $d(\cdot)$ can be the mean of the absolute or squa
 
 Much of the fields of statistics and computer science are focused on defining $f$ and $d$.
 
-## The parts of an ML problem
+## **The parts of an ML problem**
 
 To set up a machine learning (ML) problem, we need a few components.
 To solve a (standard) machine learning problem you need: 
@@ -917,9 +918,11 @@ The way we do this is to use data where we have both the input and output data t
 
 To train a machine learning algorithm, we will use the `tidymodels` package ecosystem. 
 
-## Overview 
+## **Overview**
+***
 
-### The tidymodels ecosystem
+### **The `tidymodels` ecosystem**
+***
 
 To perform our analysis we will be using the `tidymodels` suite of packages. 
 You may be familiar with the older packages `caret` or `mlr` which are also for machine learning and modeling but are not a part of the `tidyverse`. 
@@ -940,7 +943,8 @@ This is a schematic of how these packages work together to build a machine learn
 knitr::include_graphics(here::here("img","MachineLearning.png"))
 ```
 
-### Benefits of tidymodels  
+### **Benefits of `tidymodels`**
+***
 
 The two major benefits of `tidymodels` are: 
 
@@ -954,7 +958,8 @@ Modifying a piece of the overall process is now easier than before because many 
 
 
 
-## Splitting the data
+## **Splitting the data**
+***
 
 The first step after data exploration in machine learning analysis is to [split the data](https://towardsdatascience.com/train-validation-and-test-sets-72cb40cba9e7){target="_blank"} into **training** and **testing** data sets. 
 
@@ -1051,7 +1056,8 @@ count(test_pm, state)
 
 
 
-## Preparing for pre-processing the data
+## **Preparing for pre-processing the data**
+***
 
 After splitting the data, the next step is to process the training and testing data so that the data are are compatible and optimized to be used with the model. 
 This involves assigning variables to specific roles within the model and pre-processing like scaling variables and removing redundant variables. 
@@ -1269,9 +1275,11 @@ simple_rec
 
 
 
-## Running the pre-processing
+## **Running the pre-processing**
+***
 
-### Step 1: Update the recipe with training data using `prep()`
+### **Step 1: Update the recipe with training data using `prep()`**
+***
 
 The next major function of the `recipes` package is `prep()`.
 This function updates the recipe object based on the training data. 
@@ -1306,7 +1314,9 @@ You can see:
 **Note**: You may see the `prep.recipe()` function in material that you read about the `recipes` package. This is referring to the `prep()` function of the `recipes` package.
 
 
-### Step 2: Extract pre-processed training data using `bake()`
+### **Step 2: Extract pre-processed training data using `bake()`**
+***
+
 
 Since we retained our pre-processed training data (i.e. `prep(retain=TRUE)`), we can take a look at it like by using the `bake()` function of the `recipes` package like this:
 
@@ -1380,7 +1390,8 @@ pm %>% count(city) %>%
 
 **Note**: Recall that you must specify `retain = TRUE` argument of the `prep()` function to use `bake()`.
 
-### Step 3: Extract pre-processed testing data using `bake()`
+### **Step 3: Extract pre-processed testing data using `bake()`**
+***
 
 According to the `tidymodels` documentation:
 
@@ -1541,7 +1552,8 @@ Great, now we no longer have `NA` values! :)
 `bake()` will not necessarily conduct these steps on the new data.
 
 
-## Specifying the model
+## **Specifying the model**
+***
 
 So far we have used the packages `rsample` to split the data and `recipes` to assign variable types, and to specify and prep our pre-processing (as well as to optionally extract the pre-processed data).
 
@@ -1595,7 +1607,8 @@ lm_PM_model <-
 lm_PM_model
 ```
 
-## Fitting the model
+## **Fitting the model**
+***
 
 We can  use the `parsnip` package with a newer package called `workflows` to fit our model. 
 
@@ -1647,7 +1660,8 @@ PM_fit <- lm_PM_model %>%
 
 </details>
 
-## Assessing the model fit
+## **Assessing the model fit**
+***
 
 After we fit our model, we can use the `broom` package to look at the output from the fitted model in an easy/tidy way.   
 
@@ -1689,7 +1703,8 @@ PM_wflow_fit %>%
 
 The state in which the monitor was located and the CMAQ model and the aod satellite information appear to be the most important for predicting the air pollution at a given monitor.
 
-## Model performance
+## **Model performance**
+***
 
 In this next section, our goal is to assess the overall model performance. 
 The way we do this is to compare the similarity between the predicted estimates of the outcome variable produced by the model and the true outcome variable values. 
@@ -1733,7 +1748,8 @@ values_pred_train
 
 ```
 
-### Visualizing model performance
+### **Visualizing model performance**
+***
 
 Now, we can compare the predicted outcome values (or fitted values) $\hat{Y}$ to the actual outcome values $Y$ that we observed: 
 
@@ -1748,7 +1764,8 @@ wf_fitted_values %>%
 OK, so our range of the predicted outcome values appears to be smaller than the real values. 
 We could probably do a bit better.
 
-### Quantifying model performance 
+### **Quantifying model performance**
+***
 
 Next, let's use different distance functions $d(\cdot)$ to assess how far off our predicted outcome $\hat{Y} = f(X)$ and actual outcome $Y$ values are from each other: 
 
@@ -1798,7 +1815,8 @@ yardstick::mae(wf_fitted_values,
                truth = value, estimate = .fitted)
 ```
 
-## Cross validation
+## **Cross validation**
+***
 
 Until now we have used everything in our "training" dataset (and have not touched the "testing" dataset) from the `rsample` package to build our machine learning (ML) model $\hat{Y} = f(X)$ (or to estimate $f$ using the features or predictor variable $X$). 
 
@@ -1837,7 +1855,8 @@ knitr::include_graphics(here::here("img", "vfold.png"))
 
 **Note**: People typically ignore spatial dependence with cross validation of air pollution monitoring data in the air pollution field, so we will do the same.  However, it might make sense to leave out blocks of monitors rather than  random individual monitors to help account for some spatial dependence.
 
-### Creating the $v$-folds using `rsample`
+### **Creating the $v$-folds using `rsample`**
+***
 
 The [`vfold_cv()`](https://tidymodels.github.io/rsample/reference/vfold_cv.html){target="_blank"} function of the `rsample` package can be used to parse the training data into folds for $v$-fold cross validation.
 
@@ -1864,7 +1883,8 @@ Once the folds are created they can be used to evaluate performance by fitting t
 knitr::include_graphics(here::here("img", "cross_validation.png"))
 ```
 
-### Assessing model performance on $v$-folds using `tune`
+### **Assessing model performance on $v$-folds using `tune`**
+***
 
 We can fit the model to our cross validation folds using the `fit_resamples()` function of the `tune` package, by specifying our `workflow` object and the cross validation fold object we just created. 
 See [here](https://tidymodels.github.io/tune/reference/fit_resamples.html){target="_blank"} for more information.
@@ -1892,7 +1912,8 @@ In the previous section, we demonstrated how to build a machine learning model (
 In the next few section, we will demonstrate another machine learning model. 
 
 
-## Random Forest
+## **Random Forest**
+***
 
 Now, we are going to predict our outcome variable (air pollution) using a decision tree method called [random forest](https://en.wikipedia.org/wiki/Random_forest){target="_blank"}.
 
@@ -2111,7 +2132,8 @@ If we tuned our random forest model based on the number of trees or the value fo
 However, our cross validated mean rmse value of 1.72 is quite good because our range of true outcome values is much larger: (`r round(range(test_pm$value),3)`).
 
 
-## Model tuning
+## **Model tuning**
+***
 
 [Hyperparameters](https://machinelearningmastery.com/difference-between-a-parameter-and-a-hyperparameter/) are often things that we need to specify about a model. For example, the number of predictor variables (or features) that will be randomly sampled at each split when creating the tree models called `mtry` is a hyperparameter. The default number for regression analyses is the number of predictors divided by 3. Instead of arbitrarily specifying this, we can try to determine the best option for model performance by a process called tuning. 
 
@@ -2209,7 +2231,8 @@ show_best(tune_RF_results, metric = "rmse", n =1)
 There we have it... looks like an `mtry` of 17 and `min_n` of 4 had the best `rmse` value. You can verify this in the above output, but it is easier to just pull this row out using this function. We can see that the mean `rmse` value across the cross validation sets was 1.712. Before tuning it was 1.725  with a similar `std_err` so the performance was very slightly improved.
 
 
-## Final model performance evaluation
+## **Final model performance evaluation**
+***
 
 Now that we have decided that we have reasonable performance with our training data, we can stop building our model and evaluate performance with our testing data. 
 
@@ -2547,7 +2570,7 @@ Let's add some text to our plot to explain it a bit more. We can do so using the
 ```
 
 
-```{r, echo = FALSE, message=FALSE, eval=FALSE}
+```{r, echo = FALSE, message=FALSE, eval=FALSE, include = FALSE}
 png(here::here("img", "main_plot_maps.png"), 
     height = 1500, width = 2000, res = 300)
 (truth/pred) + plot_annotation(title = "Machine Learning Methods Allow for Prediction of Air Pollution", subtitle = "A random forest model predicts true monitored levels of fine particulate matter (PM 2.5) air pollution based on\ndata about population density and other predictors reasonably well, thus suggesting that we can predict levels\nof pollution in places with poor monitoring", theme = theme(plot.title = element_text(size =12, face = "bold"), plot.subtitle = element_text(size = 8)))
@@ -2557,7 +2580,8 @@ dev.off()
 # **Summary**
 ***
 
-## Synopsis
+## **Synopsis**
+***
 
 In this case study, we explored gravimetric monitoring data of fine particulate matter air pollution (outcome variable). 
 Our goal was to able to predict air pollution where we only had predictor variables (or features) without having observed a corresponding measurement of air pollution.
@@ -2630,7 +2654,8 @@ We also saw that we can use the `collect_predictions()` function of the `tune` p
 
 
 
-## Suggested Homework
+## **Suggested Homework**
+***
 
 Students can predict air pollution monitor values using a different algorithm and provide an explanation for how that algorithm works and why it may be a good choice for modeling this data.
 
@@ -2638,7 +2663,8 @@ Students can predict air pollution monitor values using a different algorithm an
 # **Additional Information**
 ***
 
-## Helpful Links
+## **Helpful Links**
+***
 
 1. A review of [tidymodels](https://rviews.rstudio.com/2019/06/19/a-gentle-intro-to-tidymodels/){target="_blank"}  
 2. A [course on tidymodels](https://juliasilge.com/blog/tidymodels-ml-course/){target="_blank"} by Julia Silge  
@@ -2711,7 +2737,8 @@ Package   | Use in this case study
 [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
 
 
-## Session info 
+## **Session info**
+***
 
 
 ```{r}
@@ -2719,7 +2746,8 @@ sessionInfo()
 ```
 
 
-## Acknowledgements
+## **Acknowledgements**
+***
 
 
 We would like to acknowledge [Roger Peng](http://www.biostat.jhsph.edu/~rpeng/), [Megan Latshaw](https://www.jhsph.edu/faculty/directory/profile/1708/megan-weil-latshaw), and [Kirsten Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler) for assisting in framing the major direction of the case study.
