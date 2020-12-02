@@ -64,6 +64,10 @@ Wright, Carrie and Jager, Leah and Taub, Margaret and Hicks, Stephanie. (2020). 
 
 ####
 
+To access the GitHub Repository for this case study see here: https://github.com/opencasestudies/ocs-bp-air-pollution.
+
+This case study is part of a series of public health case studies for the [Bloomberg American Health  Initiative](https://americanhealth.jhu.edu/open-case-studies).
+
 # **Motivation**
 ***
 A variety of different sources contribute different types of pollutants to what we call air pollution. 
@@ -433,7 +437,8 @@ We do not have the sales data yet for this year, but we do know the characterist
 We can build a model of the characteristics that explained sales last year to estimate what cars might sell well this year. 
 In this case, our outcome variable is the sales of cars, while the different characteristics of the cars make up our features.
 
-### Start with a question
+### **Start with a question**
+***
 
 This is the most commonly missed step when developing a machine learning algorithm. 
 Machine learning can very easily be turned into an engineering problem. 
@@ -451,7 +456,8 @@ Our **features** (or predictor variables) include data about population density,
 All of our data was previously collected by a [researcher](http://www.biostat.jhsph.edu/~rpeng/) at the [Johns Hopkins School of Public Health](https://www.jhsph.edu/) who studies air pollution and climate change. 
 
 
-### Our outcome variable
+### **Our outcome variable**
+***
 
 The monitor data that we will be using comes from **[gravimetric monitors](https://publiclab.org/wiki/filter-pm){target="_blank"}** (see picture below) operated by the US [Environmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}.
 
@@ -486,7 +492,8 @@ In our data set, the `value` column indicates the PM~2.5~ monitor average for 20
 The units are micrograms of fine particulate matter (PM) that is less than 2.5 micrometers in diameter per cubic meter of air - mass concentration (ug/m^3^).
 Recall the WHO exposure guideline is < 10 ug/m^3^ on average annually for PM~2.5~.
 
-### Our features (predictor variables) 
+### **Our features (predictor variables)**
+***
 
 There are 48 features with values for each of the 876 monitors (observations). 
 The data comes from the US [Environmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}, the [National Aeronautics and Space Administration (NASA)](https://www.nasa.gov/){target="_blank"}, the US [Census](https://www.census.gov/about/what/census-at-a-glance.html){target="_blank"}, and the [National Center for Health Statistics (NCHS)](https://www.cdc.gov/nchs/about/index.htm){target="_blank"}.
@@ -640,7 +647,8 @@ Great! Now we can see that these variables are now factors as indicated by `<fct
 
 
 
-### Skim package
+### **`skim` package**
+***
 
 The `skim()` function of the `skimr` package is also really helpful for getting a general sense of your data.
 By design, it provides summary statistics about variables in the data set. 

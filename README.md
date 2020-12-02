@@ -2,26 +2,32 @@
 OpenCaseStudies
 ===============
 
-\*\* need to add travis badge\*\*
+### Important links
+
+-   HTML:
+    <a href="https://www.opencasestudies.org/ocs-bp-air-pollution/" class="uri">https://www.opencasestudies.org/ocs-bp-air-pollution/</a>
+-   GitHub:
+    <a href="https://github.com/opencasestudies/ocs-bp-air-pollution/" class="uri">https://github.com/opencasestudies/ocs-bp-air-pollution/</a>
+-   Bloomberg American Health Initiative:
+    <a href="https://americanhealth.jhu.edu/open-case-studies" class="uri">https://americanhealth.jhu.edu/open-case-studies</a>
 
 ### Disclaimer
 
-The purpose of the [Open Case
-Studies](https://opencasestudies.github.io) project is **to demonstrate
-the use of various data science methods, tools, and software in the
-context of messy, real-world data**. A given case study does not cover
-all aspects of the research process, is not claiming to be the most
-appropriate way to analyze a given dataset, and should not be used in
-the context of making policy decisions without external consultation
-from scientific experts.
+The purpose of the [Open Case Studies](https://www.opencasestudies.org)
+project is **to demonstrate the use of various data science methods,
+tools, and software in the context of messy, real-world data**. A given
+case study does not cover all aspects of the research process, is not
+claiming to be the most appropriate way to analyze a given dataset, and
+should not be used in the context of making policy decisions without
+external consultation from scientific experts.
 
 ### License
 
 This case study is part of the
-[OpenCaseStudies](https://opencasestudies.github.io) project. This work
-is licensed under the Creative Commons Attribution-NonCommercial 3.0
-([CC BY-NC 3.0](https://creativecommons.org/licenses/by-nc/3.0/us/))
-United States License.
+[OpenCaseStudies](https://www.opencasestudies.org) project. This work is
+licensed under the Creative Commons Attribution-NonCommercial 3.0 ([CC
+BY-NC 3.0](https://creativecommons.org/licenses/by-nc/3.0/us/)) United
+States License.
 
 ### Citation
 
