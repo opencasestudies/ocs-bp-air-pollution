@@ -1,4 +1,5 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
 OpenCaseStudies
 ===============
 
@@ -37,7 +38,7 @@ Wright, Carrie and Jager, Leah and Taub, Margaret and Hicks, Stephanie.
 (2020). <https://github.com//opencasestudies/ocs-bp-air-pollution>.
 Predicting Annual Air Pollution (Version v1.0.0).
 
-### Acknowledgements
+### Acknowledgments
 
 We would like to acknowledge [Roger
 Peng](http://www.biostat.jhsph.edu/~rpeng/), [Megan

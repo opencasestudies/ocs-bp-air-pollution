@@ -35,7 +35,7 @@ To cite this case study please use:
 
 Wright, Carrie and Jager, Leah and Taub, Margaret and Hicks, Stephanie. (2020). [https://github.com//opencasestudies/ocs-bp-air-pollution](https://github.com//opencasestudies/ocs-bp-air-pollution). Predicting Annual Air Pollution (Version v1.0.0).
 
-### Acknowledgements
+### Acknowledgments
 
 We would like to acknowledge [Roger Peng](http://www.biostat.jhsph.edu/~rpeng/), [Megan Latshaw](https://www.jhsph.edu/faculty/directory/profile/1708/megan-weil-latshaw), and [Kirsten Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler) for assisting in framing the major direction of the case study.
 

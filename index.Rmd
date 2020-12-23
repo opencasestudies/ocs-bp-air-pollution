@@ -3,6 +3,8 @@ title: "Open Case Studies: Predicting Annual Air Pollution"
 css: style.css
 output:
   html_document:
+    includes:
+       in_header: GA_Script.Rhtml
     self_contained: yes
     code_download: yes
     highlight: tango
@@ -2754,10 +2756,13 @@ sessionInfo()
 ```
 
 
-## **Acknowledgements**
+## **Acknowledgments**
 ***
 
 
 We would like to acknowledge [Roger Peng](http://www.biostat.jhsph.edu/~rpeng/), [Megan Latshaw](https://www.jhsph.edu/faculty/directory/profile/1708/megan-weil-latshaw), and [Kirsten Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler) for assisting in framing the major direction of the case study.
 
 We would also like to acknowledge the [Bloomberg American Health Initiative](https://americanhealth.jhu.edu/) for funding this work. 
+
+
+<script type='text/javascript' id='clustrmaps' src='//cdn.clustrmaps.com/map_v2.js?cl=080808&w=a&t=tt&d=7YT-EDGa4MUwQXSQxqfv9Nd9Nt852b7plGdS6UQJO1Q&co=ffffff&cmo=3acc3a&cmn=ff5353&ct=808080'></script>
