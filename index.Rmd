@@ -119,20 +119,13 @@ knitr::include_graphics(here::here("img", "pm2.5_scale_graphic-color_2.jpg"))
 <!-- </p> -->
 
 
-<u>The following plot and table show the relative sizes of these different pollutants in micrometers (µm):</u>
+<u>The following plot shows the relative sizes of these different pollutants in micrometers (µm):</u>
 
 ```{r, echo = FALSE, out.width= "800 px"}
 knitr::include_graphics(here::here("img", "particulate-size-chart.png"))
 ```
 
 ##### [[source]](https://en.wikipedia.org/wiki/Particulates){target="_blank"}
-
-
-```{r, echo = FALSE, out.width= "800 px"}
-knitr::include_graphics(here::here("img", "particulate_types.jpg"))
-```
-
-##### [[source]](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full){target="_blank"}
 
 
 <u>This table shows how deeply some of the smaller fine particles can penetrate within the human body:</u>
@@ -162,7 +155,7 @@ Historically, epidemiological studies would assess the influence of air pollutio
 
 However, as can be seen in the following figure, these monitors are relatively sparse in certain regions of the country and are not necessarily located near pollution sources. We will see later when we evaluate the data, that even in certain relatively large cities there is only  one monitor!
 
-Furthermore, dramatic differences in pollution rates can be seen even within the same city. In fact, the term micro-environments describes environment within cities or counties which may vary greatly from one block to another.
+Furthermore, dramatic differences in pollution rates can be seen even within the same city. In fact, the term micro-environments describes environments within cities or counties which may vary greatly from one block to another.
 
 ```{r, echo = FALSE, out.width= "800 px"}
 knitr::include_graphics(here::here("img", "map_of_monitors.jpg"))
@@ -220,8 +213,9 @@ The tidyverse is a library of packages created by RStudio.
 While some students may be familiar with previous R programming packages, these packages make data science in R especially legible and intuitive.
 
 
-```{r, out.width = "20%", echo = FALSE, fig.align ="center"}
+```{r, echo = FALSE, fig.show = "hold", out.width = "20%", fig.align = "default"}
 include_graphics("https://tidyverse.tidyverse.org/logo.png")
+include_graphics("https://pbs.twimg.com/media/DkBFpSsW4AIyyIN.png")
 ```
 
 The skills, methods, and concepts that students will be familiar with by the end of this case study are:
@@ -243,31 +237,28 @@ The skills, methods, and concepts that students will be familiar with by the end
 4. Understanding of random forest
 5. How to interpret root mean squared error (rmse) to assess performance for prediction
 
-
-
-```{r, out.width = "100px", echo = FALSE, fig.align ="center"}
-include_graphics("https://pbs.twimg.com/media/DkBFpSsW4AIyyIN.png")
-```
-
-
 We will begin by loading the packages that we will need:
 
 ```{r}
+# Load packages for data import and data wrangling
 library(here)
 library(readr)
 library(dplyr)
 library(skimr)
 library(summarytools)
 library(magrittr)
+# Load packages for making correlation plots
 library(corrplot)
 library(RColorBrewer)
 library(GGally)
+# Load packages for building machine learning algorithm
 library(tidymodels)
 library(workflows)
 library(vip)
 library(tune)
 library(randomForest)
 library(doParallel)
+# Load packages for data visualization/creating map
 library(ggplot2)
 library(stringr)
 library(tidyr)
