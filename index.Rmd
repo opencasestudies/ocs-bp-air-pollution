@@ -560,20 +560,95 @@ knitr::include_graphics(here::here("img", "regression.png"))
 # **Data Import**
 ***
 
-All of our data was previously collected by a [researcher](http://www.biostat.jhsph.edu/~rpeng/) at the [Johns Hopkins School of Public Health](https://www.jhsph.edu/) who studies air pollution and climate change. 
+All of our data was previously collected by a [researcher](http://www.biostat.jhsph.edu/~rpeng/) at the [Johns Hopkins School of Public Health](https://www.jhsph.edu/) who studies air pollution and climate change.  
 
-We have one CSV file that contains both our single **outcome variable** and all of our **features** (or predictor variables).
+We have one CSV file that contains both our single **outcome variable** and all of our **features** (or predictor variables).You can find this data on our [GitHub repository](https://github.com/opencasestudies/ocs-bp-air-pollution/data/raw). Or you can download it more directly by clicking [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/raw/pm25_data.csv).
+
+We have created a "raw" subdirectory within a directory called "data" of our working directory of our RStudio project.
 
 Next, we import our data into R now so that we can explore the data further. 
 We will call our data object `pm` for particulate matter. 
 We import the data using the `read_csv()` function from the `readr` package. 
+
+We will use the `here` package to make it easier to find the data file.
+
+***
+<details> <summary> Click here to see more about creating new projects in RStudio. </summary>
+
+You can create a project by going to the File menu of RStudio like so:
+
+
+```{r, echo = FALSE, out.width="60%"}
+knitr::include_graphics(here::here("img", "New_project.png"))
+```
+
+You can also do so by clicking the project button:
+
+```{r, echo = FALSE, out.width="60%"}
+knitr::include_graphics(here::here("img", "project_button.png"))
+```
+
+See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
+
+</details>
+***
+</details>
+***
+
+
 ```{r}
-pm <- readr::read_csv(here("docs", "pm25_data.csv"))
+pm <- readr::read_csv(here("data","raw", "pm25_data.csv"))
+```
+
+We will save this data as an rda file for later in an "imported" subdirectory of the data directory.
+
+```{r}
+save(pm, file = here::here("data", "imported", "imported_pm.rda"))
 ```
 
 
-
 # **Data Exploration and Wrangling**
+***
+If you are following along but stopped, you could start here by first loading the data like so:
+
+```{r}
+load(here::here("data", "imported", "imported_pm.rda"))
+```
+
+***
+<details> <summary> If you skipped the data import section click here. </summary>
+
+An RDA file (stands for R data) of the data can be found on our [GitHub repository](https://github.com/opencasestudies/ocs-bp-air-pollution/data/imported). Or you can download it more directly by clicking [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/imported/imported_pm.rda).
+Download this file and then place it in your current working directory within a subdirectory called "imported" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
+
+```{r}
+load(here::here("data", "imported", "imported_pm.rda"))
+```
+
+
+***
+<details> <summary> Click here to see more about creating new projects in RStudio. </summary>
+
+You can create a project by going to the File menu of RStudio like so:
+
+
+```{r, echo = FALSE, out.width="60%"}
+knitr::include_graphics(here::here("img", "New_project.png"))
+```
+
+You can also do so by clicking the project button:
+
+```{r, echo = FALSE, out.width="60%"}
+knitr::include_graphics(here::here("img", "project_button.png"))
+```
+
+See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
+
+</details>
+
+***
+</details>
+
 ***
 
 The first step in performing any data analysis is to explore the data. 
@@ -848,6 +923,13 @@ Indeed this increased the correlation, but variables from each of these categori
 
 Now that we have a sense of what our data are, we can get started with building a machine learning model to predict air pollution. 
 
+First let's save our data again because we did wrangle it just a tad. This time we will save it to a subdirectory of the "data" directory called "wrangled". This is a good practice in general for data analyses to keep your data oranganized. We will also save a csv version as this is often useful to give to collaborators. To do this we will use the `write_csv()` function of the `readr` package.
+
+```{r, eval = FALSE}
+save(pm, file = here::here("data", "wrangled", "wrangled_pm.rda"))
+write_csv(pm, file = here::here("data", "wrangled", "wrangled_pm.csv"))
+```
+
 # **What is machine learning?**  {#whatisml}
 ***
 
@@ -1001,6 +1083,42 @@ To split the data into training and testing, we will use the `initial_split()` f
 
 knitr::include_graphics(here::here("img","split.png"))
 ```
+
+If you were starting the case study around here, you can obtain the data  [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
+
+Load the data like so if you are starting here:
+
+```{r}
+load(here::here("data", "wrangled", "wrangled_pm.rda"))
+```
+
+***
+<details> <summary> If you skipped previous sections click here for more information. </summary>
+Download this file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda) (same as above) and then place it in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
+
+***
+<details> <summary> Click here to see more about creating new projects in RStudio. </summary>
+
+You can create a project by going to the File menu of RStudio like so:
+
+
+```{r, echo = FALSE, out.width="60%"}
+knitr::include_graphics(here::here("img", "New_project.png"))
+```
+
+You can also do so by clicking the project button:
+
+```{r, echo = FALSE, out.width="60%"}
+knitr::include_graphics(here::here("img", "project_button.png"))
+```
+
+See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
+
+</details>
+***
+
+</details>
+***
 
 ```{r}
 set.seed(1234)
@@ -1894,6 +2012,7 @@ See [here](https://tidymodels.github.io/tune/reference/fit_resamples.html){targe
 resample_fit <- tune::fit_resamples(PM_wflow, vfold_pm)
 ```
 
+
 We can now take a look at various performance metrics based on the fit of our cross validation "resamples". 
 To do this we will use the `show_best()` function of the `tune` package.
 
@@ -1907,9 +2026,67 @@ Here we can see the mean `RMSE` value across all four folds. The function is cal
 # **Data Analysis**
 ***
 
+If you were starting the case study around here, you can obtain the data  [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
+
+Load the data like so if you are starting here:
+
+```{r}
+load(here::here("data", "wrangled", "wrangled_pm.rda"))
+```
+
+Then you can modify the data to match what we did for the previous model like so to prepare the `city` variable and to split the data into testing and training sets. (You will see later that this would be required due to the number of levels for the city variable in the original data).
+```{r}
+pm %<>%
+  mutate(city = case_when(city == "Not in a city" ~ "Not in a city",
+                          city != "Not in a city" ~ "In a city"))
+
+set.seed(1234) # same seed as before
+pm_split <-rsample::initial_split(data = pm, prop = 2/3)
+pm_split
+ train_pm <-rsample::training(pm_split)
+ test_pm <-rsample::testing(pm_split)
+```
+
+We will also split our data into cross validation folds:
+
+```{r}
+set.seed(1234)
+vfold_pm <- rsample::vfold_cv(data = train_pm, v = 4)
+vfold_pm
+```
+
+***
+<details> <summary> If you skipped previous sections click here for more information. </summary>
+Download this file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda) (same as above) and then place it in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
+
+***
+<details> <summary> Click here to see more about creating new projects in RStudio. </summary>
+
+You can create a project by going to the File menu of RStudio like so:
+
+
+```{r, echo = FALSE, out.width="60%"}
+knitr::include_graphics(here::here("img", "New_project.png"))
+```
+
+You can also do so by clicking the project button:
+
+```{r, echo = FALSE, out.width="60%"}
+knitr::include_graphics(here::here("img", "project_button.png"))
+```
+
+See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
+
+</details>
+***
+</details>
+***
+
+
 In the previous section, we demonstrated how to build a machine learning model (specifically a linear regression model) to predict air pollution with the `tidymodels` framework. 
 
 In the next few section, we will demonstrate another machine learning model. 
+
 
 
 ## **Random Forest**
@@ -1938,7 +2115,7 @@ knitr::include_graphics("https://miro.medium.com/max/1400/0*f_qQPFpdofWGLQqc.png
 
 In our case, we are going to use the random forest method of the the `randomForest` package. 
 
-This package is currently not compatible with categorical variables that have more than 53 levels. See [here](https://cran.r-project.org/web/packages/randomForest/NEWS) for the documentation about when this was updated from 25 levels. Thus we will remove the `zcta`  and `county` variables.
+This package is currently not compatible with categorical variables that have more than 53 levels. See [here](https://cran.r-project.org/web/packages/randomForest/NEWS) for the documentation about when this was updated from 25 levels. Thus we will remove the `zcta`  and `county` variables. This is why it is good that we have modified the city variable to two levels, as there were originally nearlly 600, so this would not have been compatible with this package. 
 
 Note that the `step_novel()` function is necessary here for the `state` variable to get all cross validation folds to work, because there will be different levels included in each fold test and training sets. The new levels for some of the test sets would otherwise result in an error.
 
@@ -2104,14 +2281,14 @@ resample_RF_fit <- tune::fit_resamples(RF_wflow, vfold_pm)
 collect_metrics(resample_RF_fit)
 ```
 
-Now let's compare the performance of this model with our linear regression model:
+Now let's compare the performance of this model with our linear regression model - if you have been following along you could type this to take a look. 
 
-```{r}
+```{r, eval = FALSE}
 # our initial linear regression model:
 collect_metrics(resample_fit)
 ```
 
-OK, so our first model had a mean `rmse` value of 2.17.
+For those starting here we will tell you that our first model had a mean `rmse` value of 2.17.
 It looks like the random forest model had  a much lower `rmse` value of 1.72.
 
 #### {.think_question_block}
@@ -2302,6 +2479,42 @@ Nice!
 
 # **Data Visualization**
 ***
+
+If you were starting the case study around here, you can obtain the data  [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
+
+Load the data like so if you are starting here:
+
+```{r}
+load(here::here("data", "wrangled", "wrangled_pm.rda"))
+```
+
+***
+<details> <summary> If you skipped previous sections click here for more information. </summary>
+Download this file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda) (same as above) and then place it in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
+
+***
+<details> <summary> Click here to see more about creating new projects in RStudio. </summary>
+
+You can create a project by going to the File menu of RStudio like so:
+
+
+```{r, echo = FALSE, out.width="60%"}
+knitr::include_graphics(here::here("img", "New_project.png"))
+```
+
+You can also do so by clicking the project button:
+
+```{r, echo = FALSE, out.width="60%"}
+knitr::include_graphics(here::here("img", "project_button.png"))
+```
+
+See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
+
+</details>
+***
+</details>
+***
+
 
 Our main question for this case study was:  
 
