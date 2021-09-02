@@ -1059,7 +1059,7 @@ Modifying a piece of the overall process is now easier than before because many 
 ***
 
 ```{r, echo=FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","tidymodelsBasics.png"))
+knitr::include_graphics(here::here("img","Updated_tidymodels_basics.png"))
 ```
 
 ## **Splitting the data**
@@ -2831,7 +2831,7 @@ Here are some visual summaries about what we learned about using `tidymodels` to
 First the minimal steps required:
 
 ```{r, echo=FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","tidymodelsBasics.png"))
+knitr::include_graphics(here::here("img","Updated_tidymodels_basics.png"))
 ```
 
 
