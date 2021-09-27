@@ -1,10 +1,12 @@
 ---
-title: "Open Case Studies: Predicting Annual Air Pollution"
-css: style.css
+title: |
+  ![](www/img/interactive_logo.png){width=120px align=left style="padding-right: 20px"}
+  Open Case Studies: Predicting Annual Air Pollution
+css: www/style.css
 output:
   html_document:
     includes:
-       in_header: GA_Script.Rhtml
+       in_header: www/GA_Script.Rhtml
     self_contained: yes
     code_download: yes
     highlight: tango
@@ -16,20 +18,12 @@ output:
     toc: yes
   word_document:
     toc: yes
-
+runtime: shiny_prerendered
 ---
-<style>
-#TOC {
-  background: url("https://opencasestudies.github.io/img/icon-bahi.png");
-  background-size: contain;
-  padding-top: 240px !important;
-  background-repeat: no-repeat;
-}
-</style>
 
 <!-- Open all links in new tab-->  
 <base target="_blank"/>  
-<div id="google_translate_element"></div>
+<div align="left" id="google_translate_element",></div>
 
 <script type="text/javascript" src='//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'></script>
 
@@ -46,12 +40,16 @@ library(here)
 knitr::opts_chunk$set(include = TRUE, comment = NA, echo = TRUE,
                       message = FALSE, warning = FALSE, cache = FALSE,
                       fig.align = "center", out.width = '90%')
+
+library(learnr)
+library(gradethis)
+gradethis::gradethis_setup()
 ```
 
 
 #### {.outline }
 ```{r, echo = FALSE, out.width = "800 px"}
-knitr::include_graphics(here::here("img", "main_plot_maps.png"))
+knitr::include_graphics(here::here("www", "img", "main_plot_maps.png"))
 ```
 
 ####
@@ -125,7 +123,7 @@ There are 3 major categories:
 Here you can see how these sizes compare with a human hair:
 
 ```{r, echo = FALSE, out.width= "600 px"}
-knitr::include_graphics(here::here("img", "pm2.5_scale_graphic-color_2.jpg"))
+knitr::include_graphics(here::here("www", "img", "pm2.5_scale_graphic-color_2.jpg"))
 ```
 
 ##### [[source]](https://www.epa.gov/pm-pollution/particulate-matter-pm-basics){target="_blank"}
@@ -138,7 +136,7 @@ knitr::include_graphics(here::here("img", "pm2.5_scale_graphic-color_2.jpg"))
 <u>The following plot shows the relative sizes of these different pollutants in micrometers (µm):</u>
 
 ```{r, echo = FALSE, out.width= "800 px"}
-knitr::include_graphics(here::here("img", "particulate-size-chart.png"))
+knitr::include_graphics(here::here("www", "img", "particulate-size-chart.png"))
 ```
 
 ##### [[source]](https://en.wikipedia.org/wiki/Particulates){target="_blank"}
@@ -147,7 +145,7 @@ knitr::include_graphics(here::here("img", "particulate-size-chart.png"))
 <u>This table shows how deeply some of the smaller fine particles can penetrate within the human body:</u>
 
 ```{r, echo = FALSE, out.width= "800 px"}
-knitr::include_graphics(here::here("img", "sizes.jpg"))
+knitr::include_graphics(here::here("www", "img", "sizes.jpg"))
 ```
 
 ##### [[source]](https://www.frontiersin.org/articles/10.3389/fpubh.2020.00014/full){target="_blank"}
@@ -174,7 +172,7 @@ However, as can be seen in the following figure, these monitors are relatively s
 Furthermore, dramatic differences in pollution rates can be seen even within the same city. In fact, the term micro-environments describes environments within cities or counties which may vary greatly from one block to another.
 
 ```{r, echo = FALSE, out.width= "800 px"}
-knitr::include_graphics(here::here("img", "map_of_monitors.jpg"))
+knitr::include_graphics(here::here("www", "img", "map_of_monitors.jpg"))
 ```
 
 ##### [[source]](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63){target="_blank"}
@@ -187,7 +185,7 @@ This lack of granularity in air pollution monitoring has hindered our ability to
 An [article](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63){target="_blank"} published in the *Environmental Health* journal dealt with this issue by using data, including population density, road density, among other features, to model or predict air pollution levels at a more localized scale using machine learning (ML) methods. 
 
 ```{r, echo = FALSE, out.width= "800 px"}
-knitr::include_graphics(here::here("img", "thepaper.png"))
+knitr::include_graphics(here::here("www", "img", "thepaper.png"))
 ```
 
 ##### [[source]](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63){target="_blank"}
@@ -351,7 +349,7 @@ The report also stated that:
 deaths globally — nearly **1 in every 10 deaths**.
 
 ```{r, echo = FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","2017deaths.png"))
+knitr::include_graphics(here::here("www", "img","2017deaths.png"))
 ```
 
 ##### [[source]](https://www.stateofglobalair.org/sites/default/files/soga_2019_fact_sheet.pdf){target="_blank"}
@@ -359,7 +357,7 @@ knitr::include_graphics(here::here("img","2017deaths.png"))
 The [State of Global Air 2018 report](https://www.stateofglobalair.org/sites/default/files/soga-2018-report.pdf){target="_blank"} using data from 2016 which separated different types of air pollution, found that **particulate pollution was particularly associated with mortality**.
 
 ```{r, echo = FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","2017mortality.png"))
+knitr::include_graphics(here::here("www", "img","2017mortality.png"))
 ```
 
 ##### [[source]](https://www.stateofglobalair.org/sites/default/files/soga-2018-report.pdf){target="_blank"}
@@ -369,7 +367,7 @@ The 2019 report shows that the highest levels of fine particulate pollution occu
 > More than **90%** of people worldwide live in areas **exceeding** the World Health Organization (WHO) **Guideline** for healthy air. More than half live in areas that do not even meet WHO's least-stringent air quality target.
 
 ```{r, echo = FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","PMworld.png"))
+knitr::include_graphics(here::here("www", "img","PMworld.png"))
 ```
 
 ##### [[source]](https://www.stateofglobalair.org/sites/default/files/soga_2019_fact_sheet.pdf){target="_blank"}
@@ -377,7 +375,7 @@ knitr::include_graphics(here::here("img","PMworld.png"))
 Looking at the US specifically, air pollution levels are generally improving, with declining national air pollutant concentration averages as shown from the 2019 [*Our Nation's Air*](https://gispub.epa.gov/air/trendsreport/2019/#home){target="_blank"} report from the US Environmental Protection Agency (EPA): 
 
 ```{r, echo = FALSE}
-knitr::include_graphics(here::here("img", "US.png"))
+knitr::include_graphics(here::here("www", "img", "US.png"))
 ```
 
 ##### [[source]](https://gispub.epa.gov/air/trendsreport/2019/documentation/AirTrends_Flyer.pdf){target="_blank"}
@@ -390,7 +388,7 @@ You can see that current air quality conditions at this [website](https://aqicn.
 For example, here are the conditions in Topeka Kansas at the time this case study was created:
 
 ```{r, echo = FALSE}
-knitr::include_graphics(here::here("img", "Kansas.png"))
+knitr::include_graphics(here::here("www", "img", "Kansas.png"))
 ```
 
 ##### [[source]](https://aqicn.org/city/usa/){target="_blank"}
@@ -471,7 +469,7 @@ All of our data was previously collected by a [researcher](http://www.biostat.jh
 The monitor data that we will be using comes from **[gravimetric monitors](https://publiclab.org/wiki/filter-pm){target="_blank"}** (see picture below) operated by the US [Environmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}.
 
 ```{r, echo = FALSE, out.width="100px"}
-knitr::include_graphics(here::here("img","monitor.png"))
+knitr::include_graphics(here::here("www", "img","monitor.png"))
 ```
 
 ##### [image curtesy of [Kirsten Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler)]
@@ -479,7 +477,7 @@ knitr::include_graphics(here::here("img","monitor.png"))
 These monitors use a filtration system to specifically capture fine particulate matter. 
 
 ```{r, echo = FALSE, out.width="150px"}
-knitr::include_graphics(here::here("img","filter.png"))
+knitr::include_graphics(here::here("www", "img","filter.png"))
 ```
 
 ##### [[source]](https://publiclab.org/wiki/filter-pm){target="_blank"}
@@ -566,7 +564,7 @@ Variable   | Details
 Many of these features have to do with the circular area around the monitor called the "buffer". These are illustrated in the following figure:
 
 ```{r, echo = FALSE, out.width = "800px",}
-knitr::include_graphics(here::here("img", "regression.png"))
+knitr::include_graphics(here::here("www", "img", "regression.png"))
 ```
 
 ##### [[source]](https://www.ncbi.nlm.nih.gov/pubmed/15292906){target="_blank"}
@@ -595,13 +593,13 @@ You can create a project by going to the File menu of RStudio like so:
 
 
 ```{r, echo = FALSE, out.width="60%"}
-knitr::include_graphics(here::here("img", "New_project.png"))
+knitr::include_graphics(here::here("www", "img", "New_project.png"))
 ```
 
 You can also do so by clicking the project button:
 
 ```{r, echo = FALSE, out.width="60%"}
-knitr::include_graphics(here::here("img", "project_button.png"))
+knitr::include_graphics(here::here("www", "img", "project_button.png"))
 ```
 
 See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
@@ -612,14 +610,22 @@ See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Project
 ***
 
 
-```{r}
+```{r, eval=FALSE}
 pm <- readr::read_csv(here("data","raw", "pm25_data.csv"))
+```
+
+```{r, echo=FALSE}
+pm <- readr::read_csv(here("www", "data","raw", "pm25_data.csv"))
 ```
 
 We will save this data as an rda file for later in an "imported" subdirectory of the data directory.
 
-```{r}
+```{r, eval=FALSE}
 save(pm, file = here::here("data", "imported", "imported_pm.rda"))
+```
+
+```{r, echo=FALSE}
+save(pm, file = here::here("www", "data", "imported", "imported_pm.rda"))
 ```
 
 
@@ -627,8 +633,12 @@ save(pm, file = here::here("data", "imported", "imported_pm.rda"))
 ***
 If you are following along but stopped, you could start here by first loading the data like so:
 
-```{r}
+```{r, eval=FALSE}
 load(here::here("data", "imported", "imported_pm.rda"))
+```
+
+```{r, echo=FALSE}
+load(here::here("www", "data", "imported", "imported_pm.rda"))
 ```
 
 ***
@@ -637,8 +647,12 @@ load(here::here("data", "imported", "imported_pm.rda"))
 An RDA file (stands for R data) of the data can be found on our [GitHub repository](https://github.com/opencasestudies/ocs-bp-air-pollution/data/imported). Or you can download it more directly by clicking [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/imported/imported_pm.rda).
 Download this file and then place it in your current working directory within a subdirectory called "imported" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
-```{r}
+```{r, eval=FALSE}
 load(here::here("data", "imported", "imported_pm.rda"))
+```
+
+```{r, echo=FALSE}
+load(here::here("www", "data", "imported", "imported_pm.rda"))
 ```
 
 
@@ -649,13 +663,13 @@ You can create a project by going to the File menu of RStudio like so:
 
 
 ```{r, echo = FALSE, out.width="60%"}
-knitr::include_graphics(here::here("img", "New_project.png"))
+knitr::include_graphics(here::here("www", "img", "New_project.png"))
 ```
 
 You can also do so by clicking the project button:
 
 ```{r, echo = FALSE, out.width="60%"}
-knitr::include_graphics(here::here("img", "project_button.png"))
+knitr::include_graphics(here::here("www", "img", "project_button.png"))
 ```
 
 See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
@@ -1033,13 +1047,13 @@ The tidymodels package collection, which includes parsnip, has other packages fo
 There are many R packages in the `tidymodels` ecosystem, which assist with various steps in the process of building a machine learning algorithm. These are the main packages, but there are others.
 
 ```{r, echo=FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","simpletidymodels.png"))
+knitr::include_graphics(here::here("www", "img","simpletidymodels.png"))
 ```
 
 This is a schematic of how these packages work together to build a machine learning algorithm:
 
 ```{r, echo=FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","MachineLearning.png"))
+knitr::include_graphics(here::here("www", "img","MachineLearning.png"))
 ```
 
 ### **Benefits of `tidymodels`**
@@ -1059,7 +1073,7 @@ Modifying a piece of the overall process is now easier than before because many 
 ***
 
 ```{r, echo=FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","Updated_tidymodels_basics.png"))
+knitr::include_graphics(here::here("www", "img","Updated_tidymodels_basics.png"))
 ```
 
 ## **Splitting the data**
@@ -1097,15 +1111,19 @@ To split the data into training and testing, we will use the `initial_split()` f
 
 ```{r, echo=FALSE}
 
-knitr::include_graphics(here::here("img","split.png"))
+knitr::include_graphics(here::here("www", "img","split.png"))
 ```
 
 If you were starting the case study around here, you can obtain the data  [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
 
 Load the data like so if you are starting here:
 
-```{r}
+```{r, eval=FALSE}
 load(here::here("data", "wrangled", "wrangled_pm.rda"))
+```
+
+```{r, echo=FALSE}
+load(here::here("www", "data", "wrangled", "wrangled_pm.rda"))
 ```
 
 ***
@@ -1119,13 +1137,13 @@ You can create a project by going to the File menu of RStudio like so:
 
 
 ```{r, echo = FALSE, out.width="60%"}
-knitr::include_graphics(here::here("img", "New_project.png"))
+knitr::include_graphics(here::here("www", "img", "New_project.png"))
 ```
 
 You can also do so by clicking the project button:
 
 ```{r, echo = FALSE, out.width="60%"}
-knitr::include_graphics(here::here("img", "project_button.png"))
+knitr::include_graphics(here::here("www", "img", "project_button.png"))
 ```
 
 See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
@@ -1296,7 +1314,7 @@ summary(simple_rec)
 To summarize this step, we use the `recipe()` function to assign roles to all the variables: 
 
 ```{r, echo=FALSE, out.width="400px"}
-knitr::include_graphics(here::here("img","Starting_a_recipe_recipes1.png"))
+knitr::include_graphics(here::here("www", "img","Starting_a_recipe_recipes1.png"))
 ```
 
 
@@ -1305,7 +1323,7 @@ knitr::include_graphics(here::here("img","Starting_a_recipe_recipes1.png"))
 Next, we use the `step*()` functions from the `recipe` package to specify pre-processing steps. 
 
 ```{r, echo=FALSE, out.width="400px"}
-knitr::include_graphics(here::here("img","Making_a_recipe_recipes2.png"))
+knitr::include_graphics(here::here("www", "img","Making_a_recipe_recipes2.png"))
 ```
 
 **This [link](https://tidymodels.github.io/recipes/reference/index.html){target="_blank"} and this [link](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"} show the many options for recipe step functions.**
@@ -1455,7 +1473,7 @@ You can see:
 Since we retained our pre-processed training data (i.e. `prep(retain=TRUE)`), we can take a look at it by using the `bake()` function of the `recipes` package like this:
 
 ```{r, echo=FALSE, out.width="400px"}
-knitr::include_graphics(here::here("img","training_preprocessing_recipes3.png"))
+knitr::include_graphics(here::here("www", "img","training_preprocessing_recipes3.png"))
 ```
 
 Let's bake! 
@@ -1536,7 +1554,7 @@ Therefore, if you wanted to look at the pre-processed testing data you would use
 (You generally want to leave your testing data alone, but it is good to look for issues like the introduction of NA values).
 
 ```{r, echo=FALSE, out.width="400px"}
-knitr::include_graphics(here::here("img","testing_preprocessing_recipes4.png"))
+knitr::include_graphics(here::here("www", "img","testing_preprocessing_recipes4.png"))
 ```
 
 Let's bake! 
@@ -1964,7 +1982,7 @@ We will use the `rsample` package again in order to further implement what are c
 Here is a visualization of the concept for cross validation/resampling/repartitioning from [Max Kuhn](https://resources.rstudio.com/authors/max-kuhn){target="_blank"}:
 
 ```{r, echo=FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","resampling.png"))
+knitr::include_graphics(here::here("www", "img","resampling.png"))
 ```
 
 Technically creating our testing and training set out of our original training data is sometimes considered a form of [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"}, called the holdout method. 
@@ -1984,7 +2002,7 @@ This is really useful for fine tuning specific aspects of the model in a process
 Here is a visualization of how the folds are created:
 
 ```{r, echo=FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img", "vfold.png"))
+knitr::include_graphics(here::here("www", "img", "vfold.png"))
 ```
 
 **Note**: People typically ignore spatial dependence with cross validation of air pollution monitoring data in the air pollution field, so we will do the same.  However, it might make sense to leave out blocks of monitors rather than  random individual monitors to help account for some spatial dependence.
@@ -2014,7 +2032,7 @@ Now we can see that we have created 4 folds of the data and we can see how many 
 Once the folds are created they can be used to evaluate performance by fitting the model to each of the re-samples that we created:
 
 ```{r, echo=FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img", "cross_validation.png"))
+knitr::include_graphics(here::here("www", "img", "cross_validation.png"))
 ```
 
 ### **Assessing model performance on $v$-folds using `tune`**
@@ -2046,8 +2064,12 @@ If you were starting the case study around here, you can obtain the data  [here]
 
 Load the data like so if you are starting here:
 
-```{r}
+```{r, eval=FALSE}
 load(here::here("data", "wrangled", "wrangled_pm.rda"))
+```
+
+```{r, echo=FALSE}
+load(here::here("www", "data", "wrangled", "wrangled_pm.rda"))
 ```
 
 Then you can modify the data to match what we did for the previous model like so to prepare the `city` variable and to split the data into testing and training sets. (You will see later that this would be required due to the number of levels for the city variable in the original data).
@@ -2082,13 +2104,13 @@ You can create a project by going to the File menu of RStudio like so:
 
 
 ```{r, echo = FALSE, out.width="60%"}
-knitr::include_graphics(here::here("img", "New_project.png"))
+knitr::include_graphics(here::here("www", "img", "New_project.png"))
 ```
 
 You can also do so by clicking the project button:
 
 ```{r, echo = FALSE, out.width="60%"}
-knitr::include_graphics(here::here("img", "project_button.png"))
+knitr::include_graphics(here::here("www", "img", "project_button.png"))
 ```
 
 See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
@@ -2500,8 +2522,12 @@ If you were starting the case study around here, you can obtain the data  [here]
 
 Load the data like so if you are starting here:
 
-```{r}
+```{r, eval=FALSE}
 load(here::here("data", "wrangled", "wrangled_pm.rda"))
+```
+
+```{r, echo=FALSE}
+load(here::here("www", "data", "wrangled", "wrangled_pm.rda"))
 ```
 
 ***
@@ -2515,13 +2541,13 @@ You can create a project by going to the File menu of RStudio like so:
 
 
 ```{r, echo = FALSE, out.width="60%"}
-knitr::include_graphics(here::here("img", "New_project.png"))
+knitr::include_graphics(here::here("www", "img", "New_project.png"))
 ```
 
 You can also do so by clicking the project button:
 
 ```{r, echo = FALSE, out.width="60%"}
-knitr::include_graphics(here::here("img", "project_button.png"))
+knitr::include_graphics(here::here("www", "img", "project_button.png"))
 ```
 
 See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
@@ -2831,14 +2857,14 @@ Here are some visual summaries about what we learned about using `tidymodels` to
 First the minimal steps required:
 
 ```{r, echo=FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","Updated_tidymodels_basics.png"))
+knitr::include_graphics(here::here("www", "img","Updated_tidymodels_basics.png"))
 ```
 
 
 Here is a guide for more advanced analyses involving preprocessing, cross validation, or tuning:
 
 ```{r, echo=FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","full_tidymodels_overview.png"))
+knitr::include_graphics(here::here("www", "img","full_tidymodels_overview.png"))
 ```
 
 
@@ -2849,7 +2875,7 @@ knitr::include_graphics(here::here("img","full_tidymodels_overview.png"))
 Here, we provide an overview of the `tidymodels` framework. 
 
 ```{r, echo=FALSE, out.width="800px"}
-knitr::include_graphics(here::here("img","ecosystem.png"))
+knitr::include_graphics(here::here("www", "img","ecosystem.png"))
 ```
 
 

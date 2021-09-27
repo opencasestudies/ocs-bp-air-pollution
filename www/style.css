@@ -99,3 +99,10 @@ li.toctree-l2:first-child {
     background: #FFE6E6;
     color: black;
 }
+
+.exercise_block {
+    padding: .5em;
+    border: 1px solid lightgrey;
+    background: white;
+    color: black;
+}
