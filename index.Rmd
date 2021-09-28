@@ -22,7 +22,8 @@ runtime: shiny_prerendered
 ---
 
 <!-- Open all links in new tab-->  
-<base target="_blank"/>  
+<base target="_blank"/> 
+
 <div align="left" id="google_translate_element",></div>
 
 <script type="text/javascript" src='//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'></script>
@@ -745,7 +746,7 @@ Great! Now we can see that these variables are now factors as indicated by `<fct
 
 
 
-### **`skim` package**
+## **`skim` package**
 ***
 
 The `skim()` function of the `skimr` package is also really helpful for getting a general sense of your data.
@@ -959,6 +960,74 @@ First let's save our data again because we did wrangle it just a tad. This time 
 save(pm, file = here::here("data", "wrangled", "wrangled_pm.rda"))
 write_csv(pm, file = here::here("data", "wrangled", "wrangled_pm.csv"))
 ```
+
+## **Exercise**
+
+***
+
+``` {r dew_quiz, echo = FALSE}
+quiz(caption = "",
+  question("When using machine learning for prediction, what is the name of the variable that we want to predict?",
+    answer("Feature variable", message = "Features (or predictor variables) are variables used to predict the outcome variable."),
+    answer("Predictor variable", message = "Features (or predictor variables) are variables used to predict the outcome variable."),
+    answer("Outcome variable", correct = TRUE),
+    allow_retry = TRUE,
+    random_answer_order = TRUE
+  ),
+  question("Suppose in our data set, there is a variable that is numeric IDs. These IDs are unique but do not necessarily contain information regarding orders, i.e., the ordering of the numbers is not of our interest. What data class is the most appropriate for this variable?",
+    answer("Double `<dbl>`", message = "Recall that order is not of our interest. Try again."),
+    answer("Integer `<int>`", message = "Recall that order is not of our interest. Try again."),
+    answer("Character `<chr>`", message = "Character variables have values that are character strings, such as words or phrases."),
+    answer("Factor `<fct>`", correct = TRUE, message = "A factor is something that has unique levels but there is no appreciable order to the levels."),
+    allow_retry = TRUE,
+    random_answer_order = TRUE
+  ),
+  question("In prediction analyses, which one of the following is NOT the reason why we need to care about whether the variables are correlated?",
+    answer("To avoid the problem of multicollinearity when using a linear regression model."),
+    answer("To avoid redundant variables that may cause unnecessary noise."),
+    answer("Correlation can make it difficult to interpret what variables are actually predictive."),
+    answer("Having highly correlated variables makes our prediction more accurate.", correct = TRUE, message = "To review this topic, refer to the [\"Evaluate correlation\"](https://www.opencasestudies.org/ocs-bp-air-pollution/#:~:text=In%20prediction%20analyses,should%20we%20care%20about%20this?) section of this case study."),
+    allow_retry = TRUE,
+    random_answer_order = TRUE
+  ),
+  question("Taking a log transformation can account for extreme value ranges of our variables.",
+    answer("False"),
+    answer("True", correct = TRUE),
+    allow_retry = TRUE,
+    random_answer_order = TRUE
+  )
+)
+```
+
+#### {.exercise_block}
+
+Suppose we have a dataframe called `mydata`. There are five variables in this dataframe: `var1`, `var2`, `var3`, `var4`, and `var5`. Try to come up with the code for creating the plot called `myplot`. This plot visualizes correlations between variables. (Hint: start from `mydata` and use a function from the GGally package)
+
+```{r dew_exercise-setup}
+library(tidyverse)
+library(GGally)
+
+set.seed(123)
+var1 <- runif(20, min = 0, max = 5)
+var2 <- var1 + 1
+var3 <- (-1) * var1
+var4 <- rnorm(20, mean = 2.5, sd = 2)
+var5 <- 2 * var4
+mydata <- data.frame(var1, var2, var3, var4, var5)
+myplot <- mydata %>%
+  ggcorr(palette = "RdBu", label = TRUE)
+```
+
+```{r dew_exercise, exercise=TRUE, exercise.eval = TRUE}
+myplot
+```
+
+```{r dew_exercise-solution}
+mydata %>%
+  ggcorr(palette = "RdBu", label = TRUE)
+```
+
+####
 
 # **What is machine learning?**  {#whatisml}
 ***
@@ -2056,6 +2125,57 @@ tune::show_best(resample_fit, metric = "rmse")
 
 Here we can see the mean `RMSE` value across all four folds. The function is called `show_best()` because it is also used for model tuning and it will show the parameter combination with the best performance, we will discuss this more later in the case study.
 
+## **Exercise**
+
+***
+
+``` {r ML_Quiz, echo = FALSE}
+quiz(caption = "",
+  question("To solve a standard machine learning problem we need: (check all that apply)",
+    answer("A data set to train from.", correct = TRUE),
+    answer("An algorithm or set of algorithms to try $f$. Note: $\\hat Y = f(\\bf{X})$ where $\\hat Y$ is the predicted outcome and $\\bf{X}$ is a vector of predictor variables.", correct = TRUE),
+    answer("A distance metric $d$ for measuring how close $Y$ is to $\\hat Y$. Note: $Y$ is the observed outcome.", correct = TRUE),
+    answer("A definition of what a \"good\" distance is.", correct = TRUE),
+    allow_retry = TRUE,
+    random_answer_order = FALSE
+  ),
+  question("Creating a recipe using the `recipes` package allows us to: (check all that apply)",
+    answer("specify what variables are to be used in the model", correct = TRUE),
+    answer("specify any pre-processing steps", correct = TRUE),
+    answer("execute the pre-processing steps and create the data frame of predictors", message = "Simply creating a recipe does not execute pre-processing steps. See the [Running the pre-processing](https://www.opencasestudies.org/ocs-bp-air-pollution/#Running_the_pre-processing) section."),
+    allow_retry = TRUE,
+    random_answer_order = TRUE
+  ),
+  question("When assigning variable roles, what function could we use? (check all that apply)",
+    answer("`rsample::initial_split()`", message = "We used `rsample::initial_split()` function to split the data into training and testing data."),
+    answer("`stats::formula()`", message = "We used `formula()` function to view the formula of the recipe."),
+    answer("`recipes::recipe()`", correct = TRUE, message = "This is used with formula notation."),
+    answer("`recipes::update_role()`", correct = TRUE),
+    allow_retry = TRUE,
+    random_answer_order = TRUE
+  ),
+  question("One-hot encoding means simply encoding our categorical variables numerically.",
+    answer("True", message = "Recall that numeric assignments can be interpreted by algorithms as having a particular rank or order. We use one-hot encoding to avoid this problem. Try again."),
+    answer("False", correct = TRUE, message = "In one-hot encoding, [binary numbers](https://en.wikipedia.org/wiki/Binary_number) made of 1s and 0s are used to arbitrarily assign a numeric value that has no apparent order."),
+    allow_retry = TRUE,
+    random_answer_order = TRUE
+  ),
+  question("Which one of the following functions was used to return a data frame with coefficients from our machine learning model (one row per coefficient)?",
+    answer("`workflows::workflow()`", message = "`workflows::workflow()` was used to create a workflow."),
+    answer("`vip::vip()`", message = "`vip::vip()` was used to view the top contributing variables in our model."),
+    answer("`broom::tidy()`", correct = TRUE),
+    allow_retry = TRUE,
+    random_answer_order = TRUE
+  ),
+  question("V-fold cross validation: (check all that apply)",
+    answer("uses $v-1$ folds of the training data to iteratively train the model", correct = TRUE),
+    answer("uses the one fold that was not used to fit to test the performance of the model each time", correct = TRUE, message = "See [here](https://www.opencasestudies.org/ocs-bp-air-pollution/#:~:text=Once%20the%20folds%20are%20created,re-samples%20that%20we%20created:) for details."),
+    answer("uses a fold of the testing data from using the funtion `initial_split()` to interatively evaluate the model performance", message = "Remember that the testing data is not used in any part of training. See [here](https://www.opencasestudies.org/ocs-bp-air-pollution/#:~:text=Once%20the%20folds%20are%20created,re-samples%20that%20we%20created:) for details."),
+    allow_retry = TRUE,
+    random_answer_order = TRUE
+  )
+)
+```
 
 # **Data Analysis**
 ***
@@ -2515,6 +2635,267 @@ test_predictions %>%
 
 Nice!
 
+## **Exercise**
+
+***
+
+``` {r da_quiz, echo = FALSE}
+quiz(caption = "",
+  question("Which one of the arguments of the `parsnip::rand_forest()` function  defines the number of predictor variables that will be randomly sampled at each split when creating the tree models?",
+    answer("`min_n`", message = "`min_n` defines the minimum number of data points in a node that are required for the node to be split further."),
+    answer("`trees`", message = "`trees` defines the number of trees in the ensemble."),
+    answer("`mtry`", correct = TRUE),
+    allow_retry = TRUE,
+    random_answer_order = TRUE
+  ),
+  question("Using the `last_fit()` function of the `tune` package requires pre-processing steps.",
+    answer("True", message = "It does not require pre-processing steps."),
+    answer("False", correct = TRUE, message = "It does not require pre-processing steps."),
+    allow_retry = TRUE,
+    random_answer_order = TRUE
+  )
+)
+```
+
+#### {.exercise_block}
+
+`mtcars`is a built-in dataset in R.  In this exercise, build a machine learning model that predicts `mpg` (miles/(US) gallon) using variables `cyl` (number of cylinders), `hp` (gross horsepower), `wt` (weight (1000 lbs)), `gear` (number of forward gears), and `carb` (number of carburetors). Click [here](https://www.rdocumentation.org/packages/datasets/versions/3.6.2/topics/mtcars) to see documentation of `mtcars`. 
+
+Notes: 
+
+* Refer to the [`tidymodels` Steps](https://rsconnect.biostat.jhsph.edu/ocs-bp-air-pollution-interactive/#tidymodels_Steps) section. 
+* Use a linear regression model.
+* Use "lm" as computational engine.
+
+```{r da_exercise-setup}
+library(tidyverse)
+library(tidymodels)
+```
+
+```{r da_exercise, exercise=TRUE, exercise.lines = 38, eval=FALSE}
+# Replace the underscores("_") with your code with one character per "_".
+set.seed(1234)  # "1234" can be replaced by any seed that you like
+ct <- as_tibble(mtcars)
+# Step 1: Split into testing and training data
+ct_split <- rsample::_____________(data = ct)
+train_ct <- rsample::training(________)
+test_ct <- rsample::testing(________)
+# Step 2: Create recipe and assign variable roles
+rec <- train_ct %>%
+  recipes::______(___ ~ ___ + __ + __ + ____ + ____)
+# Step 3: Specify model, engine, and mode
+ct_model <- parsnip::__________() # Use a linear regression model
+lm_ct_model <- 
+  ct_model  %>%
+  parsnip::__________("lm") %>% # Use "lm" computational engine
+  set_mode("regression")
+# Step 4: Create workflow, add recipe, add model
+ct_wflow <-workflows::workflow() %>%
+  workflows::add_recipe(___) %>%
+  workflows::_________(lm_ct_model)
+# Step 5: Fit workflow
+ct_wflow_fit <- parsnip::___(________, data = train_ct)
+# Step 6: Get predictions
+mpg_pred_train <- 
+  _______(ct_wflow_fit, train_ct) %>%
+  bind_cols(train_ct %>% select(mpg))
+# Step 7: Use predictions to get performance metrics
+# It might be helpful to look at "mpg_pred_train"
+yardstick::metrics(mpg_pred_train, 
+                 truth = ___, estimate = _____)
+# Now that we have built the model, let's see what the performance is with the test data
+ct_test_fit <- parsnip::___(ct_wflow, data = _______)
+mpg_pred_test <- 
+  predict(___________, _______) %>%
+  bind_cols(_______ %>% select(mpg))
+yardstick::metrics(mpg_pred_test, 
+                 truth = ___, estimate = _____)
+```
+
+```{r da_exercise-hint-1}
+set.seed(1234)
+ct <- as_tibble(mtcars)
+# Step 1: Split into testing and training data
+ct_split <- rsample::initial_split(data = ct)
+train_ct <- rsample::training(ct_split)
+test_ct <- rsample::testing(ct_split)
+```
+
+```{r da_exercise-hint-2}
+set.seed(1234)
+ct <- as_tibble(mtcars)
+# Step 1: Split into testing and training data
+ct_split <- rsample::initial_split(data = ct)
+train_ct <- rsample::training(ct_split)
+test_ct <- rsample::testing(ct_split)
+# Step 2: Create recipe and assign variable roles
+rec <- train_ct %>%
+  recipes::recipe(mpg ~ cyl + hp + wt + gear + carb)
+```
+
+```{r da_exercise-hint-3}
+set.seed(1234)
+ct <- as_tibble(mtcars)
+# Step 1: Split into testing and training data
+ct_split <- rsample::initial_split(data = ct)
+train_ct <- rsample::training(ct_split)
+test_ct <- rsample::testing(ct_split)
+# Step 2: Create recipe and assign variable roles
+rec <- train_ct %>%
+  recipes::recipe(mpg ~ cyl + hp + wt + gear + carb)
+# Step 3: Specify model, engine, and mode
+ct_model <- parsnip::linear_reg()
+lm_ct_model <- 
+  ct_model  %>%
+  parsnip::set_engine("lm") %>%
+  set_mode("regression")
+```
+
+```{r da_exercise-hint-4}
+set.seed(1234)
+ct <- as_tibble(mtcars)
+# Step 1: Split into testing and training data
+ct_split <- rsample::initial_split(data = ct)
+train_ct <- rsample::training(ct_split)
+test_ct <- rsample::testing(ct_split)
+# Step 2: Create recipe and assign variable roles
+rec <- train_ct %>%
+  recipes::recipe(mpg ~ cyl + hp + wt + gear + carb)
+# Step 3: Specify model, engine, and mode
+ct_model <- parsnip::linear_reg()
+lm_ct_model <- 
+  ct_model  %>%
+  parsnip::set_engine("lm") %>%
+  set_mode("regression")
+# Step 4: Create workflow, add recipe, add model
+ct_wflow <-workflows::workflow() %>%
+  workflows::add_recipe(rec) %>%
+  workflows::add_model(lm_ct_model)
+```
+
+```{r da_exercise-hint-5}
+set.seed(1234)
+ct <- as_tibble(mtcars)
+# Step 1: Split into testing and training data
+ct_split <- rsample::initial_split(data = ct)
+train_ct <- rsample::training(ct_split)
+test_ct <- rsample::testing(ct_split)
+# Step 2: Create recipe and assign variable roles
+rec <- train_ct %>%
+  recipes::recipe(mpg ~ cyl + hp + wt + gear + carb)
+# Step 3: Specify model, engine, and mode
+ct_model <- parsnip::linear_reg()
+lm_ct_model <- 
+  ct_model  %>%
+  parsnip::set_engine("lm") %>%
+  set_mode("regression")
+# Step 4: Create workflow, add recipe, add model
+ct_wflow <-workflows::workflow() %>%
+  workflows::add_recipe(rec) %>%
+  workflows::add_model(lm_ct_model)
+# Step 5: Fit workflow
+ct_wflow_fit <- parsnip::fit(ct_wflow, data = train_ct)
+```
+
+```{r da_exercise-hint-6}
+set.seed(1234)
+ct <- as_tibble(mtcars)
+# Step 1: Split into testing and training data
+ct_split <- rsample::initial_split(data = ct)
+train_ct <- rsample::training(ct_split)
+test_ct <- rsample::testing(ct_split)
+# Step 2: Create recipe and assign variable roles
+rec <- train_ct %>%
+  recipes::recipe(mpg ~ cyl + hp + wt + gear + carb)
+# Step 3: Specify model, engine, and mode
+ct_model <- parsnip::linear_reg()
+lm_ct_model <- 
+  ct_model  %>%
+  parsnip::set_engine("lm") %>%
+  set_mode("regression")
+# Step 4: Create workflow, add recipe, add model
+ct_wflow <-workflows::workflow() %>%
+  workflows::add_recipe(rec) %>%
+  workflows::add_model(lm_ct_model)
+# Step 5: Fit workflow
+ct_wflow_fit <- parsnip::fit(ct_wflow, data = train_ct)
+# Step 6: Get predictions
+mpg_pred_train <- 
+  predict(ct_wflow_fit, train_ct) %>%
+  bind_cols(train_ct %>% select(mpg))
+```
+
+```{r da_exercise-hint-7}
+set.seed(1234)
+ct <- as_tibble(mtcars)
+# Step 1: Split into testing and training data
+ct_split <- rsample::initial_split(data = ct)
+train_ct <- rsample::training(ct_split)
+test_ct <- rsample::testing(ct_split)
+# Step 2: Create recipe and assign variable roles
+rec <- train_ct %>%
+  recipes::recipe(mpg ~ cyl + hp + wt + gear + carb)
+# Step 3: Specify model, engine, and mode
+ct_model <- parsnip::linear_reg()
+lm_ct_model <- 
+  ct_model  %>%
+  parsnip::set_engine("lm") %>%
+  set_mode("regression")
+# Step 4: Create workflow, add recipe, add model
+ct_wflow <-workflows::workflow() %>%
+  workflows::add_recipe(rec) %>%
+  workflows::add_model(lm_ct_model)
+# Step 5: Fit workflow
+ct_wflow_fit <- parsnip::fit(ct_wflow, data = train_ct)
+# Step 6: Get predictions
+mpg_pred_train <- 
+  predict(ct_wflow_fit, train_ct) %>%
+  bind_cols(train_ct %>% select(mpg))
+# Step 7: Use predictions to get performance metrics
+yardstick::metrics(mpg_pred_train, 
+                 truth = mpg, estimate = .pred)
+```
+
+```{r da_exercise-solution}
+set.seed(1234)
+ct <- as_tibble(mtcars)
+# Step 1: Split into testing and training data
+ct_split <- rsample::initial_split(data = ct)
+train_ct <- rsample::training(ct_split)
+test_ct <- rsample::testing(ct_split)
+# Step 2: Create recipe and assign variable roles
+rec <- train_ct %>%
+  recipes::recipe(mpg ~ cyl + hp + wt + gear + carb)
+# Step 3: Specify model, engine, and mode
+ct_model <- parsnip::linear_reg()
+lm_ct_model <- 
+  ct_model  %>%
+  parsnip::set_engine("lm") %>%
+  set_mode("regression")
+# Step 4: Create workflow, add recipe, add model
+ct_wflow <-workflows::workflow() %>%
+  workflows::add_recipe(rec) %>%
+  workflows::add_model(lm_ct_model)
+# Step 5: Fit workflow
+ct_wflow_fit <- parsnip::fit(ct_wflow, data = train_ct)
+# Step 6: Get predictions
+mpg_pred_train <- 
+  predict(ct_wflow_fit, train_ct) %>%
+  bind_cols(train_ct %>% select(mpg))
+# Step 7: Use predictions to get performance metrics
+yardstick::metrics(mpg_pred_train, 
+                 truth = mpg, estimate = .pred)
+# Now let's assume we were satisfied with this model, we will see what the performance is with the test data
+ct_test_fit <- parsnip::fit(ct_wflow, data = test_ct)
+mpg_pred_test <- 
+  predict(ct_test_fit, test_ct) %>%
+  bind_cols(test_ct %>% select(mpg))
+yardstick::metrics(mpg_pred_test, 
+                 truth = mpg, estimate = .pred)
+```
+
+####
+
 # **Data Visualization**
 ***
 
@@ -2832,6 +3213,52 @@ png(here::here("img", "main_plot_maps.png"),
 (truth/pred) + plot_annotation(title = "Machine Learning Methods Allow for Prediction of Air Pollution", subtitle = "A random forest model predicts true monitored levels of fine particulate matter (PM 2.5) air pollution based on\ndata about population density and other predictors reasonably well, thus suggesting that we can predict levels\nof pollution in places with poor monitoring", theme = theme(plot.title = element_text(size =12, face = "bold"), plot.subtitle = element_text(size = 8)))
 dev.off()
 ```
+
+## **Exercise**
+
+***
+
+#### {.exercise_block}
+
+Recall how we created a plot that is mostly limited to the outline of the US. According to [Wikipedia](https://en.wikipedia.org/wiki/List_of_extreme_points_of_Canada), latitude and longitude bounds of mainland Canada are about: 
+
+* top = 72 # north lat
+* left = -142 # west long
+* right = -55 # east long
+* bottom = 41 # south lat
+
+Create a plot that is mostly limited to the outline of Canada
+
+```{r dv_exercise-setup}
+library(tidyverse)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf)
+library(rgeos)
+library(lwgeom)
+library(maps)
+```
+
+```{r dv_exercise, exercise=TRUE}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+ggplot(data = world) +
+```
+
+```{r dv_exercise-hint-1}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+ggplot(data = world) +
+    geom_sf()
+```
+
+```{r dv_exercise-hint-2}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+ggplot(data = world) +
+    geom_sf() +
+    coord_sf(xlim = c(-142, -55), ylim = c(41, 72), 
+             expand = FALSE)
+```
+
+####
 
 # **Summary**
 ***
