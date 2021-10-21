@@ -10,20 +10,20 @@ knitr::opts_chunk$set(echo = TRUE)
 # Exercise chunks
 ## Data Exploration and Wrangling
 
-* `dew_quiz`
-* `dew_exercise`
+* `dew_quiz` - outcome/predictor variable, data types (class), why care about correlated data, why log transformation
+* `dew_exercise` - correlation plot
 
 ## Machine Learning
 
-* `ml+quiz`
+* `ml_quiz` - elements of a ml problem, recipes::recipe, assign variable roles, one-hot encoding, broom::tidy(), V-fold cross validation
 
 ## Data Analysis
 
-* `da_quiz`
-* `da_exercise`
+* `da_quiz` - parsnip::rand_forest() arguments, last_fit()
+* `da_exercise` - link here needs to be updated if the app is hosted somewhere else
 
 ## Data Visualization
 
-* `dv_exercise`
+* `dv_exercise` - plot map of Canada
 
 # Other Notes

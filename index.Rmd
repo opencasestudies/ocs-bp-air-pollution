@@ -2129,7 +2129,7 @@ Here we can see the mean `RMSE` value across all four folds. The function is cal
 
 ***
 
-``` {r ML_Quiz, echo = FALSE}
+``` {r ml_quiz, echo = FALSE}
 quiz(caption = "",
   question("To solve a standard machine learning problem we need: (check all that apply)",
     answer("A data set to train from.", correct = TRUE),
@@ -2641,7 +2641,7 @@ Nice!
 
 ``` {r da_quiz, echo = FALSE}
 quiz(caption = "",
-  question("Which one of the arguments of the `parsnip::rand_forest()` function  defines the number of predictor variables that will be randomly sampled at each split when creating the tree models?",
+  question("Which one of the arguments of the `parsnip::rand_forest()` function defines the number of predictor variables that will be randomly sampled at each split when creating the tree models?",
     answer("`min_n`", message = "`min_n` defines the minimum number of data points in a node that are required for the node to be split further."),
     answer("`trees`", message = "`trees` defines the number of trees in the ensemble."),
     answer("`mtry`", correct = TRUE),
