@@ -78,6 +78,12 @@ Wright, Carrie and Meng, Qier and Jager, Leah and Taub, Margaret and Hicks, Step
 
 To access the GitHub Repository for this case study see here: https://github.com/opencasestudies/ocs-bp-air-pollution.
 
+You may also access and download the data using our `OCSdata` package. To learn more about this package including examples, see this [link](https://github.com/opencasestudies/OCSdata). Here is how you would install this package:
+
+```{r, eval=FALSE}
+install.packages("OCSdata")
+```
+
 This case study is part of a series of public health case studies for the [Bloomberg American Health  Initiative](https://americanhealth.jhu.edu/open-case-studies).
 
 
@@ -284,6 +290,8 @@ library(maps)
 library(rnaturalearth)
 library(rgeos)
 library(patchwork)
+# Load package for downloading the case study data files
+library(OCSdata)
 ```
 
 
@@ -320,6 +328,7 @@ Package   | Use in this case study
 [lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert map geographical data
 [rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
 [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
+[OCSdata](https://github.com/opencasestudies/OCSdata) | to access and download OCS data files
 ___
 
 
@@ -582,7 +591,14 @@ knitr::include_graphics(here::here("img", "regression.png"))
 
 All of our data was previously collected by a [researcher](http://www.biostat.jhsph.edu/~rpeng/) at the [Johns Hopkins School of Public Health](https://www.jhsph.edu/) who studies air pollution and climate change.  
 
-We have one CSV file that contains both our single **outcome variable** and all of our **features** (or predictor variables).You can find this data on our [GitHub repository](https://github.com/opencasestudies/ocs-bp-air-pollution/data/raw). Or you can download it more directly by clicking [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/raw/pm25_data.csv).
+We have one CSV file that contains both our single **outcome variable** and all of our **features** (or predictor variables). You can download this file using the `OCSdata` package:
+
+```{r, eval=FALSE}
+# library(OCSdata)
+raw_data("ocs-bp-air-pollution")
+```
+
+If you have trouble using the package, you can also find this data on our [GitHub repository](https://github.com/opencasestudies/ocs-bp-air-pollution/tree/master/data/raw). Or you can download it more directly by clicking [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/raw/pm25_data.csv).
 
 We have created a "raw" subdirectory within a directory called "data" of our working directory of our RStudio project.
 
@@ -639,8 +655,24 @@ load(here::here("data", "imported", "imported_pm.rda"))
 
 <details> <summary> If you skipped the data import section click here. </summary>
 
-An RDA file (stands for R data) of the data can be found on our [GitHub repository](https://github.com/opencasestudies/ocs-bp-air-pollution/data/imported). Or you can download it more directly by clicking [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/imported/imported_pm.rda).
-Download this file and then place it in your current working directory within a subdirectory called "imported" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
+First you need to install the `OCSdata` package:
+
+```{r, eval=FALSE}
+install.packages("OCSdata")
+```
+
+Then, you may download the imported data `.rda` file using the following function:
+
+```{r, eval=FALSE}
+# library(OCSdata)
+imported_data("ocs-bp-air-pollution")
+```
+
+If the package does not work for you, an RDA file (stands for R data) of the data can be found on our [GitHub repository](https://github.com/opencasestudies/ocs-bp-air-pollution/tree/master/data/imported). Or you can download it more directly by clicking [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/imported/imported_pm.rda).
+
+To load the downloaded data into your environment, you may double click on the `.rda` file in Rstudio or using the `load()` function.
+
+To copy and paste our code below, place the downloaded file in your current working directory within a subdirectory called "imported" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
 ```{r}
 load(here::here("data", "imported", "imported_pm.rda"))
@@ -1106,18 +1138,33 @@ To split the data into training and testing, we will use the `initial_split()` f
 knitr::include_graphics(here::here("img","split.png"))
 ```
 
-If you were starting the case study around here, you can obtain the data  [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
 
-Load the data like so if you are starting here:
+#### {.click_to_expand_block}
+
+<details> <summary> If you skipped previous sections click here for more information on how to obtain and load the data. </summary>
+
+First you need to install the `OCSdata` package:
+
+```{r, eval=FALSE}
+install.packages("OCSdata")
+```
+
+Then, you may download the wrangled data `.rda` file using the following function:
+
+```{r, eval=FALSE}
+# library(OCSdata)
+wrangled_rda("ocs-bp-air-pollution")
+```
+
+If the package does not work for you, you may also download this `.rda` file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
+
+To load the downloaded data into your environment, you may double click on the `.rda` file in Rstudio or using the `load()` function.
+
+To copy and paste our code below, place the downloaded `.rda` file in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
 ```{r}
 load(here::here("data", "wrangled", "wrangled_pm.rda"))
 ```
-
-#### {.click_to_expand_block}
-
-<details> <summary> If you skipped previous sections click here for more information. </summary>
-Download this file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda) (same as above) and then place it in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
 <hr style="height:1px;border:none;color:#333;background-color:#333;" />
 
@@ -2065,7 +2112,13 @@ Here we can see the mean `RMSE` value across all four folds. The function is cal
 # **Data Analysis**
 ***
 
-If you were starting the case study around here, you can obtain the data  [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
+If you were starting the case study around here, you can download the data (`.rda`) using the `OCSdata` package:
+
+```{r, eval=FALSE}
+# install.packages("OCSdata")
+# library(OCSdata)
+wrangled_rda("ocs-bp-air-pollution")
+```
 
 Load the data like so if you are starting here:
 
@@ -2073,31 +2126,32 @@ Load the data like so if you are starting here:
 load(here::here("data", "wrangled", "wrangled_pm.rda"))
 ```
 
-Then you can modify the data to match what we did for the previous model like so to prepare the `city` variable and to split the data into testing and training sets. (You will see later that this would be required due to the number of levels for the city variable in the original data).
-```{r}
-pm %<>%
-  mutate(city = case_when(city == "Not in a city" ~ "Not in a city",
-                          city != "Not in a city" ~ "In a city"))
-
-set.seed(1234) # same seed as before
-pm_split <-rsample::initial_split(data = pm, prop = 2/3)
-pm_split
- train_pm <-rsample::training(pm_split)
- test_pm <-rsample::testing(pm_split)
-```
-
-We will also split our data into cross validation folds:
-
-```{r}
-set.seed(1234)
-vfold_pm <- rsample::vfold_cv(data = train_pm, v = 4)
-vfold_pm
-```
-
 #### {.click_to_expand_block}
 
-<details> <summary> If you skipped previous sections click here for more information. </summary>
-Download this file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda) (same as above) and then place it in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
+<details> <summary> Click here for a step-by-step guide on how to download and load the data. </summary>
+
+First you need to install the `OCSdata` package:
+
+```{r, eval=FALSE}
+install.packages("OCSdata")
+```
+
+Then, you may download the wrangled data `.rda` file using the following function:
+
+```{r, eval=FALSE}
+# library(OCSdata)
+wrangled_rda("ocs-bp-air-pollution")
+```
+
+If the package does not work for you, you may also download this `.rda` file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
+
+To load the downloaded data into your environment, you may double click on the `.rda` file in Rstudio or using the `load()` function.
+
+To copy and paste our code below, place the downloaded `.rda` file in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
+
+```{r}
+load(here::here("data", "wrangled", "wrangled_pm.rda"))
+```
 
 <hr style="height:1px;border:none;color:#333;background-color:#333;" />
 
@@ -2126,6 +2180,27 @@ See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Project
 
 ####
 
+Then you can modify the data to match what we did for the previous model like so to prepare the `city` variable and to split the data into testing and training sets. (You will see later that this would be required due to the number of levels for the city variable in the original data).
+
+```{r}
+pm %<>%
+  mutate(city = case_when(city == "Not in a city" ~ "Not in a city",
+                          city != "Not in a city" ~ "In a city"))
+
+set.seed(1234) # same seed as before
+pm_split <-rsample::initial_split(data = pm, prop = 2/3)
+pm_split
+ train_pm <-rsample::training(pm_split)
+ test_pm <-rsample::testing(pm_split)
+```
+
+We will also split our data into cross validation folds:
+
+```{r}
+set.seed(1234)
+vfold_pm <- rsample::vfold_cv(data = train_pm, v = 4)
+vfold_pm
+```
 
 In the previous section, we demonstrated how to build a machine learning model (specifically a linear regression model) to predict air pollution with the `tidymodels` framework. 
 
@@ -2530,18 +2605,32 @@ Nice!
 # **Data Visualization**
 ***
 
-If you were starting the case study around here, you can obtain the data  [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
+#### {.click_to_expand_block}
 
-Load the data like so if you are starting here:
+<details> <summary> If you skipped previous sections click here for more information on how to obtain and load the data. </summary>
+
+First you need to install the `OCSdata` package:
+
+```{r, eval=FALSE}
+install.packages("OCSdata")
+```
+
+Then, you may download the wrangled data `.rda` file using the following function:
+
+```{r, eval=FALSE}
+# library(OCSdata)
+wrangled_rda("ocs-bp-air-pollution")
+```
+
+If the package does not work for you, you may also download this `.rda` file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
+
+To load the downloaded data into your environment, you may double click on the `.rda` file in Rstudio or using the `load()` function.
+
+To copy and paste our code below, place the downloaded `.rda` file in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
 ```{r}
 load(here::here("data", "wrangled", "wrangled_pm.rda"))
 ```
-
-#### {.click_to_expand_block}
-
-<details> <summary> If you skipped previous sections click here for more information. </summary>
-Download this file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda) (same as above) and then place it in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
 <hr style="height:1px;border:none;color:#333;background-color:#333;" />
 
