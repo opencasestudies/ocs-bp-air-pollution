@@ -72,7 +72,7 @@ This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 [
 
 To cite this case study please use:
 
-Wright, Carrie and Jager, Leah and Taub, Margaret and Hicks, Stephanie. (2020). [https://github.com//opencasestudies/ocs-bp-air-pollution](https://github.com//opencasestudies/ocs-bp-air-pollution/). Predicting Annual Air Pollution (Version v1.0.0).
+Wright, Carrie and Meng, Qier and Jager, Leah and Taub, Margaret and Hicks, Stephanie. (2020). [https://github.com//opencasestudies/ocs-bp-air-pollution](https://github.com//opencasestudies/ocs-bp-air-pollution/). Predicting Annual Air Pollution (Version v1.0.0).
 
 ####
 
@@ -507,6 +507,8 @@ Recall the WHO exposure guideline is < 10 ug/m^3^ on average annually for PM~2.5
 There are 48 features with values for each of the 876 monitors (observations). 
 The data comes from the US [Environmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}, the [National Aeronautics and Space Administration (NASA)](https://www.nasa.gov/){target="_blank"}, the US [Census](https://www.census.gov/about/what/census-at-a-glance.html){target="_blank"}, and the [National Center for Health Statistics (NCHS)](https://www.cdc.gov/nchs/about/index.htm){target="_blank"}.
 
+#### {.click_to_expand_block}
+
 <details><summary> Click here to see a table about the set of features </summary>
 
 Variable   | Details                                                                        
@@ -563,6 +565,8 @@ Variable   | Details
 
 </details>
 
+####
+
 Many of these features have to do with the circular area around the monitor called the "buffer". These are illustrated in the following figure:
 
 ```{r, echo = FALSE, out.width = "800px",}
@@ -588,7 +592,8 @@ We import the data using the `read_csv()` function from the `readr` package.
 
 We will use the `here` package to make it easier to find the data file.
 
-***
+#### {.click_to_expand_block}
+
 <details> <summary> Click here to see more about creating new projects in RStudio. </summary>
 
 You can create a project by going to the File menu of RStudio like so:
@@ -607,9 +612,8 @@ knitr::include_graphics(here::here("img", "project_button.png"))
 See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
 
 </details>
-***
-</details>
-***
+
+####
 
 
 ```{r}
@@ -631,7 +635,8 @@ If you are following along but stopped, you could start here by first loading th
 load(here::here("data", "imported", "imported_pm.rda"))
 ```
 
-***
+#### {.click_to_expand_block}
+
 <details> <summary> If you skipped the data import section click here. </summary>
 
 An RDA file (stands for R data) of the data can be found on our [GitHub repository](https://github.com/opencasestudies/ocs-bp-air-pollution/data/imported). Or you can download it more directly by clicking [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/imported/imported_pm.rda).
@@ -641,8 +646,8 @@ Download this file and then place it in your current working directory within a 
 load(here::here("data", "imported", "imported_pm.rda"))
 ```
 
+<hr style="height:1px;border:none;color:#333;background-color:#333;" />
 
-***
 <details> <summary> Click here to see more about creating new projects in RStudio. </summary>
 
 You can create a project by going to the File menu of RStudio like so:
@@ -662,10 +667,11 @@ See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Project
 
 </details>
 
-***
+<hr style="height:1px;border:none;color:#333;background-color:#333;" />
+
 </details>
 
-***
+####
 
 The first step in performing any data analysis is to explore the data. 
 
@@ -1108,11 +1114,13 @@ Load the data like so if you are starting here:
 load(here::here("data", "wrangled", "wrangled_pm.rda"))
 ```
 
-***
+#### {.click_to_expand_block}
+
 <details> <summary> If you skipped previous sections click here for more information. </summary>
 Download this file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda) (same as above) and then place it in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
-***
+<hr style="height:1px;border:none;color:#333;background-color:#333;" />
+
 <details> <summary> Click here to see more about creating new projects in RStudio. </summary>
 
 You can create a project by going to the File menu of RStudio like so:
@@ -1131,10 +1139,12 @@ knitr::include_graphics(here::here("img", "project_button.png"))
 See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
 
 </details>
-***
+
+<hr style="height:1px;border:none;color:#333;background-color:#333;" />
 
 </details>
-***
+
+####
 
 ```{r}
 set.seed(1234)
@@ -1265,11 +1275,15 @@ simple_rec <- train_pm %>%
 simple_rec
 ```
 
-<details><summary> Click here learn more about the working with `id` variables </summary>
+#### {.click_to_expand_block}
+
+<details><summary> Click here to learn more about the working with `id` variables </summary>
 
 This option works well with the newer `workflows` package, however `id` variables are often dropped from analyses that do not use this newer package as they can make the process difficult with using the `parsnip` package alone due to the fact that new levels (or possible values) may be introduced with the testing data.
 
 </details>
+
+####
 
 We could also specify the outcome and predictors in the same way as we just specified the id variable. 
 Please see [here](https://tidymodels.github.io/recipes/reference/recipe.html){target="_blank"} for examples of other roles for variables. 
@@ -1379,6 +1393,8 @@ simple_rec %>%
   step_nzv(all_predictors(), - CMAQ, - aod)
 ```
 
+#### {.click_to_expand_block}
+
 <details><summary> Click here to learn about examples where you might have near-zero variance variables</summary>
 
 1) **Similar Values** - If the population density was nearly the same for every zcta that contained a monitor, then knowing the population density near our monitor would contribute little to our model in assisting us to predict monitor air pollution values. 
@@ -1388,6 +1404,8 @@ simple_rec %>%
 See this [blog post](https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/){target="_blank"} about why removing near-zero variance variables isn't always a good idea if we think that a variable might be especially informative.
 
 </details>
+
+####
 
 Let's put all this together now. 
 
@@ -1609,8 +1627,6 @@ pm_split
 
 See if you can come up with the code for the new recipe.
 
-####
-
 ***
 
 <details> <summary> Click here to reveal the code for the new recipe. </summary>
@@ -1627,7 +1643,10 @@ novel_rec <-recipe(train_pm) %>%
     step_nzv(all_numeric()) 
 ```
 </details>
+
 ***
+
+####
 
 ```{r}
 novel_rec
@@ -1644,8 +1663,6 @@ Now let's retrain our training data and try baking our test data.
 
 Do you recall how to pre-process and extract the pre-processed training data?
 
-####
-
 ***
 
 <details> <summary> Click here to reveal the answer. </summary>
@@ -1655,7 +1672,10 @@ prepped_rec <- prep(novel_rec, verbose = TRUE, retain = TRUE)
 baked_train <- bake(prepped_rec, new_data = NULL)
 ```
 </details> 
+
 ***
+
+####
 
 
 #### {.scrollable }
@@ -1776,6 +1796,7 @@ PM_wflow_fit <- parsnip::fit(PM_wflow, data = train_pm)
 PM_wflow_fit
 ```
 
+#### {.click_to_expand_block}
 
 <details><summary> Click here to see the steps that the `workflows` package performs that used to be required </summary>
 
@@ -1793,6 +1814,8 @@ PM_fit <- lm_PM_model %>%
 ```
 
 </details>
+
+####
 
 ## **Assessing the model fit**
 ***
@@ -2071,11 +2094,13 @@ vfold_pm <- rsample::vfold_cv(data = train_pm, v = 4)
 vfold_pm
 ```
 
-***
+#### {.click_to_expand_block}
+
 <details> <summary> If you skipped previous sections click here for more information. </summary>
 Download this file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda) (same as above) and then place it in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
-***
+<hr style="height:1px;border:none;color:#333;background-color:#333;" />
+
 <details> <summary> Click here to see more about creating new projects in RStudio. </summary>
 
 You can create a project by going to the File menu of RStudio like so:
@@ -2094,9 +2119,12 @@ knitr::include_graphics(here::here("img", "project_button.png"))
 See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
 
 </details>
-***
+
+<hr style="height:1px;border:none;color:#333;background-color:#333;" />
+
 </details>
-***
+
+####
 
 
 In the previous section, we demonstrated how to build a machine learning model (specifically a linear regression model) to predict air pollution with the `tidymodels` framework. 
@@ -2197,8 +2225,6 @@ Then, we put this all together into a `workflow`:
 
 See if you can come up with the code to do this.
 
-####
-
 ***
 <details> <summary> Click here to reveal the answer. </summary>
 
@@ -2209,7 +2235,10 @@ RF_wflow <- workflows::workflow() %>%
 
 ```
 </details> 
+
 ***
+
+####
 
 ```{r}
 RF_wflow
@@ -2223,8 +2252,6 @@ Finally, we fit the data to the model:
 
 Do you recall how to do this?
 
-####
-
 ***
 <details> <summary> Click here to reveal the answer. </summary>
 
@@ -2232,7 +2259,10 @@ Do you recall how to do this?
 RF_wflow_fit <- parsnip::fit(RF_wflow, data = train_pm)
 ```
 </details> 
+
 ***
+
+####
 
 ```{r}
 RF_wflow_fit
@@ -2245,7 +2275,6 @@ Let's take a look at the top 10 contributing variables:
 
 See if you can recall how to do this.
 
-####
 
 ```{r, echo = FALSE}
 RF_wflow_fit %>% 
@@ -2264,7 +2293,10 @@ RF_wflow_fit %>%
   vip(num_features = 10)
 ```
 </details>
+
 ***
+
+####
 
 
 Interesting! In the previous model the CMAQ values and the state where the monitor was located were also the top two most important, however predictors about education levels of the communities where the monitor was located was among the top most important. Now we see that population density and proximity to sources of emissions and roads are among the top ten.
@@ -2277,8 +2309,6 @@ Now let's take a look at model performance by fitting the data using cross valid
 
 See if you can recall how to do this.
 
-####
-
 ***
 <details> <summary> Click here to reveal the answer. </summary>
 
@@ -2289,7 +2319,10 @@ collect_metrics(resample_RF_fit)
 ```
 
 </details>
+
 ***
+
+####
 
 ```{r, echo = FALSE}
 set.seed(456)
@@ -2312,14 +2345,15 @@ It looks like the random forest model had  a much lower `rmse` value of 1.72.
 
 Do you recall how the RMSE is calculated?
 
-####
-
 ***
 
 <details> <summary> Click here to reveal the answer. </summary>
 $$RMSE = \sqrt{\frac{\sum_{i=1}^{n}{(\hat{y_t}- y_t)}^2}{n}}$$
-</details> 
+</details>
+
 ***
+
+####
 
 If we tuned our random forest model based on the number of trees or the value for `mtry` (which is "The number of predictors that will be randomly sampled at each split when creating the tree models"), we might get a model with even better performance.
 
@@ -2504,11 +2538,13 @@ Load the data like so if you are starting here:
 load(here::here("data", "wrangled", "wrangled_pm.rda"))
 ```
 
-***
+#### {.click_to_expand_block}
+
 <details> <summary> If you skipped previous sections click here for more information. </summary>
 Download this file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda) (same as above) and then place it in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
-***
+<hr style="height:1px;border:none;color:#333;background-color:#333;" />
+
 <details> <summary> Click here to see more about creating new projects in RStudio. </summary>
 
 You can create a project by going to the File menu of RStudio like so:
@@ -2527,9 +2563,12 @@ knitr::include_graphics(here::here("img", "project_button.png"))
 See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
 
 </details>
-***
+
+<hr style="height:1px;border:none;color:#333;background-color:#333;" />
+
 </details>
-***
+
+####
 
 
 Our main question for this case study was:  
@@ -2718,8 +2757,6 @@ Thus we will use the parsnip `fit()` and `predict()` functions of the `parsnip` 
 
 Why do we not need pre-processed data?
 
-####
-
 ***
 
 <details> <summary> Click here to reveal the answer. </summary>
@@ -2727,7 +2764,10 @@ Why do we not need pre-processed data?
 Since we are using a workflow, the data will be pre-processed when it is fit as well.
 
 </details>
+
 ***
+
+####
 
 
 ```{r}
@@ -2842,7 +2882,7 @@ knitr::include_graphics(here::here("img","full_tidymodels_overview.png"))
 ```
 
 
-
+#### {.click_to_expand_block}
 
 <details><summary> Click here for more on what we learned with `tidymodels` </summary>
 
@@ -2882,6 +2922,7 @@ We also saw that we can use the `collect_predictions()` function of the `tune` p
 
 </details>
 
+####
 
 
 ## **Suggested Homework**
