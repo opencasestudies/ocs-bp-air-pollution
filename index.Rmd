@@ -3145,17 +3145,18 @@ Package   | Use in this case study
 sessionInfo()
 ```
 
-**RMarkdown Compilation Time: **
+**Estimate of RMarkdown Compilation Time: **
 
 ```{r, echo=FALSE}
 rmarkdown:::perf_timer_stop("render")
 pts = rmarkdown:::perf_timer_summary()
-cat("About", round(pts$time[1]/1000 + 10), "seconds")
+cat("About", round(pts$time[1]/1000 + 5), "-", round(pts$time[1]/1000 + 15),"seconds")
 ```
+
+This compilation time was measured on a PC machine operating on Windows 10. This range should only be used as an estimate as compilation time will vary with different machines and operating systems.
 
 ## **Acknowledgments**
 ***
-
 
 We would like to acknowledge [Roger Peng](http://www.biostat.jhsph.edu/~rpeng/), [Megan Latshaw](https://www.jhsph.edu/faculty/directory/profile/1708/megan-weil-latshaw), and [Kirsten Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler) for assisting in framing the major direction of the case study.
 
