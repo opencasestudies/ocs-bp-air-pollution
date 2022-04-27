@@ -33,14 +33,21 @@ This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 (
 
 To cite this case study please use:
 
-Wright, Carrie and Jager, Leah and Taub, Margaret and Hicks, Stephanie. (2020). [https://github.com//opencasestudies/ocs-bp-air-pollution](https://github.com//opencasestudies/ocs-bp-air-pollution). Predicting Annual Air Pollution (Version v1.0.0).
+Wright, Carrie and Meng, Qier and Jager, Leah and Taub, Margaret and Hicks, Stephanie. (2020). [https://github.com//opencasestudies/ocs-bp-air-pollution](https://github.com//opencasestudies/ocs-bp-air-pollution). Predicting Annual Air Pollution (Version v1.0.0).
 
 ### Acknowledgments
 
 We would like to acknowledge [Roger Peng](http://www.biostat.jhsph.edu/~rpeng/), [Megan Latshaw](https://www.jhsph.edu/faculty/directory/profile/1708/megan-weil-latshaw), and [Kirsten Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler) for assisting in framing the major direction of the case study.
 
-We would also like to acknowledge the [Bloomberg American Health Initiative](https://americanhealth.jhu.edu/) for funding this work. 
+We would like to acknowledge [Michael Breshock](https://mbreshock.github.io/) for his contributions to this case study and developing the `OCSdata` package.
 
+We would also like to acknowledge the [Bloomberg American Health Initiative](https://americanhealth.jhu.edu/) for funding this work.
+
+### Reading Metrics
+
+The total reading time for this case study was calculated with [koRpus](https://github.com/unDocUMeantIt/koRpus): **About 100 minutes**
+
+The Flesch-Kincaid Readability Index was also calculated with [koRpus](https://github.com/unDocUMeantIt/koRpus): **Grade 10, Age 15**
 
 ### Title 
 
@@ -207,4 +214,10 @@ This case study is intended for those with some familiarity with linear regressi
 #### Suggested homework
 
 Students can predict air pollution monitor values using a different algorithm and provide an explanation for how that algorithm works and why it may be a good choice for modeling this data.
+
+#### Estimate of RMarkdown Compilation Time:
+
+~ About 148 - 158 seconds
+
+This compilation time was measured on a PC machine operating on Windows 10. This range should only be used as an estimate as compilation time will vary with different machines and operating systems.
 

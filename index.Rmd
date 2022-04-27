@@ -46,6 +46,14 @@ library(here)
 knitr::opts_chunk$set(include = TRUE, comment = NA, echo = TRUE,
                       message = FALSE, warning = FALSE, cache = FALSE,
                       fig.align = "center", out.width = '90%')
+library(magrittr)
+remotes::install_github("benmarwick/wordcountaddin", type = "source", dependencies = TRUE)
+remotes::install_github("alistaire47/read.so")
+library(wordcountaddin)
+library(read.so)
+
+rmarkdown:::perf_timer_reset_all()
+rmarkdown:::perf_timer_start("render")
 ```
 
 
@@ -86,11 +94,41 @@ install.packages("OCSdata")
 
 This case study is part of a series of public health case studies for the [Bloomberg American Health  Initiative](https://americanhealth.jhu.edu/open-case-studies).
 
+***
+
+The total reading time for this case study is calculated via [koRpus](https://github.com/unDocUMeantIt/koRpus) and shown below: 
+
+```{r, echo=FALSE}
+readtable = text_stats("index.Rmd") # producing reading time markdown table
+readtime = read.so::read.md(readtable) %>% dplyr::select(Method, koRpus) %>% # reading table into dataframe, selecting relevant factors
+  dplyr::filter(Method == "Reading time") %>% # dropping unnecessary rows
+  dplyr::mutate(koRpus = paste(round(as.numeric(stringr::str_split(koRpus, " ")[[1]][1])), "minutes")) %>% # rounding reading time estimate
+  dplyr::mutate(Method = "koRpus") %>% dplyr::relocate(koRpus, .before = Method) %>% dplyr::rename(`Reading Time` = koRpus) # reorganizing table
+knitr::kable(readtime, format="markdown")
+```
+
+***
+
+**Readability Score: **
+
+A readability index estimates the reading difficulty level of a particular text. Flesch-Kincaid, FORCAST, and SMOG are three common readability indices that were calculated for this case study via [koRpus](https://github.com/unDocUMeantIt/koRpus). These indices provide an estimation of the minimum reading level required to comprehend this case study by grade and age. 
+
+```{r, echo=FALSE}
+rt = wordcountaddin::readability("index.Rmd", quiet=TRUE) # producing readability markdown table
+df = read.so::read.md(rt) %>% dplyr::select(index, grade, age) %>%  # reading table into dataframe, selecting relevant factors
+  tidyr::drop_na() %>% dplyr::mutate(grade = round(as.numeric(grade)), # dropping rows with missing values, rounding age and grade columns
+                                     age = round(as.numeric(age))
+                                     )
+knitr::kable(df, format="markdown")
+```
+
+***
 
 Please help us by filling out our survey.
 
 
 <div style="display: flex; justify-content: center;"><iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfpN4FN3KELqBNEgf2Atpi7Wy7Nqy2beSkFQINL7Y5sAMV5_w/viewform?embedded=true" width="1200" height="700" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe></div>
+
 
 # **Motivation**
 ***
@@ -328,7 +366,7 @@ Package   | Use in this case study
 [lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert map geographical data
 [rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
 [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
-[OCSdata](https://github.com/opencasestudies/OCSdata) | to access and download OCS data files
+[OCSdata](https://github.com/opencasestudies/OCSdata){target="_blank"} | to access and download OCS data files
 ___
 
 
@@ -593,7 +631,8 @@ All of our data was previously collected by a [researcher](http://www.biostat.jh
 We have one CSV file that contains both our single **outcome variable** and all of our **features** (or predictor variables). You can download this file using the `OCSdata` package:
 
 ```{r, eval=FALSE}
-OCSdata::raw_data("ocs-bp-air-pollution")
+# install.packages("OCSdata")
+OCSdata::raw_data("ocs-bp-air-pollution", outpath = getwd())
 ```
 
 If you have trouble using the package, you can also find this data on our [GitHub repository](https://github.com/opencasestudies/ocs-bp-air-pollution/tree/master/data/raw). Or you can download it more directly by clicking [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/raw/pm25_data.csv).
@@ -659,10 +698,11 @@ First you need to install the `OCSdata` package:
 install.packages("OCSdata")
 ```
 
-Then, you may download the imported data `.rda` file using the following function:
+Then, you may download and load the imported data `.rda` file using the following code:
 
 ```{r, eval=FALSE}
-OCSdata::imported_data("ocs-bp-air-pollution")
+OCSdata::imported_data("ocs-bp-air-pollution", outpath = getwd())
+load(here::here("OCSdata", "data", "imported", "imported_pm.rda"))
 ```
 
 If the package does not work for you, an RDA file (stands for R data) of the data can be found on our [GitHub repository](https://github.com/opencasestudies/ocs-bp-air-pollution/tree/master/data/imported). Or you can download it more directly by clicking [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/imported/imported_pm.rda).
@@ -1146,10 +1186,11 @@ First you need to install the `OCSdata` package:
 install.packages("OCSdata")
 ```
 
-Then, you may download the wrangled data `.rda` file using the following function:
+Then, you may download and load the wrangled data `.rda` file using the following code:
 
 ```{r, eval=FALSE}
-OCSdata::wrangled_rda("ocs-bp-air-pollution")
+OCSdata::wrangled_rda("ocs-bp-air-pollution", outpath = getwd())
+load(here::here("OCSdata", "data", "wrangled", "wrangled_pm.rda"))
 ```
 
 If the package does not work for you, you may also download this `.rda` file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
@@ -2104,35 +2145,28 @@ Here we can see the mean `RMSE` value across all four folds. The function is cal
 # **Data Analysis**
 ***
 
-If you were starting the case study around here, you can download the data (`.rda`) using the `OCSdata` package:
-
-```{r, eval=FALSE}
-# install.packages("OCSdata")
-# library(OCSdata)
-wrangled_rda("ocs-bp-air-pollution")
-```
-
-Load the data like so if you are starting here:
+If you have been following along but stopped and are starting here you could load the wrangled data using the following command:
 
 ```{r}
-load(here::here("data", "wrangled", "wrangled_pm.rda"))
+load(here::here( "data", "wrangled", "wrangled_pm.rda"))
 ```
 
 #### {.click_to_expand_block}
 
-<details> <summary> Click here for a step-by-step guide on how to download and load the data. </summary>
+<details> <summary> If you skipped the previous sections, click here for a step-by-step guide on how to download and load the data. </summary>
 
-First you need to install the `OCSdata` package:
+First you need to install and load the `OCSdata` package:
 
 ```{r, eval=FALSE}
 install.packages("OCSdata")
+library(OCSdata)
 ```
 
-Then, you may download the wrangled data `.rda` file using the following function:
+Then, you may load the wrangled data `.rda` file using the following function:
 
 ```{r, eval=FALSE}
-# library(OCSdata)
-wrangled_rda("ocs-bp-air-pollution")
+wrangled_rda("ocs-bp-air-pollution", outpath = getwd())
+load(here::here("OCSdata", "data", "wrangled", "wrangled_pm.rda"))
 ```
 
 If the package does not work for you, you may also download this `.rda` file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
@@ -2594,6 +2628,12 @@ Nice!
 # **Data Visualization**
 ***
 
+If you have been following along but stopped and are starting here you could load the wrangled data using the following command:
+
+```{r}
+load(here::here("data", "wrangled", "wrangled_pm.rda"))
+```
+
 #### {.click_to_expand_block}
 
 <details> <summary> If you skipped previous sections click here for more information on how to obtain and load the data. </summary>
@@ -2604,10 +2644,11 @@ First you need to install the `OCSdata` package:
 install.packages("OCSdata")
 ```
 
-Then, you may download the wrangled data `.rda` file using the following function:
+Then, you may download and load the wrangled data `.rda` file using the following code:
 
 ```{r, eval=FALSE}
-OCSdata::wrangled_rda("ocs-bp-air-pollution")
+OCSdata::wrangled_rda("ocs-bp-air-pollution", outpath = getwd())
+load(here::here("OCSdata", "data", "wrangled", "wrangled_pm.rda"))
 ```
 
 If the package does not work for you, you may also download this `.rda` file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
@@ -3104,12 +3145,22 @@ Package   | Use in this case study
 sessionInfo()
 ```
 
+**Estimate of RMarkdown Compilation Time: **
+
+```{r, echo=FALSE}
+rmarkdown:::perf_timer_stop("render")
+pts = rmarkdown:::perf_timer_summary()
+cat("About", round(pts$time[1]/1000 + 5), "-", round(pts$time[1]/1000 + 15),"seconds")
+```
+
+This compilation time was measured on a PC machine operating on Windows 10. This range should only be used as an estimate as compilation time will vary with different machines and operating systems.
 
 ## **Acknowledgments**
 ***
 
-
 We would like to acknowledge [Roger Peng](http://www.biostat.jhsph.edu/~rpeng/), [Megan Latshaw](https://www.jhsph.edu/faculty/directory/profile/1708/megan-weil-latshaw), and [Kirsten Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler) for assisting in framing the major direction of the case study.
+
+We would like to acknowledge [Michael Breshock](https://mbreshock.github.io/) for his contributions to this case study and developing the `OCSdata` package.
 
 We would also like to acknowledge the [Bloomberg American Health Initiative](https://americanhealth.jhu.edu/) for funding this work. 
 
