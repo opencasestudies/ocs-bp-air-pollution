@@ -1165,7 +1165,7 @@ If we get good prediction with our testing set, then we know that our model can 
 
 We will not touch the testing set until we have completed optimizing our model with the training set. 
 This will allow us to have a less biased evaluation of how well our model can do with other data besides the data used in the training set to build the model. 
-Ideally, you would also want a completely independent data set to further test the performance of your model.
+**Ideally, you would also want a completely independent data set to further test the performance of your model.**
 
 To split the data into training and testing, we will use the `initial_split()` function in the `rsample` package to specify how we want to split our data.
 
@@ -1238,7 +1238,14 @@ pm_split
 
 A couple of notes from the code above: 
 
-- Typically, data are split into 3/4 of the observations for training and 1/4 for testing. This is the default proportion and does not need to be specified. However, you can change the proportion using the `prop` argument, which we will do that here for illustrative purposes.
+- Typically, data are split with the majority of the observations for training and a smaller portion for testing. The default with this function is 3/4 (75%) of the observations for training and 1/4 (25%) for testing. This is the default proportion and does not need to be specified. However, you can change the proportion using the `prop` argument, which we will do here for illustrative purposes. Often people use 80% (4/5) for training and 20% for testing (1/5) or some other similar proportion like what we used here with 2/3 for training and 1/3 for testing. 
+
+<details><summary> Click here to learn more about how people decide what split proportion to use. </summary>
+
+Having more training data helps the model to train on a greater variety of observations. However, having more testing data helps to see how generalizable the model is and allows for better comparisons of different models. The need for each may depend on your data and how much variability it has and the size of your data. For smaller datasets, setting aside a larger portion for testing can be beneficial to avoid having a very small testing dataset. Here's a [paper](https://onlinelibrary.wiley.com/doi/full/10.1002/sam.11583) that describes more about this topic.
+
+</details>
+
 - Since the split is performed randomly, it is a good idea to use the `set.seed()` function in base R to ensure that if your rerun your code that your split will be the same next time.
 - We can see the number of monitors in our training, testing, and original data by typing in the name of our split object. The result will look like this:
 <training data sample number, testing data sample number, original sample number> 
@@ -2357,6 +2364,9 @@ Do you recall how to do this?
 ```{r}
 RF_wflow_fit <- parsnip::fit(RF_wflow, data = train_pm)
 ```
+
+If you get an error "Can not handle categorical predictors with more than 53 categories." then you should scroll up a bit and make sure that you removed the categorical variables that have more than 53 categories as this method can't handle such variables at this time.
+
 </details> 
 
 ***
@@ -3045,7 +3055,7 @@ We learned that if the model fits well than the estimated values will be very si
 
 5. Overall model performance evaluation  
 
-Once we chose our final model, we evaluated the final model performance using the testing data using the `last_fit()` function of the `tune` package. This gives us a better estimate about how well the model will predict or classify the outcome variable of interest with new independent data. Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources. 
+Once we chose our final model, we evaluated the final model performance using the testing data using the `last_fit()` function of the `tune` package. This gives us a better estimate about how well the model will predict or classify the outcome variable of interest with new independent data. **Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources.**
 
 We also saw that we can use the `collect_predictions()` function of the `tune` package to get the predictions for our test data. We saw that we can get more detailed prediction data using the `predict()` function of the `parsnip` package.
 
