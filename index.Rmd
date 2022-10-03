@@ -1309,7 +1309,11 @@ count(test_pm, state)
 ***
 
 After splitting the data, the next step is to process the training and testing data so that the data are are compatible and optimized to be used with the model. 
-This involves assigning variables to specific roles within the model and pre-processing like scaling variables and removing redundant variables. 
+
+In order to start this, we need to think about what each of the aspects of our data might do in the model. For example, is this particular column of data possibly helpful for predicting the outcome? Or are these the values that we would consider the outcome of interest? This process is described as assigning variables to specific roles within the model.
+
+We will then do what is called pre-processing to prepare the data so it is ready. This involves things like like scaling variables and removing redundant variables. 
+
 This process is also called feature engineering.
 
 To do this in `tidymodels`, we will create what's called a "recipe" using the `recipes` package, which is a standardized format for a sequence of steps for pre-processing the data.
