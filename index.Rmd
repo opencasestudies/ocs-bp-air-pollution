@@ -536,6 +536,8 @@ knitr::include_graphics(here::here("img","filter.png"))
 The weight of this particulate matter is manually measured daily or weekly. 
 For the EPA standard operating procedure for PM gravimetric analysis in 2008, we refer the reader to [here](https://www3.epa.gov/ttnamti1/files/ambient/pm25/spec/RTIGravMassSOPFINAL.pdf){target="_blank"}.
 
+#### {.click_to_expand_block}
+
 <details><summary>For more on Gravimetric analysis, you can expand here </summary>
 
 Gravimetric analysis is also used for [emission testing](https://www.mt.com/us/en/home/applications/Laboratory_weighing/emissions-testing-particulate-matter.html){target="_blank"}. 
@@ -545,6 +547,8 @@ There are [other monitoring systems](https://www.sensirion.com/en/about-us/newsr
 Gravimetric analysis is considered to be among the most accurate methods for measuring particulate matter.
 
 </details>
+
+####
 
 In our data set, the `value` column indicates the PM~2.5~ monitor average for 2008 in mass of fine particles/volume of air for 876 gravimetric monitors. 
 The units are micrograms of fine particulate matter (PM) that is less than 2.5 micrometers in diameter per cubic meter of air - mass concentration (ug/m^3^).
@@ -1462,6 +1466,8 @@ We can do this with the `step_dummy()` function and the `one_hot = TRUE` argumen
 One-hot encoding means that we do not simply encode our categorical variables numerically as a simple 1,2,3, as our numeric assignments can be interpreted by algorithms as having a particular rank or order. 
 Instead, new binary variables made up of 1s and 0s are used to arbitrarily assign a numeric value that has no apparent order. 
 
+#### {.click_to_expand_block}
+
 <details><summary>For more information about what one-hot encoding is, you can expand here. </summary>
 
 For example, say we only had three city values for the city variable that were "Tuscon", "Denver", and "New York".
@@ -1484,6 +1490,8 @@ This would be replaced by three new variables one for if the value was "Tuscon",
 | 0 	| 1 	| 0 	|
 
 </details>
+
+####
 
 Here we will create such variables to replace the current, state, country, and city categorical data. Similarly the ZCTA values are not intended to be interpreted as numeric as they could be thought of like a zip code and thus we would also want to encode this as well. 
 
