@@ -498,7 +498,7 @@ In this case, our outcome variable is the sales of cars, while the different cha
 
 This is the most commonly missed step when developing a machine learning algorithm. 
 Machine learning can very easily be turned into an engineering problem. 
-Just dump the outcome and the features into a black box algorithm and viola! 
+Just dump the outcome and the features into a [black box algorithm](https://en.wikipedia.org/wiki/Black_box) and viola! 
 But this kind of thinking can lead to major problems. In general good machine learning questions:
 
 1. Have a plausible explanation for why the features predict the outcome. 
@@ -1915,7 +1915,7 @@ The `tidy()` function returns a tidy data frame with coefficients from the model
 
 Many other `broom` functions currently only work with `parsnip` objects, not raw `workflows` objects. 
 
-However, we can use the `tidy` function if we first use the `extract_fit_parsnip()` function.
+However, we can use the `tidy` function if we first use the `extract_fit_parsnip()` function which is imported as part of the `workflows` package from the [`hardhat` package](https://hardhat.tidymodels.org/) (also part of tidymodels).
 
 ```{r}
 wflowoutput <- PM_wflow_fit %>% 
