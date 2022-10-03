@@ -323,9 +323,11 @@ library(ggplot2)
 library(stringr)
 library(tidyr)
 library(lwgeom)
+library(proxy)# needed for lwgeom
 library(sf)
 library(maps)
 library(rnaturalearth)
+library(rnaturalearthdata) # needed for rnaturalearth
 library(rgeos)
 library(patchwork)
 # Load package for downloading the case study data files
@@ -1362,6 +1364,12 @@ Since this number is arbitrary and the county information is also given in the d
 However, it is useful to keep this data to take a look at what is happening later. 
 We will show you what to do in this case in just a bit.
 
+To summarize this step, we will use the `recipe()` function to assign roles to all the variables: 
+
+```{r, echo=FALSE, out.width="400px"}
+knitr::include_graphics(here::here("img","Starting_a_recipe_recipes1.png"))
+```
+
 In the simplest case, we might use all predictors like this:
 
 ```{r}
@@ -1418,11 +1426,7 @@ We can view our recipe in more detail using the base `summary()` function.
 summary(simple_rec)
 ```
 
-To summarize this step, we use the `recipe()` function to assign roles to all the variables: 
 
-```{r, echo=FALSE, out.width="400px"}
-knitr::include_graphics(here::here("img","Starting_a_recipe_recipes1.png"))
-```
 
 
 ### Step 2: Specify the pre-processing steps with `step*()` functions
@@ -1468,7 +1472,7 @@ We can do this with the `step_dummy()` function and the `one_hot = TRUE` argumen
 
 
 One-hot encoding means that we do not simply encode our categorical variables numerically as a simple 1,2,3, as our numeric assignments can be interpreted by algorithms as having a particular rank or order. 
-Instead, new binary variables made up of 1s and 0s are used to arbitrarily assign a numeric value that has no apparent order. 
+Instead, new binary variables made up of 1s and 0s are used to arbitrarily assign a numeric value that has no apparent order. Note that while there is a different but similar method to do this referred to as dummy variables, one-hot encoded variables are also sometimes called dummy variables.
 
 #### {.click_to_expand_block}
 
