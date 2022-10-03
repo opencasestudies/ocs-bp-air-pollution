@@ -1252,11 +1252,15 @@ A couple of notes from the code above:
 
 - Typically, data are split with the majority of the observations for training and a smaller portion for testing. The default with this function is 3/4 (75%) of the observations for training and 1/4 (25%) for testing. This is the default proportion and does not need to be specified. However, you can change the proportion using the `prop` argument, which we will do here for illustrative purposes. Often people use 80% (4/5) for training and 20% for testing (1/5) or some other similar proportion like what we used here with 2/3 for training and 1/3 for testing. 
 
+#### {.click_to_expand_block}
+
 <details><summary> Click here to learn more about how people decide what split proportion to use. </summary>
 
 Having more training data helps the model to train on a greater variety of observations. However, having more testing data helps to see how generalizable the model is and allows for better comparisons of different models. The need for each may depend on your data and how much variability it has and the size of your data. For smaller datasets, setting aside a larger portion for testing can be beneficial to avoid having a very small testing dataset. Here's a [paper](https://onlinelibrary.wiley.com/doi/full/10.1002/sam.11583) that describes more about this topic.
 
 </details>
+
+####
 
 - Since the split is performed randomly, it is a good idea to use the `set.seed()` function in base R to ensure that if your rerun your code that your split will be the same next time.
 - We can see the number of monitors in our training, testing, and original data by typing in the name of our split object. The result will look like this:
