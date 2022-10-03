@@ -570,7 +570,7 @@ Variable   | Details
 **county** | County where the monitor is located
 **city** | City where the monitor is located
 **CMAQ**  | Estimated values of air pollution from a computational model called [**Community Multiscale Air Quality (CMAQ)**](https://www.epa.gov/cmaq){target="_blank"} <br> --  A monitoring system that simulates the physics of the atmosphere using chemistry and weather data to predict the air pollution <br> -- ***Does not use any of the PM~2.5~ gravimetric monitoring data.*** (There is a version that does use the gravimetric monitoring data, but not this one!) <br> -- Data from the EPA
-**zcta** | [Zip Code Tabulation Area](https://www2.census.gov/geo/pdfs/education/brochures/ZCTAs.pdf){target="_blank"} where the monitor is located <br> -- Postal Zip codes are converted into "generalized areal representations" that are non-overlapping  <br> -- Data from the 2010 Census  
+**zcta** | [Zip Code Tabulation Area](https://en.wikipedia.org/wiki/ZIP_Code_Tabulation_Area){target="_blank"} where the monitor is located <br> -- Postal Zip codes are converted into "generalized areal representations" that are non-overlapping  <br> -- Data from the 2010 Census  
 **zcta_area** | Land area of the zip code area in meters squared  <br> -- Data from the 2010 Census  
 **zcta_pop** | Population in the zip code area  <br> -- Data from the 2010 Census  
 **imp_a500** | Impervious surface measure <br> -- Within a circle with a radius of 500 meters around the monitor <br> -- Impervious surface are roads, concrete, parking lots, buildings <br> -- This is a measure of development 
@@ -1454,11 +1454,38 @@ There are several ways to select what variables to apply steps to:
 Let's try adding some steps to our recipe.
 
 
-We might want to potentially [one-hot encode](https://machinelearningmastery.com/why-one-hot-encode-data-in-machine-learning/){target="_blank"} some of our categorical variables so that they can be used with certain algorithms. 
+We might want to potentially modify some of our categorical variables so that they can be used with certain algorithms, like regression, that require only numeric values. 
 
-We can do this with the `step_dummy()` function and the `one_hot = TRUE` argument. 
-One-hot encoding means that we do not simply encode our categorical variables numerically, as our numeric assignments can be interpreted by algorithms as having a particular rank or order. 
-Instead, binary variables made of 1s and 0s are used to arbitrarily assign a numeric value that has no apparent order.
+We can do this with the `step_dummy()` function and the `one_hot = TRUE` argument to use a method called [One-hot encoding](https://machinelearningmastery.com/why-one-hot-encode-data-in-machine-learning/){target="_blank"}.
+
+
+One-hot encoding means that we do not simply encode our categorical variables numerically as a simple 1,2,3, as our numeric assignments can be interpreted by algorithms as having a particular rank or order. 
+Instead, new binary variables made up of 1s and 0s are used to arbitrarily assign a numeric value that has no apparent order. 
+
+<details><summary>For more information about what one-hot encoding is, you can expand here. </summary>
+
+For example, say we only had three city values for the city variable that were "Tuscon", "Denver", and "New York".
+
+| City 	|
+|:---:	|
+| Tuscon 	|
+| New York 	|
+| Tuscon 	|
+| Denver 	|
+
+This would be replaced by three new variables one for if the value was "Tuscon", one for if the value was "Denver", and one for if the value was "New York". Each would be made up of zeros and ones. One for the new Tuscon variable would indicate that indeed "Tuscon" was the value and zero would indicate that it was instead "New York" or "Denver". Essentially there is one "hot" value possible for each new variable, where the value will be one.
+
+
+| Tuscon 	| Denver 	| New York 	|
+|:---:	|:---:	|:---:	|
+| 1 	| 0 	| 0 	|
+| 0 	| 0 	| 1 	|
+| 1 	| 0 	| 0 	|
+| 0 	| 1 	| 0 	|
+
+</details>
+
+Here we will create such variables to replace the current, state, country, and city categorical data. Similarly the ZCTA values are not intended to be interpreted as numeric as they could be thought of like a zip code and thus we would also want to encode this as well. 
 
 ```{r}
 simple_rec %>%
