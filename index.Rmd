@@ -2260,7 +2260,7 @@ knitr::include_graphics("https://miro.medium.com/max/1400/0*f_qQPFpdofWGLQqc.png
 
 In our case, we are going to use the random forest method of the the `randomForest` package. 
 
-This package is currently not compatible with categorical variables that have more than 53 levels. See [here](https://cran.r-project.org/web/packages/randomForest/NEWS) for the documentation about when this was updated from 25 levels. Thus we will remove the `zcta`  and `county` variables. This is why it is good that we have modified the city variable to two levels, as there were originally nearlly 600, so this would not have been compatible with this package. 
+This package is currently not compatible with categorical variables that have more than 53 levels. See [here](https://cran.r-project.org/web/packages/randomForest/NEWS) for the documentation about when this was updated from 25 levels. Thus we will remove the `zcta`  and `county` variables. This is why it is good that we have modified the city variable to two levels, as there were originally nearly 600, so this would not have been compatible with this package. 
 
 Note that the `step_novel()` function is necessary here for the `state` variable to get all cross validation folds to work, because there will be different levels included in each fold test and training sets. The new levels for some of the test sets would otherwise result in an error.
 
