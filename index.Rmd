@@ -907,21 +907,23 @@ If we are using a linear regression to model our data, then we might run into a 
 Another reason we should look out for correlation is that we don't want to include redundant variables. This can add unnecessary noise to our algorithm causing a reduction in prediction accuracy, and it can cause our algorithm to be unnecessarily slower. Finally, it can also make it difficult to interpret what variables are actually predictive.
 
 Let's first take a look at all of our numeric variables with the`corrplot` package:
-The `corrplot` package is another option to look at correlation among possible predictors, and particularly useful if we have many predictors. 
+The `corrplot` package is a great option to look at correlation among possible predictors, and particularly useful if we have many predictors. 
 
-First, we calculate the Pearson correlation coefficients between all features pairwise using the `cor()` function of the `stats` package (which is loaded automatically). Then we use the `corrplot::corrplot()` function. 
+First, we calculate the Pearson correlation coefficients between all features pairwise using the `cor()` function of the `stats` package (which is loaded automatically). Then we use the `corrplot::corrplot()` function. The `tl.cex = 0.5` argument controls the size of the text label. 
 
 ```{r}
 PM_cor <- cor(pm %>% dplyr::select_if(is.numeric))
 corrplot::corrplot(PM_cor, tl.cex = 0.5)
 ```
-The `tl.cex = 0.5` argument controls the size of the text label. 
+Nice! Now we can see which variables show a positive (blue) or negative (red) correlation to one another. Variables that show a very little correlation with one another appear as white or lightly colored. We can see that each variable is perfectly correlated with itself, which is it why there is a line of blue squares diagnally across the plot.
 
-We can also plot the absolute value of the Pearson correlation coefficients using the `abs()` function from base R and change the order of the columns.  
+We can also plot the absolute value of the Pearson correlation coefficients using the `abs()` function from base R and change the order of the columns. This can be helplful if we aren't interested in the direction of the correlation and just want to see which variables have a relationship with one another.
+
 ```{r}
 corrplot(abs(PM_cor), order = "hclust", tl.cex = 0.5, cl.lim = c(0, 1))
 
 ```
+Nice, this is a bit easier to read now as it isn't as distracting to look at the different colors - we just want to focus on the intensity. Notice that the legend here now doesn't inform us of much in the case of the red because we have plotted the absolute values of the correlation values and they will thus all be positive and blue. The darker the blue the more correlation.
 
 There are several options for ordering the variables. See [here](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html) for more options. Here we will use the "hclust" option for ordering by [hierarchical clustering](https://en.wikipedia.org/wiki/Hierarchical_clustering) - which will order the variables by how similar they are to one another.
 
@@ -952,7 +954,7 @@ select(pm, contains("imp")) %>%
 
 
 
-Indeed, we can see that `imp_a1000` and `imp_a500` are highly correlated, as well as `imp_a10000`, `imp_a15000`.
+Indeed, we can now see more clearly that `imp_a1000` and `imp_a500` are highly correlated, as well as `imp_a10000`, `imp_a15000`. We also get a sense of how the data points vary across the range of values. Note that in this plot red indicates positive correlation values and blue indicates negative correlation values.This is in contrast to our previous plot.
 
 Next, let's take a look at the road density data:
 
@@ -962,7 +964,7 @@ select(pm, contains("pri")) %>%
        layout.exp=2, label = TRUE)
 ```
 
-We can see that many of the road density variables are highly correlated with one another, while others are less so.
+We can see that many of the road density variables are highly correlated with one another, while others are less so. Again note that in this plot red indicates positive correlation values and blue indicates negative correlation values.
 
 Finally let's look at the emission variables.
 
@@ -974,6 +976,8 @@ select(pm, contains("nei")) %>%
 select(pm, contains("nei")) %>%
   ggpairs()
 ```
+We can see some fairly high correlation values as well.
+
 
 We would also expect the population density data might correlate with some of these variables. 
 Let's take a look.
@@ -995,6 +999,7 @@ select(log_nei_2008_pm25_sum_10000, popdens_county,
 Interesting, so these variables don't appear to be highly correlated, therefore we might need variables from each of the categories to predict our monitor PM~2.5~ pollution values.
 
 Because some variables in our data have extreme values, it might be good to take a log transformation. This can affect our estimates of correlation. 
+
 ```{r}
 pm %>%
   mutate(log_popdens_county= log(popdens_county)) %>%
@@ -1015,7 +1020,7 @@ Indeed this increased the correlation, but variables from each of these categori
 
 Now that we have a sense of what our data are, we can get started with building a machine learning model to predict air pollution. 
 
-First let's save our data again because we did wrangle it just a tad. This time we will save it to a subdirectory of the "data" directory called "wrangled". This is a good practice in general for data analyses to keep your data oranganized. We will also save a csv version as this is often useful to give to collaborators. To do this we will use the `write_csv()` function of the `readr` package.
+First let's save our data again because we did wrangle it just a tad. This time we will save it to a subdirectory of the "data" directory called "wrangled". This is a good practice in general for data analyses to keep your data organized. We will also save a csv version as this is often useful to give to collaborators. To do this we will use the `write_csv()` function of the `readr` package.
 
 ```{r, eval = FALSE}
 save(pm, file = here::here("data", "wrangled", "wrangled_pm.rda"))
