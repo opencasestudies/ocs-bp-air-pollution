@@ -478,7 +478,10 @@ There are some important considerations regarding the data analysis in this case
 # **What are the data?** {#whatarethedata}
 ***
 
-When using supervised machine learning for prediction, where the outcome is needed (for more explanation of supervised vs unsupervised machine learning refer to [this](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}), there are two main types of data of interest:
+We are going to perform a type of machine learning to try to predict air pollution levels that is called supervised machine learning. This type of machine learning requires that we have an outcome or result of real values (of in our case air pollution) to work with that will guide or supervise our work. This will ultimately allow us to try to predict air pollution values in the future when we don't have them. 
+For more explanation of what supervised machine learning is (and how it compares to a different kind of machine learning called unsupervised machine learning) refer to [this](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}), 
+ 
+When using supervised machine learning for prediction,there are two main types of data of interest:
 
 1. A **continuous** outcome variable that we want to predict 
 2. A set of feature(s) (or predictor variables) that we use to predict the outcome variable
