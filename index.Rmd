@@ -1123,6 +1123,8 @@ This is a schematic of how these packages work together to build a machine learn
 knitr::include_graphics(here::here("img","MachineLearning.png"))
 ```
 
+Here we can see that after exploring and  splitting the data, we perform the initial modeling stages of variable assignment and pre-processing steps as shown in the blue box the, while the green box indicates the steps required to  train the model by specifying the model, fitting the model and tuning it. 
+
 ### **Benefits of `tidymodels`**
 ***
 
