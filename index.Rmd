@@ -903,8 +903,6 @@ If we are using a linear regression to model our data, then we might run into a 
 
 Another reason we should look out for correlation is that we don't want to include redundant variables. This can add unnecessary noise to our algorithm causing a reduction in prediction accuracy, and it can cause our algorithm to be unnecessarily slower. Finally, it can also make it difficult to interpret what variables are actually predictive.
 
-Intuitively we can expect some of our variables to be correlated.
-
 Let's first take a look at all of our numeric variables with the`corrplot` package:
 The `corrplot` package is another option to look at correlation among possible predictors, and particularly useful if we have many predictors. 
 
@@ -1428,7 +1426,7 @@ knitr::include_graphics(here::here("img","Making_a_recipe_recipes2.png"))
 8. [**Dimensionality Reduction/ Signal Extraction**](https://en.wikipedia.org/wiki/Dimensionality_reduction){target="_blank"} -- reducing the space of features or predictors to a smaller set of variables that capture the variation or signal in the original variables (ex. Principal Component Analysis and Independent Component Analysis)
 9. **Filtering** -- filtering options for removing variables (ex. remove variables that are highly correlated to others or remove variables with very little variance and therefore likely little predictive capacity)
 10. [**Row operations**](https://tartarus.org/gareth/maths/Linear_Algebra/row_operations.pdf){target="_blank"} -- performing functions on the values within the rows  (ex. rearranging, filtering, imputing)
-11. **Checking functions** -- Sanity checks to look for missing values, to look at the variable classes etc.
+11. **Checking functions** -- Gut checks to look for missing values, to look at the variable classes etc.
 
 All of the step functions look like `step_*()` with the `*` replaced with a name, except for the check functions which look like `check_*()`.
 
@@ -2701,7 +2699,7 @@ See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Project
 
 Our main question for this case study was:  
 
-> Can we predict annual average air pollution concentrations at the granularity of zip code regional levels using predictors such as data about population density, urbanization, road density, as well as, satellite pollution data and chemical modeling data?
+> Can we predict regional annual average air pollution concentrations by zip-code using predictors such as population density, urbanization, road density, as well as, satellite pollution data and chemical modeling data?
 
 Thus far, we have built a machine learning (ML) model to predict fine particulate matter air pollution levels based on our predictor variables (or features).
 
