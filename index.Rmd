@@ -1310,7 +1310,7 @@ count(test_pm, state)
 
 After splitting the data, the next step is to process the training and testing data so that the data are are compatible and optimized to be used with the model. 
 
-In order to start this, we need to think about what each of the aspects of our data might do in the model. For example, is this particular column of data possibly helpful for predicting the outcome? Or are these the values that we would consider the outcome of interest? This process is described as assigning variables to specific roles within the model.
+In order to start this, we need to think about what each of the aspects of our data might do in the model. For example, is this particular column of data what we would consider the outcome of interest? Or is these data values possibly helpful for predicting the outcome? This process is described as assigning variables to specific roles within the model.
 
 We will then do what is called pre-processing to prepare the data so it is ready. This involves things like like scaling variables and removing redundant variables. 
 
