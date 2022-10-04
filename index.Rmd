@@ -2211,7 +2211,7 @@ yardstick::mae(wf_fitted_values,
                truth = value, estimate = .fitted)
 ```
 
-The lower the error values, the better the performance. RMSE and MAE can range from zero to infinity, so we aren't doing too bad.  The MAE value suggests that the average difference between the value predicted and the real value was 1.47 ug/m3. The range of the values was 3-22 in the training data, so this is a relatively small amount. The difference between the RMSE and the MAE can indicate the variance of the errors. Since the RMSE and MAE were similar, this indicates that the errors were quite consistent across the range of values and large errors are unlikely to have occurred, where our prediction would have been really far off. The [R squared error](https://en.wikipedia.org/wiki/Coefficient_of_determination) value indicates how much variability in the outcome value could be explained by the predictors in the model. This value ranges from 0 to 1 (sometimes -1 depending on the method used for calculation). A value of 1 would indicate the the model perfectly predicted the outcome. Our value indicates that 39% of the variability of the air pollution measures could be explained by the model. So we could maybe do a bit better. See [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4678365/) for more information. Note that the inclusion of more predictors can increase the R squared error. 
+The lower the error values, the better the performance. RMSE and MAE can range from zero to infinity, so we aren't doing too bad.  The MAE value suggests that the average difference between the value predicted and the real value was `r `round(yardstick::mae(wf_fitted_values, truth = value, estimate = .fitted)$.estimate, 2)` ug/m3. The range of the values was 3-22 in the training data, so this is a relatively small amount. The difference between the RMSE and the MAE can indicate the variance of the errors. Since the RMSE and MAE were similar, this indicates that the errors were quite consistent across the range of values and large errors are unlikely to have occurred, where our prediction would have been really far off. The [R squared error](https://en.wikipedia.org/wiki/Coefficient_of_determination) value indicates how much variability in the outcome value could be explained by the predictors in the model. This value ranges from 0 to 1 (sometimes -1 depending on the method used for calculation). A value of 1 would indicate the the model perfectly predicted the outcome. Our value indicates that `round(yardstick::rsq(wf_fitted_values, truth = value, estimate = .fitted)$.estimate, 2)*100`% of the variability of the air pollution measures could be explained by the model. So we could maybe do a bit better. See [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4678365/) for more information. 
 
 ## **Cross validation**
 ***
@@ -2251,7 +2251,7 @@ Here is a visualization of how the folds are created:
 knitr::include_graphics(here::here("img", "vfold.png"))
 ```
 
-**Note**: People typically ignore spatial dependence with cross validation of air pollution monitoring data in the air pollution field, so we will do the same.  However, it might make sense to leave out blocks of monitors rather than random individual monitors to help account for some spatial dependence.
+**Note**: People typically ignore spatial dependence with cross validation of air pollution monitoring data in the air pollution field, so we will do the same. However, it might make sense to leave out blocks of monitors rather than random individual monitors to help account for some spatial dependence.
 
 ### **Creating the $v$-folds using `rsample`**
 ***
@@ -2599,8 +2599,8 @@ Now let's compare the performance of this model with our linear regression model
 collect_metrics(resample_fit)
 ```
 
-For those starting here we will tell you that our first model had a mean `rmse` value of 2.17.
-It looks like the random forest model had  a much lower `rmse` value of 1.72. This suggest that this model is better at prediction air pollution values. In addition, the R squared value is higher, suggesting that 59% of the variance of the air pollution values could be explained by the model. 
+For those starting here we will tell you that our first model had a mean `rmse` value of `r round(collect_metrics(resample_fit)$mean[1], 2)`.
+It looks like the random forest model had  a much lower `rmse` value of `r round(collect_metrics(resample_RF_fit)$mean[1], 2)`. This suggest that this model is better at prediction air pollution values. In addition, the R squared value is much higher (it was `r round(collect_metrics(resample_fit)$mean[2], 2)*100`% and is now `r round(collect_metrics(resample_RF_fit)$mean[2], 2)*100`%), suggesting that more of the variance of the air pollution values could be explained by the new Random Forest model. 
 
 #### {.think_question_block}
 <b><u> Question Opportunity </u></b>
@@ -2619,7 +2619,7 @@ $$RMSE = \sqrt{\frac{\sum_{i=1}^{n}{(\hat{y_t}- y_t)}^2}{n}}$$
 
 If we tuned our random forest model based on the number of trees or the value for `mtry` (which is "The number of predictors that will be randomly sampled at each split when creating the tree models"), we might get a model with even better performance.
 
-However, our cross validated mean rmse value of 1.72 is quite good because our range of true outcome values is much larger: (`r round(range(test_pm$value),3)`).
+However, our cross validated mean rmse value of `r round(collect_metrics(resample_RF_fit)$mean[1], 2)` is quite good because our range of true outcome values is much larger: (`r round(range(test_pm$value),3)`).
 
 
 ## **Model tuning**
@@ -2719,7 +2719,7 @@ We can now use the `show_best()` function (which we used previously to get a bet
 show_best(tune_RF_results, metric = "rmse", n = 1)
 ```
 
-There we have it... looks like an `mtry` of 17 and `min_n` of 4 had the best `rmse` value. You can verify this in the above output, but it is easier to just pull this row out using this function. We can see that the mean `rmse` value across the cross validation sets was 1.712. Before tuning it was 1.725  with a similar `std_err` so the performance was very slightly improved. In other words the model was slightly better at perdicting air pollution values.
+There we have it... looks like an `mtry` of `r show_best(tune_RF_results, metric = "rmse", n = 1)$mtry` and `show_best(tune_RF_results, metric = "rmse", n = 1)$min_n` of 4 had the best `rmse` value. You can verify this in the above output, but it is easier to just pull this row out using this function. We can see that the mean `rmse` value across the cross validation sets was `r round(show_best(tune_RF_results, metric = "rmse", n = 1)$mean, 2)`. Before tuning it was `r round(collect_metrics(resample_RF_fit)$mean[1], 2)`  with a fairly similar `std_err` so the performance may be slightly improved. In other words the model was slightly better at predicting air pollution values.
 
 
 ## **Final model performance evaluation**
@@ -2767,7 +2767,7 @@ To see the performance on the test data we can use the `collect_metrics()` funct
 collect_metrics(overallfit)
 ```
 
-Awesome! We can see that our rmse of 1.44 is quite similar with our testing data cross validation sets. We achieved quite good performance, which suggests that we could predict other locations with more sparse monitoring based on our predictors with reasonable accuracy.
+Awesome! We can see that our rmse of `r round(collect_metrics(overallfit)$.estimate, 2)[1]` is quite similar to that of our testing data cross validation sets (where rmse was `r round(show_best(tune_RF_results, metric = "rmse", n = 1)$mean, 2)` . We achieved quite good performance, which suggests that we could predict other locations with more sparse monitoring based on our predictors with reasonable accuracy.
 
 Now if you wanted to take a look at the predicted values for the test set (the 292 rows with predictions out of the 876 original monitor values) you can use the  `collect_predictions()` function of the `tune` package:
 
