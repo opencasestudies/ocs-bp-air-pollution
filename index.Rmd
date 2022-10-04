@@ -2775,7 +2775,7 @@ To see the performance on the test data we can use the `collect_metrics()` funct
 collect_metrics(overallfit)
 ```
 
-Awesome! We can see that our rmse of `r round(collect_metrics(overallfit)$.estimate, 2)[1]` is quite similar to that of our testing data cross validation sets (where rmse was `r round(show_best(tune_RF_results, metric = "rmse", n = 1)$mean, 2)` . We achieved quite good performance, which suggests that we could predict other locations with more sparse monitoring based on our predictors with reasonable accuracy.
+Awesome! We can see that our rmse of `r round(collect_metrics(overallfit)$.estimate, 2)[1]` is quite similar to that of our testing data cross validation sets (where rmse was `r round(show_best(tune_RF_results, metric = "rmse", n = 1)$mean, 2)` . We achieved quite good performance, which suggests that we could predict other locations with more sparse monitoring based on our predictors with reasonable accuracy, however some of our predictors involve monitoring itself, so the accuracy would likely be lower.
 
 Now if you wanted to take a look at the predicted values for the test set (the 292 rows with predictions out of the 876 original monitor values) you can use the  `collect_predictions()` function of the `tune` package:
 
@@ -2926,6 +2926,7 @@ ggplot(data = world) +
                shape = 23, fill = "darkred")
 
 ```
+
 Nice!
 
 Now let's add county lines.
@@ -2988,7 +2989,9 @@ counties %<>%
 
 head(counties)
 ```
+
 Now we just need to make these names in the new `county` variable of the `counties` data to be in title format. We can use the `str_to_title()` function of the `stringr` package to do this. 
+
 ```{r}
 counties[["county"]] <- stringr::str_to_title(counties[["county"]])
 ```
@@ -3003,6 +3006,7 @@ map_data <- dplyr::inner_join(counties, pm, by = "county")
 glimpse(map_data)
 
 ```
+
 Nice! we can see that we have add a `geom` variable to the `pm` data.
 
 Now we can use this to color the counties in our plot based on the `value` variable of our `pm` data, which you may recall is the actual monitor data for fine particulate air pollution at each monitor. 
@@ -3034,6 +3038,7 @@ truth <- ggplot(data = world) +
 truth
 
 ```
+
 Nice!
 
 Now let's do the same with our predicted outcome values.
@@ -3131,7 +3136,7 @@ Let's add some text to our plot to explain it a bit more. We can do so using the
 
 ```{r}
 (truth/pred) + 
-  plot_annotation(title = "Machine Learning Methods Allow for Prediction of Air Pollution", subtitle = "A random forest model predicts true monitored levels of fine particulate matter (PM 2.5) air pollution based on\ndata about population density and other predictors reasonably well, thus suggesting that we can predict levels\nof pollution in places with poor monitoring",
+  plot_annotation(title = "Machine Learning Methods Allow for Prediction of Air Pollution", subtitle = "A random forest model predicts true monitored levels of fine particulate matter (PM 2.5) air pollution based on\ndata about population density and other predictors reasonably well, thus suggesting that we can use similar methods to predict levels\nof pollution in places with poor monitoring",
                   theme = theme(plot.title = element_text(size =12, face = "bold"), 
                                 plot.subtitle = element_text(size = 8)))
 
@@ -3142,7 +3147,7 @@ Let's add some text to our plot to explain it a bit more. We can do so using the
 png(here::here("img", "main_plot_maps.png"), 
     height = 1500, width = 2000, res = 300)
 (truth/pred) + 
-  plot_annotation(title = "Machine Learning Methods Allow for Prediction of Air Pollution", subtitle = "A random forest model predicts true monitored levels of fine particulate matter (PM 2.5) air pollution based on\ndata about population density and other predictors reasonably well, thus suggesting that we can predict levels\nof pollution in places with poor monitoring",
+  plot_annotation(title = "Machine Learning Methods Allow for Prediction of Air Pollution", subtitle = "A random forest model predicts true monitored levels of fine particulate matter (PM 2.5) air pollution based on\ndata about population density and other predictors reasonably well, thus suggesting that we can use similar methods predict levels\nof pollution in places with poor monitoring",
                   theme = theme(plot.title = element_text(size =12, face = "bold"),
                                 plot.subtitle = element_text(size = 8)))
 dev.off()
@@ -3163,7 +3168,7 @@ Our learning objectives were:
 - Demonstrate how to build a machine learning model with `tidymodels`
 - Demonstrate how to visualize geo-spatial data using `ggplot2`
 
-Using the machine learning models built in this case study, we could now extend this model to be used to predict air pollution levels in areas with poor monitoring, to help identify regions where populations maybe especially at risk for the health effects of air pollution.  
+Using the machine learning models built in this case study, we could now extend this model to predict air pollution levels in areas with poor monitoring, to help identify regions where populations maybe especially at risk for the health effects of air pollution.  
 
 Analyses like the one in our case study are important for defining which groups could benefit the most from interventions, education, and policy changes when attempting to mitigate public health challenges. You can see in this [article](https://www.nejm.org/doi/full/10.1056/NEJMoa1702747){target="_blank"} that many additional considerations would be involved to adequately understand the data enough to recommend policy changes.
 
