@@ -1908,7 +1908,7 @@ There are four things we need to define about our model:
 4. Any **arguments** necessary for the model/package selected (using the `set_args()`function -  for example the `mtry =` argument for random forest which is the number of variables to be used as options for splitting at each tree node)
 
 Let's walk through these steps one by one. 
-For our case, we are going to start our analysis with a linear regression but we will demonstrate how we can try different models.
+For our case, we are going to start our analysis with a linear regression (a very common starting point for modeling) but we will demonstrate how we can try different models. We will also show how to model with a Random Forest method, which is very widely used. 
 
 The first step is to define what type of model we would like to use. 
 See [here](https://www.tidymodels.org/find/parsnip/){target="_blank"} for modeling options in `parsnip`.
