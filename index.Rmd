@@ -1445,7 +1445,7 @@ knitr::include_graphics(here::here("img","Making_a_recipe_recipes2.png"))
 2. [**Transformation**](https://en.wikipedia.org/wiki/Data_transformation_(statistics)){target="_blank"} -- changing all values of a variable in the same way, typically to make it more normal or easier to interpret
 3. [**Discretization**](https://en.wikipedia.org/wiki/Discretization_of_continuous_features){target="_blank"} -- converting continuous values into discrete or nominal values - binning for example to reduce the number of possible levels (However this is generally not advisable!)
 4. [**Encoding / Creating Dummy Variables**](https://en.wikipedia.org/wiki/Dummy_variable_(statistics)){target="_blank"} -- creating a numeric code for categorical variables
-([**More on Dummy Variables and one-hot encoding**](https://medium.com/p/b5840be3c41a/responses/show){target="_blank"})
+([**More on one-hot and Dummy Variables encoding**](https://medium.com/p/b5840be3c41a/responses/show){target="_blank"})
 5. [**Data type conversions**](https://cran.r-project.org/web/packages/hablar/vignettes/convert.html){target="_blank"}  -- which means changing from integer to factor or numeric to date etc.
 6. [**Interaction**](https://statisticsbyjim.com/regression/interaction-effects/){target="_blank"}  term addition to the model -- which means that we would be modeling for predictors that would influence the capacity of each other to predict the outcome
 7. [**Normalization**](https://en.wikipedia.org/wiki/Normalization_(statistics)){target="_blank"} -- centering and scaling the data to a similar range of values
@@ -1501,12 +1501,49 @@ This would be replaced by three new variables one for if the value was "Tuscon",
 
 ####
 
-Here we will create such variables to replace the current, state, country, and city categorical data. Similarly the ZCTA values are not intended to be interpreted as numeric as they could be thought of like a zip code and thus we would also want to encode this as well. 
+Here we will create such variables to replace the current, state, country, and city categorical data. Similarly the ZCTA values (which are currently a factor class) are not intended to be interpreted as numeric as they could be thought of like a zip code and thus we would also want to encode this as well. 
 
 ```{r}
 simple_rec %>%
   step_dummy(state, county, city, zcta, one_hot = TRUE)
 ```
+
+#### {.click_to_expand_block}
+
+<details><summary> Click here to see how the variables would change if our recipe stopped here with simply the one-hot encoding. </summary>
+
+To create the data we will use steps that we will demonstrate later, for now we will just show you what the new encoded variables look like.
+
+```{r, echo = FALSE, include = FALSE}
+one_hot_rec <- recipe(train_pm) %>%
+  update_role(everything(), new_role = "predictor") %>%
+  update_role(value, new_role = "outcome") %>%
+  update_role(id, new_role = "id variable")
+one_hot_rec %<>% step_dummy(state, county, city, zcta, one_hot = TRUE)
+prepped_one_hot_rec <- prep(one_hot_rec , verbose = TRUE, retain = TRUE )
+baked_one_hot_rec <- bake(prepped_one_hot_rec, new_data = NULL)
+```
+
+Scroll through to see!
+
+##### {.scrollable }
+
+```{r, echo = FALSE}
+summary(baked_one_hot_rec)
+glimpse(baked_one_hot_rec)
+```
+
+Compare this with the original data:
+
+```{r, echo = FALSE}
+glimpse(pm)
+```
+
+#####
+
+</details>
+
+####
 
 Our `fips` variable includes a numeric code for state and county - and therefore is essentially a proxy for county.
 Since we already have county, we will just use it and keep the `fips` ID as another ID variable.
