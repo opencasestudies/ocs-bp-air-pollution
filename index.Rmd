@@ -1370,6 +1370,8 @@ To summarize this step, we will use the `recipe()` function to assign roles to a
 knitr::include_graphics(here::here("img","Starting_a_recipe_recipes1.png"))
 ```
 
+We will describe this step by step and then show all the steps together.
+
 In the simplest case, we might use all predictors like this:
 
 ```{r}
