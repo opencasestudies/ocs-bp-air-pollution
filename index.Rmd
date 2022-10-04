@@ -1524,22 +1524,21 @@ prepped_one_hot_rec <- prep(one_hot_rec , verbose = TRUE, retain = TRUE )
 baked_one_hot_rec <- bake(prepped_one_hot_rec, new_data = NULL)
 ```
 
-Scroll through to see!
 
-##### {.scrollable }
 
-```{r, echo = FALSE}
-summary(baked_one_hot_rec)
-glimpse(baked_one_hot_rec)
+
+
+```{r}
+length(names(train_pm))
+length(names(baked_one_hot_rec)) # many more variables!
+
+train_pm %>% select(zcta, city, state, county) %>% head
+
+# let's look at a few
+baked_one_hot_rec %>% select("zcta_X54520", "city_Not.in.a.city", "state_Indiana") %>% head()
+
 ```
 
-Compare this with the original data:
-
-```{r, echo = FALSE}
-glimpse(pm)
-```
-
-#####
 
 </details>
 
@@ -1653,7 +1652,7 @@ You can see:
 ***
 
 
-Since we retained our pre-processed training data (i.e. `prep(retain=TRUE)`), we can take a look at it by using the `bake()` function of the `recipes` package like this:
+Since we retained our pre-processed training data (i.e. `prep(retain=TRUE)`), we can take a look at it by using the `bake()` function of the `recipes` package. The `bake` function allows us to apply our modeling steps (in this case just pre-processing on the training data) and see what it would do the data.
 
 ```{r, echo=FALSE, out.width="400px"}
 knitr::include_graphics(here::here("img","training_preprocessing_recipes3.png"))
@@ -1726,7 +1725,7 @@ pm %>% count(city) %>%
 
 ####
 
-**Note**: Recall that you must specify `retain = TRUE` argument of the `prep()` function to use `bake()`.
+**Note**: Recall that you must specify `retain = TRUE` argument of the `prep()` function to use `bake()` to see pre-processed training data.
 
 ### **Step 3: Extract pre-processed testing data using `bake()`**
 ***
@@ -1840,7 +1839,7 @@ novel_rec
 
 
 
-Now let's retrain our training data and try baking our test data.
+Now let's retrain our training data with the new model recipe and try baking our test data again.
 
 
 
@@ -1888,8 +1887,8 @@ glimpse(baked_test_pm)
 Great, now we no longer have `NA` values! :)
 
 **Note**: if you use the skip option for some of the pre-processing steps, be careful. 
-`juice()` will show all of the results ignoring `skip = TRUE` (as you can still use this function if you perfer it to `bake()`).
-`bake()` will not necessarily conduct these steps on the new data.
+the `juice()` function (an older option) will show all of the results ignoring `skip = TRUE` (as you can still use this function if you prefer it to `bake()`). The
+`bake()` function will not necessarily conduct these steps on the new data.
 
 
 ## **Specifying the model**
@@ -2042,7 +2041,65 @@ PM_wflow_fit %>%
   vip(num_features = 10)
 ```
 
-The state in which the monitor was located and the CMAQ model and the aod satellite information appear to be the most important for predicting the air pollution at a given monitor.
+The location of the monitor (being in California versus another state), the CMAQ model, and the aod satellite information appear to be the most important for predicting the air pollution at a given monitor.
+
+Indeed, if we plot monitor values for those in California relative to other states we can see that there are some high values for monitors in California. This may be playing a role in what we are seeing. Here we assume that you have some experience plotting with the `ggplot2`package. If not, please see this [case study](https://www.opencasestudies.org/ocs-bp-co2-emissions/).
+
+#### {.click_to_expand_block}
+
+<details><summary> Click here for an introduction about this package if you are  new to using `ggplot2` </summary>
+
+
+The [ggplot2 package](http://ggplot2.tidyverse.org) is generally intuitive for beginners because it is based on a  [grammar of graphics](http://vita.had.co.nz/papers/layered-grammar.html) or the `gg` in `ggplot2`. 
+The idea is that you can construct many sentences by learning just a few nouns, adjectives, and verbs. There are specific “words” that we will need to learn and once we do, you will be able to create (or “write”) hundreds of different plots.
+
+The critical part to making graphics using `ggplot2` is the data needs to be in a _tidy_ format. 
+Given that we have just spent time putting our data in _tidy_ format, we are primed to take advantage of all that `ggplot2` has to offer! 
+
+We will show how it is easy to pipe _tidy_ data (output) as input to other functions that create plots. 
+This all works because we are working 
+within the _tidyverse_. 
+
+**What is the `ggplot()` function?** 
+As explained by Hadley Wickham:
+
+> The grammar tells us that a statistical graphic is a mapping from data to aesthetic attributes (colour, shape, size) of geometric objects (points, lines, bars). The plot may also contain statistical transformations of the data and is drawn on a specific coordinates system.
+`ggplot2` Terminology: 
+
+- **ggplot** - the main function where you specify the dataset and variables to plot (this is where we define the `x` and
+`y` variable names)
+- **geoms** - geometric objects
+    - e.g. `geom_point()`, `geom_bar()`, `geom_line()`, `geom_histogram()`
+- **aes** - aesthetics
+    - shape, transparency, color, fill, line types
+- **scales** - define how your data will be plotted
+    - continuous, discrete, log, etc
+
+The function `aes()` is an aesthetic mapping function inside the `ggplot()` object. 
+We use this function to specify plot attributes (e.g. `x` and `y` variable names) that will not change as we add more layers.  
+
+Anything that goes in the `ggplot()` object becomes a global setting. 
+From there, we use the `geom` objects to add more layers to the base `ggplot()` object. 
+These will define what we are interested in illustrating using the data.
+
+</details>
+
+####
+
+
+```{r}
+
+baked_train_ready %>% 
+  mutate(state_California = as.factor(state_California)) %>%
+  mutate(state_California = recode(state_California, 
+                                   "0" = "Not California", 
+                                   "1" = "California")) %>%
+  ggplot(aes(x = state_California, y = value)) + 
+  geom_boxplot() +
+  geom_jitter(width = .05) + 
+  xlab("Location of Monitor")
+
+```
 
 ## **Model performance**
 ***
