@@ -1688,7 +1688,7 @@ Two of these are our ID variables (`fips` and the actual monitor ID (`id`)) and 
 Thus we only have 33 predictors now. 
 We can also see that we no longer have any categorical variables. 
 Variables like `state` are gone and only `state_California` remains as it was the only state identity to have nonzero variance.
-We can also see that there were more monitors listed as `"Not in a city"` than any city. 
+
 
 We can see that California had the largest number of monitors compared to the other states.
 
@@ -1707,6 +1707,9 @@ pm %>% count(state)  %>%
 ```
 
 ####
+
+
+We can also see that there were more monitors listed as `"Not in a city"` than any city. 
 
 ```{r, eval = FALSE}
 pm %>% count(city)
