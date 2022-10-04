@@ -2183,7 +2183,7 @@ This is calculated and 1 minus the fraction of the residual sum of squares ($SS_
 $$RSQ = R^2 = 1 - \frac{SSres}{SStot}$$
 
 $$SS_{tot} = \sum_{i=1}^{n}{(y_i- \bar{y})}^2$$
-The total sum of squares is proportional to the variance of the data. It is calculated as the sum of each  true value from the mean true value ($\bar{y}$).
+The total sum of squares is proportional to the variance of the data. It is calculated as the sum of each true value from the mean true value ($\bar{y}$).
 
 $$SS_{res} = \sum_{i=1}^{n}{(y_i- \hat{y_i})}^2$$
 
@@ -2210,6 +2210,8 @@ Alternatively if you only wanted one metric you could use the `mae()`, `rsq()`, 
 yardstick::mae(wf_fitted_values, 
                truth = value, estimate = .fitted)
 ```
+
+The lower the error values, the better the performance. RMSE and MAE can range from zero to infinity, so we aren't doing too bad.  The MAE value suggests that the average difference between the value predicted and the real value was 1.47 ug/m3. The range of the values was 3-22 in the training data, so this is a relatively small amount. The difference between the RMSE and the MAE can indicate the variance of the errors. Since the RMSE and MAE were similar, this indicates that the errors were quite consistent across the range of values and large errors are unlikely to have occurred, where our prediction would have been really far off. The [R squared error](https://en.wikipedia.org/wiki/Coefficient_of_determination) value indicates how much variability in the outcome value could not be explained by the predictors in the model. This value ranges from 0 to 1 (sometimes -1 depending on the method used for calculation). Our value indicates that 39% of the variability of the air pollution measures could not be explained by the predictors in the model. See [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4678365/) for more information. Note that the inclusion of more predictors can increase the R squared error. 
 
 ## **Cross validation**
 ***
