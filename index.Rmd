@@ -2199,6 +2199,8 @@ $$RMSE = \sqrt{\frac{\sum_{i=1}^{n}{(\hat{y_t}- y_t)}^2}{n}}$$
 
 One way to calculate these metrics within the `tidymodels` framework is to use the `yardstick` package using the `metrics()` function. 
 
+Note that you may obtain different results depending on your version of R and the package versions you are using. See [Session Info](#sessioninfo) section to learn what we used.
+
 ```{r}
 yardstick::metrics(wf_fitted_values, 
                    truth = value, estimate = .fitted)
@@ -2211,7 +2213,7 @@ yardstick::mae(wf_fitted_values,
                truth = value, estimate = .fitted)
 ```
 
-The lower the error values, the better the performance. RMSE and MAE can range from zero to infinity, so we aren't doing too bad.  The MAE value suggests that the average difference between the value predicted and the real value was `r `round(yardstick::mae(wf_fitted_values, truth = value, estimate = .fitted)$.estimate, 2)` ug/m3. The range of the values was 3-22 in the training data, so this is a relatively small amount. The difference between the RMSE and the MAE can indicate the variance of the errors. Since the RMSE and MAE were similar, this indicates that the errors were quite consistent across the range of values and large errors are unlikely to have occurred, where our prediction would have been really far off. The [R squared error](https://en.wikipedia.org/wiki/Coefficient_of_determination) value indicates how much variability in the outcome value could be explained by the predictors in the model. This value ranges from 0 to 1 (sometimes -1 depending on the method used for calculation). A value of 1 would indicate the the model perfectly predicted the outcome. Our value indicates that `round(yardstick::rsq(wf_fitted_values, truth = value, estimate = .fitted)$.estimate, 2)*100`% of the variability of the air pollution measures could be explained by the model. So we could maybe do a bit better. See [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4678365/) for more information. 
+The lower the error values, the better the performance. RMSE and MAE can range from zero to infinity, so we aren't doing too bad.  The MAE value suggests that the average difference between the value predicted and the real value was `r round(yardstick::mae(wf_fitted_values, truth = value, estimate = .fitted)$.estimate, 2)` ug/m3. The range of the values was 3-22 in the training data, so this is a relatively small amount. The difference between the RMSE and the MAE can indicate the variance of the errors. Since the RMSE and MAE were similar, this indicates that the errors were quite consistent across the range of values and large errors are unlikely to have occurred, where our prediction would have been really far off. The [R squared error](https://en.wikipedia.org/wiki/Coefficient_of_determination) value indicates how much variability in the outcome value could be explained by the predictors in the model. This value ranges from 0 to 1 (sometimes -1 depending on the method used for calculation). A value of 1 would indicate the the model perfectly predicted the outcome. Our value indicates that `r round(yardstick::rsq(wf_fitted_values, truth = value, estimate = .fitted)$.estimate, 2)*100`% of the variability of the air pollution measures could be explained by the model. So we could maybe do a bit better. See [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4678365/) for more information. 
 
 ## **Cross validation**
 ***
@@ -2599,7 +2601,7 @@ Now let's compare the performance of this model with our linear regression model
 collect_metrics(resample_fit)
 ```
 
-For those starting here we will tell you that our first model had a mean `rmse` value of `r round(collect_metrics(resample_fit)$mean[1], 2)`.
+For those starting here we will tell you that our first model had a cross validation mean `rmse` value of `r round(collect_metrics(resample_fit)$mean[1], 2)`.
 It looks like the random forest model had  a much lower `rmse` value of `r round(collect_metrics(resample_RF_fit)$mean[1], 2)`. This suggest that this model is better at prediction air pollution values. In addition, the R squared value is much higher (it was `r round(collect_metrics(resample_fit)$mean[2], 2)*100`% and is now `r round(collect_metrics(resample_RF_fit)$mean[2], 2)*100`%), suggesting that more of the variance of the air pollution values could be explained by the new Random Forest model. 
 
 #### {.think_question_block}
