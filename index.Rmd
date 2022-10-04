@@ -2401,7 +2401,7 @@ In the next few section, we will demonstrate another very different kind of mach
 ## **Random Forest**
 ***
 
-Now, we are going to predict our outcome variable (air pollution) using a decision tree method called [random forest](https://en.wikipedia.org/wiki/Random_forest){target="_blank"}.
+Now, to try to see if we can get better prediction performance, we are going to predict our outcome variable (air pollution) using a decision tree method called [random forest](https://en.wikipedia.org/wiki/Random_forest){target="_blank"}.
 
 A [decision tree](https://medium.com/greyatom/decision-trees-a-simple-way-to-visualize-a-decision-dc506a403aeb){target="_blank"} is a tool to partition data or anything really, based on a series of sequential (often binary) decisions, where the decisions are chosen based on their ability to optimally split the data.
 
@@ -2596,7 +2596,10 @@ resample_RF_fit <- tune::fit_resamples(RF_wflow, vfold_pm)
 collect_metrics(resample_RF_fit)
 ```
 
-Now let's compare the performance of this model with our linear regression model - if you have been following along you could type this to take a look. 
+## **Model Comparison**
+***
+
+Now let's compare the performance of our model with our linear regression model - if you have been following along you could type this to take a look. 
 
 ```{r, eval = FALSE}
 # our initial linear regression model:
@@ -2729,7 +2732,7 @@ There we have it... looks like an `mtry` of `r show_best(tune_RF_results, metric
 ## **Final model performance evaluation**
 ***
 
-Now that we have decided that we have reasonable performance with our training data, we can stop building our model and evaluate performance with our testing data. 
+Now that we have decided that we have reasonable performance with our training data using the Random Forest method and tuning, we can stop building our model and evaluate performance with our testing data. Note that you might often need to try a variety of methods to optimize your model.
 
 Here, we will use the random forest model that we built to predict values for the monitors in the testing data and we will use the values for `mtry` and `min_n` that we just determined based on our tuning analysis to achieve the best performance.
 
@@ -2767,6 +2770,7 @@ overallfit <- RF_wflow %>%
 The `overallfit` output has a lot of really useful information about the model, the testing and training data split, and the predictions for the testing data.
 
 To see the performance on the test data we can use the `collect_metrics()` function like we did before.
+
 ```{r}
 collect_metrics(overallfit)
 ```
