@@ -734,6 +734,9 @@ To load the downloaded data into your environment, you may double click on the `
 
 To copy and paste our code below, place the downloaded file in your current working directory within a subdirectory called "imported" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
+```{r, eval = FALSE}
+load(here::here("data", "imported", "imported_pm.rda"))
+```
 
 ```{r, echo=FALSE}
 load(here::here("www", "data", "imported", "imported_pm.rda"))
@@ -1297,6 +1300,10 @@ If the package does not work for you, you may also download this `.rda` file by 
 To load the downloaded data into your environment, you may double click on the `.rda` file in Rstudio or using the `load()` function.
 
 To copy and paste our code below, place the downloaded `.rda` file in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
+
+```{r, eval=FALSE}
+load(here::here("data", "wrangled", "wrangled_pm.rda"))
+```
 
 ```{r, echo=FALSE}
 load(here::here("www", "data", "wrangled", "wrangled_pm.rda"))
@@ -2483,6 +2490,10 @@ To load the downloaded data into your environment, you may double click on the `
 
 To copy and paste our code below, place the downloaded `.rda` file in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
+```{r, eval=FALSE}
+load(here::here("data", "wrangled", "wrangled_pm.rda"))
+```
+
 
 ```{r, echo=FALSE}
 load(here::here("www", "data", "wrangled", "wrangled_pm.rda"))
@@ -3239,9 +3250,16 @@ To load the downloaded data into your environment, you may double click on the `
 
 To copy and paste our code below, place the downloaded `.rda` file in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
-```{r}
+```{r, eval = FALSE}
 load(here::here("data", "wrangled", "wrangled_pm.rda"))
 ```
+
+```{r, echo = FALSE}
+load(here::here("www", "data", "wrangled", "wrangled_pm.rda"))
+```
+
+
+
 
 <hr style="height:1px;border:none;color:#333;background-color:#333;" />
 
