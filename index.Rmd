@@ -42,9 +42,20 @@ knitr::opts_chunk$set(include = TRUE, comment = NA, echo = TRUE,
                       message = FALSE, warning = FALSE, cache = FALSE,
                       fig.align = "center", out.width = '90%')
 
+
 library(learnr)
 library(gradethis)
 gradethis::gradethis_setup()
+
+library(magrittr)
+remotes::install_github("benmarwick/wordcountaddin", type = "source", dependencies = TRUE)
+remotes::install_github("alistaire47/read.so")
+library(wordcountaddin)
+library(read.so)
+
+rmarkdown:::perf_timer_reset_all()
+rmarkdown:::perf_timer_start("render")
+
 ```
 
 
@@ -71,19 +82,55 @@ This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 [
 
 To cite this case study please use:
 
-Wright, Carrie and Jager, Leah and Taub, Margaret and Hicks, Stephanie. (2020). [https://github.com//opencasestudies/ocs-bp-air-pollution](https://github.com//opencasestudies/ocs-bp-air-pollution/). Predicting Annual Air Pollution (Version v1.0.0).
+Wright, Carrie and Meng, Qier and Jager, Leah and Taub, Margaret and Hicks, Stephanie. (2020). [https://github.com//opencasestudies/ocs-bp-air-pollution](https://github.com//opencasestudies/ocs-bp-air-pollution/). Predicting Annual Air Pollution (Version v1.0.0).
 
 ####
 
 To access the GitHub Repository for this case study see here: https://github.com/opencasestudies/ocs-bp-air-pollution.
 
+You may also access and download the data using our `OCSdata` package. To learn more about this package including examples, see this [link](https://github.com/opencasestudies/OCSdata). Here is how you would install this package:
+
+```{r, eval=FALSE}
+install.packages("OCSdata")
+```
+
 This case study is part of a series of public health case studies for the [Bloomberg American Health  Initiative](https://americanhealth.jhu.edu/open-case-studies).
 
+***
+
+The total reading time for this case study is calculated via [koRpus](https://github.com/unDocUMeantIt/koRpus) and shown below: 
+
+```{r, echo=FALSE}
+readtable = text_stats("index.Rmd") # producing reading time markdown table
+readtime = read.so::read.md(readtable) %>% dplyr::select(Method, koRpus) %>% # reading table into dataframe, selecting relevant factors
+  dplyr::filter(Method == "Reading time") %>% # dropping unnecessary rows
+  dplyr::mutate(koRpus = paste(round(as.numeric(stringr::str_split(koRpus, " ")[[1]][1])), "minutes")) %>% # rounding reading time estimate
+  dplyr::mutate(Method = "koRpus") %>% dplyr::relocate(koRpus, .before = Method) %>% dplyr::rename(`Reading Time` = koRpus) # reorganizing table
+knitr::kable(readtime, format="markdown")
+```
+
+***
+
+**Readability Score: **
+
+A readability index estimates the reading difficulty level of a particular text. Flesch-Kincaid, FORCAST, and SMOG are three common readability indices that were calculated for this case study via [koRpus](https://github.com/unDocUMeantIt/koRpus). These indices provide an estimation of the minimum reading level required to comprehend this case study by grade and age. 
+
+```{r, echo=FALSE}
+rt = wordcountaddin::readability("index.Rmd", quiet=TRUE) # producing readability markdown table
+df = read.so::read.md(rt) %>% dplyr::select(index, grade, age) %>%  # reading table into dataframe, selecting relevant factors
+  tidyr::drop_na() %>% dplyr::mutate(grade = round(as.numeric(grade)), # dropping rows with missing values, rounding age and grade columns
+                                     age = round(as.numeric(age))
+                                     )
+knitr::kable(df, format="markdown")
+```
+
+***
 
 Please help us by filling out our survey.
 
 
 <div style="display: flex; justify-content: center;"><iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfpN4FN3KELqBNEgf2Atpi7Wy7Nqy2beSkFQINL7Y5sAMV5_w/viewform?embedded=true" width="1200" height="700" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe></div>
+
 
 # **Motivation**
 ***
@@ -183,7 +230,7 @@ This lack of granularity in air pollution monitoring has hindered our ability to
 
 ### Machine learning offers a solution
 
-An [article](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63){target="_blank"} published in the *Environmental Health* journal dealt with this issue by using data, including population density, road density, among other features, to model or predict air pollution levels at a more localized scale using machine learning (ML) methods. 
+An [article](https://ehjournal.biomedcentral.com/articles/10.1186/1476-069X-13-63){target="_blank"} published in the *Environmental Health* journal dealt with this issue by using data, including population density and road density, among other features, to model or predict air pollution levels at a more localized scale using machine learning (ML) methods. 
 
 ```{r, echo = FALSE, out.width= "800 px"}
 knitr::include_graphics(here::here("www", "img", "thepaper.png"))
@@ -238,11 +285,11 @@ The skills, methods, and concepts that students will be familiar with by the end
 
 <u>**Data Science Learning Objectives:**</u> 
   
-1. Familiarity with the tidymodels ecosystem
-2. Ability to evaluate correlation among predictor variables (`corrplot` and `GGally`)
+1. Familiarity with the tidymodels ecosystem.
+2. Ability to evaluate correlation among predictor variables (`corrplot` and `GGally`).
 3. Ability to implement tidymodels packages such as `rsample` to split the data into training and testing sets as well as cross validation sets.
-4. Ability to use the `recipes`, `parsnip`, and `workflows` to train and test a linear regression model and random forest model
-5. Demonstrate how to visualize geo-spatial data using `ggplot2`
+4. Ability to use the `recipes`, `parsnip`, and `workflows` to train and test a linear regression model and random forest model.
+5. Demonstrate how to visualize geo-spatial data using `ggplot2`.
 
 <u>**Statistical Learning Objectives:**</u>  
   
@@ -278,11 +325,15 @@ library(ggplot2)
 library(stringr)
 library(tidyr)
 library(lwgeom)
+library(proxy)# needed for lwgeom
 library(sf)
 library(maps)
 library(rnaturalearth)
+library(rnaturalearthdata) # needed for rnaturalearth
 library(rgeos)
 library(patchwork)
+# Load package for downloading the case study data files
+library(OCSdata)
 ```
 
 
@@ -319,6 +370,7 @@ Package   | Use in this case study
 [lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert map geographical data
 [rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
 [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
+[OCSdata](https://github.com/opencasestudies/OCSdata){target="_blank"} | to access and download OCS data files
 ___
 
 
@@ -363,7 +415,7 @@ knitr::include_graphics(here::here("www", "img","2017mortality.png"))
 
 ##### [[source]](https://www.stateofglobalair.org/sites/default/files/soga-2018-report.pdf){target="_blank"}
 
-The 2019 report shows that the highest levels of fine particulate pollution occurs in Africa and Asia and that:
+The 2019 report shows that the highest levels of fine particulate pollution occur in Africa and Asia and that:
 
 > More than **90%** of people worldwide live in areas **exceeding** the World Health Organization (WHO) **Guideline** for healthy air. More than half live in areas that do not even meet WHO's least-stringent air quality target.
 
@@ -381,10 +433,10 @@ knitr::include_graphics(here::here("www", "img", "US.png"))
 
 ##### [[source]](https://gispub.epa.gov/air/trendsreport/2019/documentation/AirTrends_Flyer.pdf){target="_blank"}
 
-However, air pollution **continues to contribute to health risk for Americans**, in particular in **regions with higher than national average rates** of pollution that actually at time exceed the WHO's recommended level. 
+However, air pollution **continues to contribute to health risk for Americans**, in particular in **regions with higher than national average rates** of pollution that, at times, exceed the WHO's recommended level. 
 Thus, it is important to obtain high spatial granularity in estimates of air pollution in order to identify locations where populations are experiencing harmful levels of exposure.
 
-You can see that current air quality conditions at this [website](https://aqicn.org/city/usa/){target="_blank"} and you will notice variation across different cities.
+You can see that current air quality conditions at this [website](https://aqicn.org/city/usa/){target="_blank"}, and you will notice variation across different cities.
 
 For example, here are the conditions in Topeka Kansas at the time this case study was created:
 
@@ -396,7 +448,7 @@ knitr::include_graphics(here::here("www", "img", "Kansas.png"))
 
 It reports particulate values using what is called the [Air Quality Index](https://www.airnow.gov/index.cfm?action=aqibasics.aqi){target="_blank"} (AQI).
 This [calculator](https://airnow.gov/index.cfm?action=airnow.calculator){target="_blank"} indicates that 114 AQI is equivalent to 40.7 ug/m^3^ and is considered unhealthy for sensitive individuals.
-Thus, some areas exceed the WHO annual exposure guideline (10 ug/m^3^) and this may adversely affect the health of people living in these locations.
+Thus, some areas exceed the WHO annual exposure guideline (10 ug/m^3^), and this may adversely affect the health of people living in these locations.
 
 Adverse health effects have been associated with populations experiencing higher pollution exposure despite the levels being below suggested guidelines. 
 Also, it appears that the composition of the particulate matter and the influence of other demographic factors may make specific populations more at risk for adverse health effects due to air pollution. 
@@ -424,13 +476,16 @@ There are some important considerations regarding the data analysis in this case
 
 2. Outdoor pollution levels are not necessarily an indication of individual exposures. People spend differing amounts of time indoors and outdoors and are exposed to different pollution levels indoors. Researchers are now developing personal monitoring systems to track air pollution levels on the personal level.
 
-3. Our analysis will use annual mean estimates of pollution levels, but these can vary greatly by season, day and even hour. There are data sources that have finer levels of temporal data, however we are interested in long term exposures, as these appear to be the most influential for health outcomes, so we chose to use annual level data. 
+3. Our analysis will use annual mean estimates of pollution levels, but these can vary greatly by season, day and even hour. There are data sources that have finer levels of temporal data; however, we are interested in long term exposures, as these appear to be the most influential for health outcomes.
 
 
 # **What are the data?** {#whatarethedata}
 ***
 
-When using supervised machine learning for prediction, where the outcome is needed (for more explanation of supervised vs unsupervised machine learning refer to [this](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}), there are two main types of data of interest:
+We are going to perform a type of machine learning to try to predict air pollution levels that is called supervised machine learning. This type of machine learning requires that we have an outcome or result of real values (of in our case air pollution) to work with that will guide or supervise our work. This will ultimately allow us to try to predict air pollution values in the future when we don't have them. 
+For more explanation of what supervised machine learning is (and how it compares to a different kind of machine learning called unsupervised machine learning where we don't have outcome values) refer to [this](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}), 
+ 
+When using supervised machine learning for prediction,there are two main types of data of interest:
 
 1. A **continuous** outcome variable that we want to predict 
 2. A set of feature(s) (or predictor variables) that we use to predict the outcome variable
@@ -450,18 +505,17 @@ In this case, our outcome variable is the sales of cars, while the different cha
 
 This is the most commonly missed step when developing a machine learning algorithm. 
 Machine learning can very easily be turned into an engineering problem. 
-Just dump the outcome and the features into a black box algorithm and viola! 
+Just dump the outcome and the features into a [black box algorithm](https://en.wikipedia.org/wiki/Black_box) and viola! 
 But this kind of thinking can lead to major problems. In general good machine learning questions:
 
 1. Have a plausible explanation for why the features predict the outcome. 
-2. Consider potential variation in both the features and the outcome over time
+2. Consider potential variation in both the features and the outcome over time.
 3. Are consistently re-evaluated on criteria 1 and 2 over time. 
 
 In this case study, we want to **predict** air pollution levels. 
-To build this machine learning algorithm, our **outcome variable** is fine particulate matter (PM~2.5~) captured from air pollution monitors in the contiguous US from 2008. 
+To build this machine learning algorithm, our **outcome variable** is average annual fine particulate matter (PM~2.5~) captured from air pollution monitors in the contiguous US in 2008. 
 Our **features** (or predictor variables) include data about population density, road density, urbanization levels, and NASA satellite data. 
 
-All of our data was previously collected by a [researcher](http://www.biostat.jhsph.edu/~rpeng/) at the [Johns Hopkins School of Public Health](https://www.jhsph.edu/) who studies air pollution and climate change. 
 
 
 ### **Our outcome variable**
@@ -486,6 +540,8 @@ knitr::include_graphics(here::here("www", "img","filter.png"))
 The weight of this particulate matter is manually measured daily or weekly. 
 For the EPA standard operating procedure for PM gravimetric analysis in 2008, we refer the reader to [here](https://www3.epa.gov/ttnamti1/files/ambient/pm25/spec/RTIGravMassSOPFINAL.pdf){target="_blank"}.
 
+#### {.click_to_expand_block}
+
 <details><summary>For more on Gravimetric analysis, you can expand here </summary>
 
 Gravimetric analysis is also used for [emission testing](https://www.mt.com/us/en/home/applications/Laboratory_weighing/emissions-testing-particulate-matter.html){target="_blank"}. 
@@ -496,6 +552,8 @@ Gravimetric analysis is considered to be among the most accurate methods for mea
 
 </details>
 
+####
+
 In our data set, the `value` column indicates the PM~2.5~ monitor average for 2008 in mass of fine particles/volume of air for 876 gravimetric monitors. 
 The units are micrograms of fine particulate matter (PM) that is less than 2.5 micrometers in diameter per cubic meter of air - mass concentration (ug/m^3^).
 Recall the WHO exposure guideline is < 10 ug/m^3^ on average annually for PM~2.5~.
@@ -505,6 +563,8 @@ Recall the WHO exposure guideline is < 10 ug/m^3^ on average annually for PM~2.5
 
 There are 48 features with values for each of the 876 monitors (observations). 
 The data comes from the US [Environmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}, the [National Aeronautics and Space Administration (NASA)](https://www.nasa.gov/){target="_blank"}, the US [Census](https://www.census.gov/about/what/census-at-a-glance.html){target="_blank"}, and the [National Center for Health Statistics (NCHS)](https://www.cdc.gov/nchs/about/index.htm){target="_blank"}.
+
+#### {.click_to_expand_block}
 
 <details><summary> Click here to see a table about the set of features </summary>
 
@@ -518,7 +578,7 @@ Variable   | Details
 **county** | County where the monitor is located
 **city** | City where the monitor is located
 **CMAQ**  | Estimated values of air pollution from a computational model called [**Community Multiscale Air Quality (CMAQ)**](https://www.epa.gov/cmaq){target="_blank"} <br> --  A monitoring system that simulates the physics of the atmosphere using chemistry and weather data to predict the air pollution <br> -- ***Does not use any of the PM~2.5~ gravimetric monitoring data.*** (There is a version that does use the gravimetric monitoring data, but not this one!) <br> -- Data from the EPA
-**zcta** | [Zip Code Tabulation Area](https://www2.census.gov/geo/pdfs/education/brochures/ZCTAs.pdf){target="_blank"} where the monitor is located <br> -- Postal Zip codes are converted into "generalized areal representations" that are non-overlapping  <br> -- Data from the 2010 Census  
+**zcta** | [Zip Code Tabulation Area](https://en.wikipedia.org/wiki/ZIP_Code_Tabulation_Area){target="_blank"} where the monitor is located <br> -- Postal Zip codes are converted into "generalized areal representations" that are non-overlapping  <br> -- Data from the 2010 Census  
 **zcta_area** | Land area of the zip code area in meters squared  <br> -- Data from the 2010 Census  
 **zcta_pop** | Population in the zip code area  <br> -- Data from the 2010 Census  
 **imp_a500** | Impervious surface measure <br> -- Within a circle with a radius of 500 meters around the monitor <br> -- Impervious surface are roads, concrete, parking lots, buildings <br> -- This is a measure of development 
@@ -562,6 +622,8 @@ Variable   | Details
 
 </details>
 
+####
+
 Many of these features have to do with the circular area around the monitor called the "buffer". These are illustrated in the following figure:
 
 ```{r, echo = FALSE, out.width = "800px",}
@@ -577,7 +639,14 @@ knitr::include_graphics(here::here("www", "img", "regression.png"))
 
 All of our data was previously collected by a [researcher](http://www.biostat.jhsph.edu/~rpeng/) at the [Johns Hopkins School of Public Health](https://www.jhsph.edu/) who studies air pollution and climate change.  
 
-We have one CSV file that contains both our single **outcome variable** and all of our **features** (or predictor variables).You can find this data on our [GitHub repository](https://github.com/opencasestudies/ocs-bp-air-pollution/data/raw). Or you can download it more directly by clicking [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/raw/pm25_data.csv).
+We have one CSV file that contains both our single **outcome variable** and all of our **features** (or predictor variables). You can download this file using the `OCSdata` package:
+
+```{r, eval=FALSE}
+# install.packages("OCSdata")
+OCSdata::raw_data("ocs-bp-air-pollution", outpath = getwd())
+```
+
+If you have trouble using the package, you can also find this data on our [GitHub repository](https://github.com/opencasestudies/ocs-bp-air-pollution/tree/master/data/raw). Or you can download it more directly by clicking [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/raw/pm25_data.csv).
 
 We have created a "raw" subdirectory within a directory called "data" of our working directory of our RStudio project.
 
@@ -587,7 +656,8 @@ We import the data using the `read_csv()` function from the `readr` package.
 
 We will use the `here` package to make it easier to find the data file.
 
-***
+#### {.click_to_expand_block}
+
 <details> <summary> Click here to see more about creating new projects in RStudio. </summary>
 
 You can create a project by going to the File menu of RStudio like so:
@@ -606,9 +676,8 @@ knitr::include_graphics(here::here("www", "img", "project_button.png"))
 See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
 
 </details>
-***
-</details>
-***
+
+####
 
 
 ```{r, eval=FALSE}
@@ -634,30 +703,46 @@ save(pm, file = here::here("www", "data", "imported", "imported_pm.rda"))
 ***
 If you are following along but stopped, you could start here by first loading the data like so:
 
-```{r, eval=FALSE}
-load(here::here("data", "imported", "imported_pm.rda"))
-```
 
 ```{r, echo=FALSE}
 load(here::here("www", "data", "imported", "imported_pm.rda"))
 ```
 
 ***
+
+#### {.click_to_expand_block}
+
+
 <details> <summary> If you skipped the data import section click here. </summary>
 
-An RDA file (stands for R data) of the data can be found on our [GitHub repository](https://github.com/opencasestudies/ocs-bp-air-pollution/data/imported). Or you can download it more directly by clicking [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/imported/imported_pm.rda).
-Download this file and then place it in your current working directory within a subdirectory called "imported" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
+First you need to install the `OCSdata` package:
 
 ```{r, eval=FALSE}
-load(here::here("data", "imported", "imported_pm.rda"))
+install.packages("OCSdata")
 ```
+
+Then, you may download and load the imported data `.rda` file using the following code:
+
+```{r, eval=FALSE}
+OCSdata::imported_data("ocs-bp-air-pollution", outpath = getwd())
+load(here::here("OCSdata", "data", "imported", "imported_pm.rda"))
+```
+
+If the package does not work for you, an RDA file (stands for R data) of the data can be found on our [GitHub repository](https://github.com/opencasestudies/ocs-bp-air-pollution/tree/master/data/imported). Or you can download it more directly by clicking [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/imported/imported_pm.rda).
+
+To load the downloaded data into your environment, you may double click on the `.rda` file in Rstudio or using the `load()` function.
+
+To copy and paste our code below, place the downloaded file in your current working directory within a subdirectory called "imported" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
+
 
 ```{r, echo=FALSE}
 load(here::here("www", "data", "imported", "imported_pm.rda"))
 ```
 
 
-***
+<hr style="height:1px;border:none;color:#333;background-color:#333;" />
+
+
 <details> <summary> Click here to see more about creating new projects in RStudio. </summary>
 
 You can create a project by going to the File menu of RStudio like so:
@@ -677,10 +762,11 @@ See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Project
 
 </details>
 
-***
+<hr style="height:1px;border:none;color:#333;background-color:#333;" />
+
 </details>
 
-***
+####
 
 The first step in performing any data analysis is to explore the data. 
 
@@ -735,7 +821,7 @@ This allows us use the `pm` data as input, but also reassigns the output to the 
 ```{r}
 # Scroll through the output!
 pm %<>%
-  mutate(across(c(id, fips, zcta), as.factor)) 
+  dplyr::mutate(across(c(id, fips, zcta), as.factor)) 
 
 glimpse(pm)
 ```
@@ -813,7 +899,7 @@ pm %>% dplyr::filter(city == "Albuquerque")
 We can see that there were only two monitors in the city of Albuquerque in 2006. Let's compare this with Baltimore.
 
 ```{r}
-pm %>% dplyr::filter(city == "Baltimore")
+pm %>% filter(city == "Baltimore")
 
 ```
 
@@ -821,10 +907,10 @@ There were in contrast five monitors for the city of Baltimore, despite the fact
 
 ```{r}
 pm %>% 
-  dplyr::filter(city == "Baltimore") %>% 
-  select(county_area:county_pop)
+  filter(city == "Baltimore") %>% 
+  dplyr::select(county_area:county_pop)
 pm %>% 
-  dplyr::filter(city == "Albuquerque") %>%
+  filter(city == "Albuquerque") %>%
   select(county_area:county_pop)
 
 ```
@@ -841,26 +927,26 @@ In prediction analyses, it is also useful to evaluate if any of the variables ar
 
 If we are using a linear regression to model our data, then we might run into a problem called multicollinearity which can lead us to misinterpret what is really predictive of our outcome variable. This phenomenon occurs when the predictor variables actually predict one another. See [this case study](https://opencasestudies.github.io/ocs-bp-RTC-analysis/) for a deeper explanation about this. 
 
-Another reason we should look out for correlation is that we don't want to include redundant variables. This can add unnecessary noise to our algorithm causing a reduction in prediction accuracy and it can cause our algorithm to be unnecessarily slower. Finally, it can also make it difficult to interpret what variables are actually predictive.
-
-Intuitively we can expect some of our variables to be correlated.
+Another reason we should look out for correlation is that we don't want to include redundant variables. This can add unnecessary noise to our algorithm causing a reduction in prediction accuracy, and it can cause our algorithm to be unnecessarily slower. Finally, it can also make it difficult to interpret what variables are actually predictive.
 
 Let's first take a look at all of our numeric variables with the`corrplot` package:
-The `corrplot` package is another option to look at correlation among possible predictors, and particularly useful if we have many predictors. 
+The `corrplot` package is a great option to look at correlation among possible predictors, and particularly useful if we have many predictors. 
 
-First, we calculate the Pearson correlation coefficients between all features pairwise using the `cor()` function of the `stats` package (which is loaded automatically). Then we use the `corrplot::corrplot()` function. 
+First, we calculate the Pearson correlation coefficients between all features pairwise using the `cor()` function of the `stats` package (which is loaded automatically). Then we use the `corrplot::corrplot()` function. The `tl.cex = 0.5` argument controls the size of the text label. 
 
 ```{r}
 PM_cor <- cor(pm %>% dplyr::select_if(is.numeric))
 corrplot::corrplot(PM_cor, tl.cex = 0.5)
 ```
-The `tl.cex = 0.5` argument controls the size of the text label. 
+Nice! Now we can see which variables show a positive (blue) or negative (red) correlation to one another. Variables that show a very little correlation with one another appear as white or lightly colored. We can see that each variable is perfectly correlated with itself, which is it why there is a line of blue squares diagnally across the plot.
 
-We can also plot the absolute value of the Pearson correlation coefficients using the `abs()` function from base R and change the order of the columns.  
+We can also plot the absolute value of the Pearson correlation coefficients using the `abs()` function from base R and change the order of the columns. This can be helplful if we aren't interested in the direction of the correlation and just want to see which variables have a relationship with one another.
+
 ```{r}
 corrplot(abs(PM_cor), order = "hclust", tl.cex = 0.5, cl.lim = c(0, 1))
 
 ```
+Nice, this is a bit easier to read now as it isn't as distracting to look at the different colors - we just want to focus on the intensity. Notice that the legend here now doesn't inform us of much in the case of the red because we have plotted the absolute values of the correlation values and they will thus all be positive and blue. The darker the blue the more correlation.
 
 There are several options for ordering the variables. See [here](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html) for more options. Here we will use the "hclust" option for ordering by [hierarchical clustering](https://en.wikipedia.org/wiki/Hierarchical_clustering) - which will order the variables by how similar they are to one another.
 
@@ -891,7 +977,7 @@ select(pm, contains("imp")) %>%
 
 
 
-Indeed, we can see that `imp_a1000` and `imp_a500` are highly correlated, as well as `imp_a10000`, `imp_a15000`.
+Indeed, we can now see more clearly that `imp_a1000` and `imp_a500` are highly correlated, as well as `imp_a10000`, `imp_a15000`. We also get a sense of how the data points vary across the range of values. Note that in this plot red indicates positive correlation values and blue indicates negative correlation values.This is in contrast to our previous plot.
 
 Next, let's take a look at the road density data:
 
@@ -901,7 +987,7 @@ select(pm, contains("pri")) %>%
        layout.exp=2, label = TRUE)
 ```
 
-We can see that many of the road density variables are highly correlated with one another, while others are less so.
+We can see that many of the road density variables are highly correlated with one another, while others are less so. Again note that in this plot red indicates positive correlation values and blue indicates negative correlation values.
 
 Finally let's look at the emission variables.
 
@@ -913,6 +999,8 @@ select(pm, contains("nei")) %>%
 select(pm, contains("nei")) %>%
   ggpairs()
 ```
+We can see some fairly high correlation values as well.
+
 
 We would also expect the population density data might correlate with some of these variables. 
 Let's take a look.
@@ -934,6 +1022,7 @@ select(log_nei_2008_pm25_sum_10000, popdens_county,
 Interesting, so these variables don't appear to be highly correlated, therefore we might need variables from each of the categories to predict our monitor PM~2.5~ pollution values.
 
 Because some variables in our data have extreme values, it might be good to take a log transformation. This can affect our estimates of correlation. 
+
 ```{r}
 pm %>%
   mutate(log_popdens_county= log(popdens_county)) %>%
@@ -954,7 +1043,7 @@ Indeed this increased the correlation, but variables from each of these categori
 
 Now that we have a sense of what our data are, we can get started with building a machine learning model to predict air pollution. 
 
-First let's save our data again because we did wrangle it just a tad. This time we will save it to a subdirectory of the "data" directory called "wrangled". This is a good practice in general for data analyses to keep your data oranganized. We will also save a csv version as this is often useful to give to collaborators. To do this we will use the `write_csv()` function of the `readr` package.
+First let's save our data again because we did wrangle it just a tad. This time we will save it to a subdirectory of the "data" directory called "wrangled". This is a good practice in general for data analyses to keep your data organized. We will also save a csv version as this is often useful to give to collaborators. To do this we will use the `write_csv()` function of the `readr` package.
 
 ```{r, eval = FALSE}
 save(pm, file = here::here("data", "wrangled", "wrangled_pm.rda"))
@@ -1081,9 +1170,9 @@ To set up a machine learning (ML) problem, we need a few components.
 To solve a (standard) machine learning problem you need: 
 
 1. A data set to train from. 
-2. An algorithm or set of algorithms you can use to try values of $f$
-3. A distance metric $d$ for measuring how close $Y$ is to $\hat{Y}$
-4. A definition of what a "good" distance is
+2. An algorithm or set of algorithms you can use to try values of $f$.
+3. A distance metric $d$ for measuring how close $Y$ is to $\hat{Y}$.
+4. A definition of what a "good" distance is.
 
 While each of these components is a _technical_ problem, there has been a ton of work addressing those technical details. The most pressing open issue in machine learning is realizing that though these are _technical_ steps they are not _objective_ steps. In other words, how you choose the data, algorithm, metric, and definition of "good" says what you value and can dramatically change the results. A couple of cases where this was a big deal are: 
 
@@ -1124,6 +1213,8 @@ This is a schematic of how these packages work together to build a machine learn
 ```{r, echo=FALSE, out.width="800px"}
 knitr::include_graphics(here::here("www", "img","MachineLearning.png"))
 ```
+
+Here we can see that after exploring and  splitting the data, we perform the initial modeling stages of variable assignment and pre-processing steps as shown in the blue box the, while the green box indicates the steps required to  train the model by specifying the model, fitting the model and tuning it. 
 
 ### **Benefits of `tidymodels`**
 ***
@@ -1173,7 +1264,7 @@ If we get good prediction with our testing set, then we know that our model can 
 
 We will not touch the testing set until we have completed optimizing our model with the training set. 
 This will allow us to have a less biased evaluation of how well our model can do with other data besides the data used in the training set to build the model. 
-Ideally, you would also want a completely independent data set to further test the performance of your model.
+**Ideally, you would also want a completely independent data set to further test the performance of your model.**
 
 To split the data into training and testing, we will use the `initial_split()` function in the `rsample` package to specify how we want to split our data.
 
@@ -1183,23 +1274,39 @@ To split the data into training and testing, we will use the `initial_split()` f
 knitr::include_graphics(here::here("www", "img","split.png"))
 ```
 
-If you were starting the case study around here, you can obtain the data  [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
 
-Load the data like so if you are starting here:
+#### {.click_to_expand_block}
+
+<details> <summary> If you skipped previous sections click here for more information on how to obtain and load the data. </summary>
+
+First you need to install the `OCSdata` package:
 
 ```{r, eval=FALSE}
-load(here::here("data", "wrangled", "wrangled_pm.rda"))
+install.packages("OCSdata")
 ```
+
+Then, you may download and load the wrangled data `.rda` file using the following code:
+
+```{r, eval=FALSE}
+OCSdata::wrangled_rda("ocs-bp-air-pollution", outpath = getwd())
+load(here::here("OCSdata", "data", "wrangled", "wrangled_pm.rda"))
+```
+
+If the package does not work for you, you may also download this `.rda` file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
+
+To load the downloaded data into your environment, you may double click on the `.rda` file in Rstudio or using the `load()` function.
+
+To copy and paste our code below, place the downloaded `.rda` file in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
 ```{r, echo=FALSE}
 load(here::here("www", "data", "wrangled", "wrangled_pm.rda"))
 ```
 
 ***
-<details> <summary> If you skipped previous sections click here for more information. </summary>
-Download this file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda) (same as above) and then place it in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
-***
+<hr style="height:1px;border:none;color:#333;background-color:#333;" />
+
+
 <details> <summary> Click here to see more about creating new projects in RStudio. </summary>
 
 You can create a project by going to the File menu of RStudio like so:
@@ -1217,11 +1324,12 @@ knitr::include_graphics(here::here("www", "img", "project_button.png"))
 
 See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
 
-</details>
-***
+
+<hr style="height:1px;border:none;color:#333;background-color:#333;" />
 
 </details>
-***
+
+####
 
 ```{r}
 set.seed(1234)
@@ -1231,7 +1339,18 @@ pm_split
 
 A couple of notes from the code above: 
 
-- Typically, data are split into 3/4 of the observations for training and 1/4 for testing. This is the default proportion and does not need to be specified. However, you can change the proportion using the `prop` argument, which we will do that here for illustrative purposes.
+- Typically, data are split with the majority of the observations for training and a smaller portion for testing. The default with this function is 3/4 (75%) of the observations for training and 1/4 (25%) for testing. This is the default proportion and does not need to be specified. However, you can change the proportion using the `prop` argument, which we will do here for illustrative purposes. Often people use 80% (4/5) for training and 20% for testing (1/5) or some other similar proportion like what we used here with 2/3 for training and 1/3 for testing. 
+
+#### {.click_to_expand_block}
+
+<details><summary> Click here to learn more about how people decide what split proportion to use. </summary>
+
+Having more training data helps the model to train on a greater variety of observations. However, having more testing data helps to see how generalizable the model is and allows for better comparisons of different models. The need for each may depend on your data and how much variability it has and the size of your data. For smaller datasets, setting aside a larger portion for testing can be beneficial to avoid having a very small testing dataset. Here's a [paper](https://onlinelibrary.wiley.com/doi/full/10.1002/sam.11583) that describes more about this topic.
+
+</details>
+
+####
+
 - Since the split is performed randomly, it is a good idea to use the `set.seed()` function in base R to ensure that if your rerun your code that your split will be the same next time.
 - We can see the number of monitors in our training, testing, and original data by typing in the name of our split object. The result will look like this:
 <training data sample number, testing data sample number, original sample number> 
@@ -1272,8 +1391,8 @@ To extract the testing and training data we can use the `training()` and `testin
 
 #### {.scrollable }
 ```{r}
-train_pm <-rsample::training(pm_split)
-test_pm <-rsample::testing(pm_split)
+train_pm <- rsample::training(pm_split)
+test_pm <- rsample::testing(pm_split)
  
 # Scroll through the output!
 count(train_pm, state)
@@ -1287,7 +1406,11 @@ count(test_pm, state)
 ***
 
 After splitting the data, the next step is to process the training and testing data so that the data are are compatible and optimized to be used with the model. 
-This involves assigning variables to specific roles within the model and pre-processing like scaling variables and removing redundant variables. 
+
+In order to start this, we need to think about what each of the aspects of our data might do in the model. For example, is this particular column of data what we would consider the outcome of interest? Or is these data values possibly helpful for predicting the outcome? This process is described as assigning variables to specific roles within the model.
+
+We will then do what is called pre-processing to prepare the data so it is ready. This involves things like like scaling variables and removing redundant variables. 
+
 This process is also called feature engineering.
 
 To do this in `tidymodels`, we will create what's called a "recipe" using the `recipes` package, which is a standardized format for a sequence of steps for pre-processing the data.
@@ -1328,6 +1451,14 @@ Since this number is arbitrary and the county information is also given in the d
 However, it is useful to keep this data to take a look at what is happening later. 
 We will show you what to do in this case in just a bit.
 
+To summarize this step, we will use the `recipe()` function to assign roles to all the variables: 
+
+```{r, echo=FALSE, out.width="400px"}
+knitr::include_graphics(here::here("img","Starting_a_recipe_recipes1.png"))
+```
+
+We will describe this step by step and then show all the steps together.
+
 In the simplest case, we might use all predictors like this:
 
 ```{r}
@@ -1352,11 +1483,15 @@ simple_rec <- train_pm %>%
 simple_rec
 ```
 
-<details><summary> Click here learn more about the working with `id` variables </summary>
+#### {.click_to_expand_block}
+
+<details><summary> Click here to learn more about the working with `id` variables </summary>
 
 This option works well with the newer `workflows` package, however `id` variables are often dropped from analyses that do not use this newer package as they can make the process difficult with using the `parsnip` package alone due to the fact that new levels (or possible values) may be introduced with the testing data.
 
 </details>
+
+####
 
 We could also specify the outcome and predictors in the same way as we just specified the id variable. 
 Please see [here](https://tidymodels.github.io/recipes/reference/recipe.html){target="_blank"} for examples of other roles for variables. 
@@ -1366,9 +1501,9 @@ The order is important here, as we first make all variables predictors and then 
 We will use the `everything()` function of the `dplyr` package to start with all of the variables in `train_pm`.
 
 ```{r}
-simple_rec <-recipe(train_pm) %>%
-    update_role(everything(), new_role = "predictor")%>%
-    update_role(value, new_role = "outcome")%>%
+simple_rec <- recipe(train_pm) %>%
+    update_role(everything(), new_role = "predictor") %>%
+    update_role(value, new_role = "outcome") %>%
     update_role(id, new_role = "id variable")
 
 simple_rec
@@ -1380,11 +1515,12 @@ We can view our recipe in more detail using the base `summary()` function.
 summary(simple_rec)
 ```
 
-To summarize this step, we use the `recipe()` function to assign roles to all the variables: 
+
 
 ```{r, echo=FALSE, out.width="400px"}
 knitr::include_graphics(here::here("www", "img","Starting_a_recipe_recipes1.png"))
 ```
+
 
 
 ### Step 2: Specify the pre-processing steps with `step*()` functions
@@ -1403,14 +1539,14 @@ knitr::include_graphics(here::here("www", "img","Making_a_recipe_recipes2.png"))
 2. [**Transformation**](https://en.wikipedia.org/wiki/Data_transformation_(statistics)){target="_blank"} -- changing all values of a variable in the same way, typically to make it more normal or easier to interpret
 3. [**Discretization**](https://en.wikipedia.org/wiki/Discretization_of_continuous_features){target="_blank"} -- converting continuous values into discrete or nominal values - binning for example to reduce the number of possible levels (However this is generally not advisable!)
 4. [**Encoding / Creating Dummy Variables**](https://en.wikipedia.org/wiki/Dummy_variable_(statistics)){target="_blank"} -- creating a numeric code for categorical variables
-([**More on Dummy Variables and one-hot encoding**](https://medium.com/p/b5840be3c41a/responses/show){target="_blank"})
+([**More on one-hot and Dummy Variables encoding**](https://medium.com/p/b5840be3c41a/responses/show){target="_blank"})
 5. [**Data type conversions**](https://cran.r-project.org/web/packages/hablar/vignettes/convert.html){target="_blank"}  -- which means changing from integer to factor or numeric to date etc.
 6. [**Interaction**](https://statisticsbyjim.com/regression/interaction-effects/){target="_blank"}  term addition to the model -- which means that we would be modeling for predictors that would influence the capacity of each other to predict the outcome
 7. [**Normalization**](https://en.wikipedia.org/wiki/Normalization_(statistics)){target="_blank"} -- centering and scaling the data to a similar range of values
 8. [**Dimensionality Reduction/ Signal Extraction**](https://en.wikipedia.org/wiki/Dimensionality_reduction){target="_blank"} -- reducing the space of features or predictors to a smaller set of variables that capture the variation or signal in the original variables (ex. Principal Component Analysis and Independent Component Analysis)
 9. **Filtering** -- filtering options for removing variables (ex. remove variables that are highly correlated to others or remove variables with very little variance and therefore likely little predictive capacity)
 10. [**Row operations**](https://tartarus.org/gareth/maths/Linear_Algebra/row_operations.pdf){target="_blank"} -- performing functions on the values within the rows  (ex. rearranging, filtering, imputing)
-11. **Checking functions** -- Sanity checks to look for missing values, to look at the variable classes etc.
+11. **Checking functions** -- Gut checks to look for missing values, to look at the variable classes etc.
 
 All of the step functions look like `step_*()` with the `*` replaced with a name, except for the check functions which look like `check_*()`.
 
@@ -1424,16 +1560,83 @@ There are several ways to select what variables to apply steps to:
 Let's try adding some steps to our recipe.
 
 
-We might want to potentially [one-hot encode](https://machinelearningmastery.com/why-one-hot-encode-data-in-machine-learning/){target="_blank"} some of our categorical variables so that they can be used with certain algorithms. 
+We might want to potentially modify some of our categorical variables so that they can be used with certain algorithms, like regression, that require only numeric values. 
 
-We can do this with the `step_dummy()` function and the `one_hot = TRUE` argument. 
-One-hot encoding means that we do not simply encode our categorical variables numerically, as our numeric assignments can be interpreted by algorithms as having a particular rank or order. 
-Instead, binary variables made of 1s and 0s are used to arbitrarily assign a numeric value that has no apparent order.
+We can do this with the `step_dummy()` function and the `one_hot = TRUE` argument to use a method called [One-hot encoding](https://machinelearningmastery.com/why-one-hot-encode-data-in-machine-learning/){target="_blank"}.
+
+
+One-hot encoding means that we do not simply encode our categorical variables numerically as a simple 1,2,3, as our numeric assignments can be interpreted by algorithms as having a particular rank or order. 
+Instead, new binary variables made up of 1s and 0s are used to arbitrarily assign a numeric value that has no apparent order. Note that while there is a different but similar method to do this referred to as dummy variables, one-hot encoded variables are also sometimes called dummy variables.
+
+#### {.click_to_expand_block}
+
+<details><summary>For more information about what one-hot encoding is, you can expand here. </summary>
+
+For example, say we only had three city values for the city variable that were "Tuscon", "Denver", and "New York".
+
+| City 	|
+|:---:	|
+| Tuscon 	|
+| New York 	|
+| Tuscon 	|
+| Denver 	|
+
+This would be replaced by three new variables one for if the value was "Tuscon", one for if the value was "Denver", and one for if the value was "New York". Each would be made up of zeros and ones. One for the new Tuscon variable would indicate that indeed "Tuscon" was the value and zero would indicate that it was instead "New York" or "Denver". Essentially there is one "hot" value possible for each new variable, where the value will be one.
+
+
+| Tuscon 	| Denver 	| New York 	|
+|:---:	|:---:	|:---:	|
+| 1 	| 0 	| 0 	|
+| 0 	| 0 	| 1 	|
+| 1 	| 0 	| 0 	|
+| 0 	| 1 	| 0 	|
+
+</details>
+
+####
+
+Here we will create such variables to replace the current, state, country, and city categorical data. Similarly the ZCTA values (which are currently a factor class) are not intended to be interpreted as numeric as they could be thought of like a zip code and thus we would also want to encode this as well. 
 
 ```{r}
 simple_rec %>%
   step_dummy(state, county, city, zcta, one_hot = TRUE)
 ```
+
+#### {.click_to_expand_block}
+
+<details><summary> Click here to see how the variables would change if our recipe stopped here with simply the one-hot encoding. </summary>
+
+To create the data we will use steps that we will demonstrate later, for now we will just show you what the new encoded variables look like.
+
+```{r, echo = FALSE, include = FALSE}
+one_hot_rec <- recipe(train_pm) %>%
+  update_role(everything(), new_role = "predictor") %>%
+  update_role(value, new_role = "outcome") %>%
+  update_role(id, new_role = "id variable")
+one_hot_rec %<>% step_dummy(state, county, city, zcta, one_hot = TRUE)
+prepped_one_hot_rec <- prep(one_hot_rec , verbose = TRUE, retain = TRUE )
+baked_one_hot_rec <- bake(prepped_one_hot_rec, new_data = NULL)
+```
+
+
+
+
+
+```{r}
+length(names(train_pm))
+length(names(baked_one_hot_rec)) # many more variables!
+
+train_pm %>% select(zcta, city, state, county) %>% head
+
+# let's look at a few
+baked_one_hot_rec %>% select("zcta_X54520", "city_Not.in.a.city", "state_Indiana") %>% head()
+
+```
+
+
+</details>
+
+####
 
 Our `fips` variable includes a numeric code for state and county - and therefore is essentially a proxy for county.
 Since we already have county, we will just use it and keep the `fips` ID as another ID variable.
@@ -1466,6 +1669,8 @@ simple_rec %>%
   step_nzv(all_predictors(), - CMAQ, - aod)
 ```
 
+#### {.click_to_expand_block}
+
 <details><summary> Click here to learn about examples where you might have near-zero variance variables</summary>
 
 1) **Similar Values** - If the population density was nearly the same for every zcta that contained a monitor, then knowing the population density near our monitor would contribute little to our model in assisting us to predict monitor air pollution values. 
@@ -1475,6 +1680,8 @@ simple_rec %>%
 See this [blog post](https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/){target="_blank"} about why removing near-zero variance variables isn't always a good idea if we think that a variable might be especially informative.
 
 </details>
+
+####
 
 Let's put all this together now. 
 
@@ -1505,15 +1712,15 @@ simple_rec
 The next major function of the `recipes` package is `prep()`.
 This function updates the recipe object based on the training data. 
 It estimates parameters (estimating the required quantities and statistics required by the steps for the variables) for pre-processing and updates the variables roles, as some of the predictors may be removed, this allows the recipe to be ready to use on other data sets. 
-It **does not necessarily actually execute the pre-processing itself**, however we will specify in argument for it to do this so that we can take a look at the pre-processed data.
+It **does not necessarily actually execute the pre-processing itself**; however, we will specify in argument for it to do this so that we can take a look at the pre-processed data.
 
 
 There are some important arguments to know about:
 
 1. `training` - you must supply a training data set to estimate parameters for pre-processing operations (recipe steps) - this may already be included in your recipe - as is the case for us
-2. `fresh` - if `fresh=TRUE`, - will retrain and estimate parameters for any previous steps that were already prepped if you add more steps to the recipe
-3. `verbose` - if `verbose=TRUE`, shows the progress as the steps are evaluated and the size of the pre-processed training set
-4. `retain` - if `retain=TRUE`, then the pre-processed training set will be saved within the recipe (as template). This is good if you are likely to add more steps and do not want to rerun the `prep()` on the previous steps. However this can make the recipe size large. This is necessary if you want to actually look at the pre-processed data.
+2. `fresh` - if `fresh=TRUE`, will retrain and estimate parameters for any previous steps that were already prepped if you add more steps to the recipe (default is `FALSE`)
+3. `verbose` - if `verbose=TRUE`, shows the progress as the steps are evaluated and the size of the pre-processed training set (default is `FALSE`)
+4. `retain` - if `retain=TRUE`, then the pre-processed training set will be saved within the recipe (as template). This is good if you are likely to add more steps and do not want to rerun the `prep()` on the previous steps. However this can make the recipe size large. This is necessary if you want to actually look at the pre-processed data (default is `TRUE`)
 
 Let's try out the `prep()` function: 
 
@@ -1522,7 +1729,7 @@ prepped_rec <- prep(simple_rec, verbose = TRUE, retain = TRUE )
 names(prepped_rec)
 ```
 
-There are also lots of useful things to checkout in the output of `prep()`.
+There are also lots of useful things to check out in the output of `prep()`.
 You can see:
 
 1. the `steps` that were run  
@@ -1539,7 +1746,7 @@ You can see:
 ***
 
 
-Since we retained our pre-processed training data (i.e. `prep(retain=TRUE)`), we can take a look at it by using the `bake()` function of the `recipes` package like this:
+Since we retained our pre-processed training data (i.e. `prep(retain=TRUE)`), we can take a look at it by using the `bake()` function of the `recipes` package. The `bake` function allows us to apply our modeling steps (in this case just pre-processing on the training data) and see what it would do the data.
 
 ```{r, echo=FALSE, out.width="400px"}
 knitr::include_graphics(here::here("www", "img","training_preprocessing_recipes3.png"))
@@ -1574,7 +1781,7 @@ Two of these are our ID variables (`fips` and the actual monitor ID (`id`)) and 
 Thus we only have 33 predictors now. 
 We can also see that we no longer have any categorical variables. 
 Variables like `state` are gone and only `state_California` remains as it was the only state identity to have nonzero variance.
-We can also see that there were more monitors listed as `"Not in a city"` than any city. 
+
 
 We can see that California had the largest number of monitors compared to the other states.
 
@@ -1594,6 +1801,9 @@ pm %>% count(state)  %>%
 
 ####
 
+
+We can also see that there were more monitors listed as `"Not in a city"` than any city. 
+
 ```{r, eval = FALSE}
 pm %>% count(city)
 ```
@@ -1609,7 +1819,7 @@ pm %>% count(city) %>%
 
 ####
 
-**Note**: Recall that you must specify `retain = TRUE` argument of the `prep()` function to use `bake()`.
+**Note**: Recall that you must specify `retain = TRUE` argument of the `prep()` function to use `bake()` to see pre-processed training data.
 
 ### **Step 3: Extract pre-processed testing data using `bake()`**
 ***
@@ -1696,15 +1906,13 @@ pm_split
 
 See if you can come up with the code for the new recipe.
 
-####
-
 ***
 
 <details> <summary> Click here to reveal the code for the new recipe. </summary>
 
 
 ```{r}
-novel_rec <-recipe(train_pm) %>%
+novel_rec <- recipe(train_pm) %>%
     update_role(everything(), new_role = "predictor") %>%
     update_role(value, new_role = "outcome") %>%
     update_role(id, new_role = "id variable") %>%
@@ -1714,7 +1922,10 @@ novel_rec <-recipe(train_pm) %>%
     step_nzv(all_numeric()) 
 ```
 </details>
+
 ***
+
+####
 
 ```{r}
 novel_rec
@@ -1722,7 +1933,7 @@ novel_rec
 
 
 
-Now let's retrain our training data and try baking our test data.
+Now let's retrain our training data with the new model recipe and try baking our test data again.
 
 
 
@@ -1730,8 +1941,6 @@ Now let's retrain our training data and try baking our test data.
 <b><u> Question Opportunity </u></b>
 
 Do you recall how to pre-process and extract the pre-processed training data?
-
-####
 
 ***
 
@@ -1742,7 +1951,10 @@ prepped_rec <- prep(novel_rec, verbose = TRUE, retain = TRUE)
 baked_train <- bake(prepped_rec, new_data = NULL)
 ```
 </details> 
+
 ***
+
+####
 
 
 #### {.scrollable }
@@ -1759,7 +1971,7 @@ And now, let's try baking our test set to see if we still have `NA` values.
 
 ```{r}
 # Scroll through the output!
-baked_test_pm <- recipes::bake(prepped_rec, new_data = test_pm)
+baked_test_pm <- bake(prepped_rec, new_data = test_pm)
 
 glimpse(baked_test_pm)
 ```
@@ -1769,8 +1981,8 @@ glimpse(baked_test_pm)
 Great, now we no longer have `NA` values! :)
 
 **Note**: if you use the skip option for some of the pre-processing steps, be careful. 
-`juice()` will show all of the results ignoring `skip = TRUE` (as you can still use this function if you perfer it to `bake()`).
-`bake()` will not necessarily conduct these steps on the new data.
+the `juice()` function (an older option) will show all of the results ignoring `skip = TRUE` (as you can still use this function if you prefer it to `bake()`). The
+`bake()` function will not necessarily conduct these steps on the new data.
 
 
 ## **Specifying the model**
@@ -1788,7 +2000,7 @@ There are four things we need to define about our model:
 4. Any **arguments** necessary for the model/package selected (using the `set_args()`function -  for example the `mtry =` argument for random forest which is the number of variables to be used as options for splitting at each tree node)
 
 Let's walk through these steps one by one. 
-For our case, we are going to start our analysis with a linear regression but we will demonstrate how we can try different models.
+For our case, we are going to start our analysis with a linear regression (a very common starting point for modeling) but we will demonstrate how we can try different models. We will also show how to model with the Random Forest method (which is very widely used) later on. 
 
 The first step is to define what type of model we would like to use. 
 See [here](https://www.tidymodels.org/find/parsnip/){target="_blank"} for modeling options in `parsnip`.
@@ -1808,8 +2020,7 @@ So we will tell `parsnip` that we want to use the `lm` package to implement our 
 We will do so by using the `set_engine()` function of the `parsnip` package.
 
 ```{r}
-lm_PM_model <- 
-  PM_model  %>%
+lm_PM_model <- PM_model  %>%
   parsnip::set_engine("lm")
 
 lm_PM_model
@@ -1820,8 +2031,7 @@ Here, we aim to predict the air pollution.
 You can do this with the `set_mode()` function of the `parsnip` package, by using either `set_mode("classification")` or `set_mode("regression")`.
 
 ```{r}
-lm_PM_model <- 
-  PM_model  %>%
+lm_PM_model <- PM_model  %>%
   parsnip::set_engine("lm") %>%
   set_mode("regression")
 
@@ -1846,9 +2056,9 @@ If you recall `novel_rec` is the recipe we previously created with the `recipes`
 Here, we combine everything together into a workflow. 
 
 ```{r}
-PM_wflow <-workflows::workflow() %>%
-           workflows::add_recipe(novel_rec) %>%
-           workflows::add_model(lm_PM_model)
+PM_wflow <- workflows::workflow() %>%
+            workflows::add_recipe(novel_rec) %>%
+            workflows::add_model(lm_PM_model)
 PM_wflow
 ```
 
@@ -1863,6 +2073,7 @@ PM_wflow_fit <- parsnip::fit(PM_wflow, data = train_pm)
 PM_wflow_fit
 ```
 
+#### {.click_to_expand_block}
 
 <details><summary> Click here to see the steps that the `workflows` package performs that used to be required </summary>
 
@@ -1881,6 +2092,8 @@ PM_fit <- lm_PM_model %>%
 
 </details>
 
+####
+
 ## **Assessing the model fit**
 ***
 
@@ -1890,11 +2103,11 @@ The `tidy()` function returns a tidy data frame with coefficients from the model
 
 Many other `broom` functions currently only work with `parsnip` objects, not raw `workflows` objects. 
 
-However, we can use the `tidy` function if we first use the `pull_workflow_fit()` function.
+However, we can use the `tidy` function if we first use the `extract_fit_parsnip()` function which is imported as part of the `workflows` package from the [`hardhat` package](https://hardhat.tidymodels.org/) (also part of tidymodels).
 
 ```{r}
 wflowoutput <- PM_wflow_fit %>% 
-  pull_workflow_fit() %>% 
+  extract_fit_parsnip() %>% 
   broom::tidy() 
 ```
 
@@ -1912,17 +2125,75 @@ This function creates a bar plot of variable importance scores for each predicto
 The bar plot is ordered by importance (highest to smallest). 
 
 
-Notice again that we need to use the `pull_workflow_fit()` function.
+Notice again that we need to use the `extract_fit_parsnip()` function.
 
 Let's take a look at the top 10 contributing variables:
 
 ```{r}
 PM_wflow_fit %>% 
-  pull_workflow_fit() %>% 
+  extract_fit_parsnip() %>% 
   vip(num_features = 10)
 ```
 
-The state in which the monitor was located and the CMAQ model and the aod satellite information appear to be the most important for predicting the air pollution at a given monitor.
+The location of the monitor (being in California versus another state), the CMAQ model, and the aod satellite information appear to be the most important for predicting the air pollution at a given monitor.
+
+Indeed, if we plot monitor values for those in California relative to other states we can see that there are some high values for monitors in California. This may be playing a role in what we are seeing. Here we assume that you have some experience plotting with the `ggplot2`package. If not, please see this [case study](https://www.opencasestudies.org/ocs-bp-co2-emissions/).
+
+#### {.click_to_expand_block}
+
+<details><summary> Click here for an introduction about this package if you are  new to using `ggplot2` </summary>
+
+
+The [ggplot2 package](http://ggplot2.tidyverse.org) is generally intuitive for beginners because it is based on a  [grammar of graphics](http://vita.had.co.nz/papers/layered-grammar.html) or the `gg` in `ggplot2`. 
+The idea is that you can construct many sentences by learning just a few nouns, adjectives, and verbs. There are specific “words” that we will need to learn and once we do, you will be able to create (or “write”) hundreds of different plots.
+
+The critical part to making graphics using `ggplot2` is the data needs to be in a _tidy_ format. 
+Given that we have just spent time putting our data in _tidy_ format, we are primed to take advantage of all that `ggplot2` has to offer! 
+
+We will show how it is easy to pipe _tidy_ data (output) as input to other functions that create plots. 
+This all works because we are working 
+within the _tidyverse_. 
+
+**What is the `ggplot()` function?** 
+As explained by Hadley Wickham:
+
+> The grammar tells us that a statistical graphic is a mapping from data to aesthetic attributes (colour, shape, size) of geometric objects (points, lines, bars). The plot may also contain statistical transformations of the data and is drawn on a specific coordinates system.
+`ggplot2` Terminology: 
+
+- **ggplot** - the main function where you specify the dataset and variables to plot (this is where we define the `x` and
+`y` variable names)
+- **geoms** - geometric objects
+    - e.g. `geom_point()`, `geom_bar()`, `geom_line()`, `geom_histogram()`
+- **aes** - aesthetics
+    - shape, transparency, color, fill, line types
+- **scales** - define how your data will be plotted
+    - continuous, discrete, log, etc
+
+The function `aes()` is an aesthetic mapping function inside the `ggplot()` object. 
+We use this function to specify plot attributes (e.g. `x` and `y` variable names) that will not change as we add more layers.  
+
+Anything that goes in the `ggplot()` object becomes a global setting. 
+From there, we use the `geom` objects to add more layers to the base `ggplot()` object. 
+These will define what we are interested in illustrating using the data.
+
+</details>
+
+####
+
+
+```{r}
+
+baked_train_ready %>% 
+  mutate(state_California = as.factor(state_California)) %>%
+  mutate(state_California = recode(state_California, 
+                                   "0" = "Not California", 
+                                   "1" = "California")) %>%
+  ggplot(aes(x = state_California, y = value)) + 
+  geom_boxplot() +
+  geom_jitter(width = .05) + 
+  xlab("Location of Monitor")
+
+```
 
 ## **Model performance**
 ***
@@ -1941,7 +2212,7 @@ First, let's pull out our predicted outcome values $\hat{Y} = f(X)$ from the mod
 
 ```{r}
 wf_fit <- PM_wflow_fit %>% 
-  pull_workflow_fit()
+  extract_fit_parsnip()
 
 wf_fitted_values <- fitted(wf_fit[["fit"]])
 head(wf_fitted_values)
@@ -1955,7 +2226,6 @@ wf_fitted_values <-
   select(value, .fitted:.std.resid)
 
 head(wf_fitted_values)
-
 ```
 
 Note that because we use the actual workflow here, we can (and actually need to) use the raw data instead of the pre-processed data.
@@ -1966,7 +2236,6 @@ values_pred_train <-
   bind_cols(train_pm %>% select(value, fips, county, id)) 
 
 values_pred_train
-
 ```
 
 ### **Visualizing model performance**
@@ -2008,7 +2277,7 @@ This is calculated and 1 minus the fraction of the residual sum of squares ($SS_
 $$RSQ = R^2 = 1 - \frac{SSres}{SStot}$$
 
 $$SS_{tot} = \sum_{i=1}^{n}{(y_i- \bar{y})}^2$$
-The total sum of squares is proportional to the variance of the data. It is calculated as the sum of each  true value from the mean true value ($\bar{y}$).
+The total sum of squares is proportional to the variance of the data. It is calculated as the sum of each true value from the mean true value ($\bar{y}$).
 
 $$SS_{res} = \sum_{i=1}^{n}{(y_i- \hat{y_i})}^2$$
 
@@ -2024,6 +2293,8 @@ $$RMSE = \sqrt{\frac{\sum_{i=1}^{n}{(\hat{y_t}- y_t)}^2}{n}}$$
 
 One way to calculate these metrics within the `tidymodels` framework is to use the `yardstick` package using the `metrics()` function. 
 
+Note that you may obtain different results depending on your version of R and the package versions you are using. See [Session Info](#sessioninfo) section to learn what we used.
+
 ```{r}
 yardstick::metrics(wf_fitted_values, 
                    truth = value, estimate = .fitted)
@@ -2036,13 +2307,15 @@ yardstick::mae(wf_fitted_values,
                truth = value, estimate = .fitted)
 ```
 
+The lower the error values, the better the performance. RMSE and MAE can range from zero to infinity, so we aren't doing too bad.  The MAE value suggests that the average difference between the value predicted and the real value was `r round(yardstick::mae(wf_fitted_values, truth = value, estimate = .fitted)$.estimate, 2)` ug/m3. The range of the values was 3-22 in the training data, so this is a relatively small amount. The difference between the RMSE and the MAE can indicate the variance of the errors. Since the RMSE and MAE were similar, this indicates that the errors were quite consistent across the range of values and large errors are unlikely to have occurred, where our prediction would have been really far off. The [R squared error](https://en.wikipedia.org/wiki/Coefficient_of_determination) value indicates how much variability in the outcome value could be explained by the predictors in the model. This value ranges from 0 to 1 (sometimes -1 depending on the method used for calculation). A value of 1 would indicate the the model perfectly predicted the outcome. Our value indicates that `r round(yardstick::rsq(wf_fitted_values, truth = value, estimate = .fitted)$.estimate, 2)*100`% of the variability of the air pollution measures could be explained by the model. So we could maybe do a bit better. See [here](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4678365/) for more information. 
+
 ## **Cross validation**
 ***
 
 Until now we have used everything in our "training" dataset (and have not touched the "testing" dataset) from the `rsample` package to build our machine learning (ML) model $\hat{Y} = f(X)$ (or to estimate $f$ using the features or predictor variable $X$). 
 
 Here, we take this beyond the simple split into training and testing data sets. 
-We will use the `rsample` package again in order to further implement what are called [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} techniques. This is also called **re-sampling** or **repartioning**.  
+We will use the `rsample` package again in order to further implement what are called [cross validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)){target="_blank"} techniques. This is also called **re-sampling** or **repartitioning**.  
 
 **Note**: we are not actually getting new samples from the underlying distribution so the term re-sampling is a bit of a misnomer.
 
@@ -2074,7 +2347,7 @@ Here is a visualization of how the folds are created:
 knitr::include_graphics(here::here("www", "img", "vfold.png"))
 ```
 
-**Note**: People typically ignore spatial dependence with cross validation of air pollution monitoring data in the air pollution field, so we will do the same.  However, it might make sense to leave out blocks of monitors rather than  random individual monitors to help account for some spatial dependence.
+**Note**: People typically ignore spatial dependence with cross validation of air pollution monitoring data in the air pollution field, so we will do the same. However, it might make sense to leave out blocks of monitors rather than random individual monitors to help account for some spatial dependence.
 
 ### **Creating the $v$-folds using `rsample`**
 ***
@@ -2087,7 +2360,7 @@ The [`vfold_cv()`](https://tidymodels.github.io/rsample/reference/vfold_cv.html)
 
 Again, because these are created at random, we need to use the base `set.seed()` function in order to obtain the same results each time we knit this document. 
 Generally speaking using 10 folds is good practice, but this depends on the variability within your data. 
-We are going to use 4 for the sake of expediency. 
+We are going to use 4 for the sake of expediency in this demonstration. 
 
 ```{r}
 set.seed(1234)
@@ -2123,7 +2396,7 @@ To do this we will use the `show_best()` function of the `tune` package.
 tune::show_best(resample_fit, metric = "rmse")
 ```
 
-Here we can see the mean `RMSE` value across all four folds. The function is called `show_best()` because it is also used for model tuning and it will show the parameter combination with the best performance, we will discuss this more later in the case study.
+Here we can see the mean `RMSE` value across all four folds. The function is called `show_best()` because it is also used for model tuning and it will show the parameter combination with the best performance, we will discuss this more later in the case study when we test different models with different parameters. However, for now this gives us a more nuanced estimate of the RMSE in terms of the performance of this single model with the training data by looking at the subsets of the training data.
 
 ## **Exercise**
 
@@ -2180,19 +2453,71 @@ quiz(caption = "",
 # **Data Analysis**
 ***
 
-If you were starting the case study around here, you can obtain the data  [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
+If you have been following along but stopped and are starting here you could load the wrangled data using the following command:
 
-Load the data like so if you are starting here:
+```{r}
+load(here::here( "data", "wrangled", "wrangled_pm.rda"))
+```
+
+#### {.click_to_expand_block}
+
+<details> <summary> If you skipped the previous sections, click here for a step-by-step guide on how to download and load the data. </summary>
+
+First you need to install and load the `OCSdata` package:
 
 ```{r, eval=FALSE}
-load(here::here("data", "wrangled", "wrangled_pm.rda"))
+install.packages("OCSdata")
+library(OCSdata)
 ```
+
+Then, you may load the wrangled data `.rda` file using the following function:
+
+```{r, eval=FALSE}
+wrangled_rda("ocs-bp-air-pollution", outpath = getwd())
+load(here::here("OCSdata", "data", "wrangled", "wrangled_pm.rda"))
+```
+
+If the package does not work for you, you may also download this `.rda` file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
+
+To load the downloaded data into your environment, you may double click on the `.rda` file in Rstudio or using the `load()` function.
+
+To copy and paste our code below, place the downloaded `.rda` file in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
+
 
 ```{r, echo=FALSE}
 load(here::here("www", "data", "wrangled", "wrangled_pm.rda"))
 ```
 
+<hr style="height:1px;border:none;color:#333;background-color:#333;" />
+
+<details> <summary> Click here to see more about creating new projects in RStudio. </summary>
+
+You can create a project by going to the File menu of RStudio like so:
+
+
+```{r, echo = FALSE, out.width="60%"}
+knitr::include_graphics(here::here("img", "New_project.png"))
+```
+
+You can also do so by clicking the project button:
+
+```{r, echo = FALSE, out.width="60%"}
+knitr::include_graphics(here::here("img", "project_button.png"))
+```
+
+See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
+
+</details>
+
+<hr style="height:1px;border:none;color:#333;background-color:#333;" />
+
+</details>
+
+####
+
+
 Then you can modify the data to match what we did for the previous model like so to prepare the `city` variable and to split the data into testing and training sets. (You will see later that this would be required due to the number of levels for the city variable in the original data).
+
 ```{r}
 pm %<>%
   mutate(city = case_when(city == "Not in a city" ~ "Not in a city",
@@ -2213,44 +2538,16 @@ vfold_pm <- rsample::vfold_cv(data = train_pm, v = 4)
 vfold_pm
 ```
 
-***
-<details> <summary> If you skipped previous sections click here for more information. </summary>
-Download this file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda) (same as above) and then place it in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
-
-***
-<details> <summary> Click here to see more about creating new projects in RStudio. </summary>
-
-You can create a project by going to the File menu of RStudio like so:
-
-
-```{r, echo = FALSE, out.width="60%"}
-knitr::include_graphics(here::here("www", "img", "New_project.png"))
-```
-
-You can also do so by clicking the project button:
-
-```{r, echo = FALSE, out.width="60%"}
-knitr::include_graphics(here::here("www", "img", "project_button.png"))
-```
-
-See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
-
-</details>
-***
-</details>
-***
-
 
 In the previous section, we demonstrated how to build a machine learning model (specifically a linear regression model) to predict air pollution with the `tidymodels` framework. 
 
-In the next few section, we will demonstrate another machine learning model. 
-
+In the next few section, we will demonstrate another very different kind of machine learning model. This will allow us to see if this model will have better prediction performance.
 
 
 ## **Random Forest**
 ***
 
-Now, we are going to predict our outcome variable (air pollution) using a decision tree method called [random forest](https://en.wikipedia.org/wiki/Random_forest){target="_blank"}.
+Now, to try to see if we can get better prediction performance, we are going to predict our outcome variable (air pollution) using a decision tree method called [random forest](https://en.wikipedia.org/wiki/Random_forest){target="_blank"}.
 
 A [decision tree](https://medium.com/greyatom/decision-trees-a-simple-way-to-visualize-a-decision-dc506a403aeb){target="_blank"} is a tool to partition data or anything really, based on a series of sequential (often binary) decisions, where the decisions are chosen based on their ability to optimally split the data.
 
@@ -2271,9 +2568,9 @@ knitr::include_graphics("https://miro.medium.com/max/1400/0*f_qQPFpdofWGLQqc.png
 ```
 
 
-In our case, we are going to use the random forest method of the the `randomForest` package. 
+Overall, a major distinction with our last regression model, is that random forest allows us to use our categorical data largely as is. There is no need to recode these predictors to be numerical. In our case, we are going to use the random forest method of the the `randomForest` package. 
 
-This package is currently not compatible with categorical variables that have more than 53 levels. See [here](https://cran.r-project.org/web/packages/randomForest/NEWS) for the documentation about when this was updated from 25 levels. Thus we will remove the `zcta`  and `county` variables. This is why it is good that we have modified the city variable to two levels, as there were originally nearlly 600, so this would not have been compatible with this package. 
+This package is currently not compatible with categorical variables that have more than 53 levels. See [here](https://cran.r-project.org/web/packages/randomForest/NEWS) for the documentation about when this was updated from 25 levels. Thus we will remove the `zcta`  and `county` variables. This is why it is good that we have modified the city variable to two levels, as there were originally nearly 600, so this would not have been compatible with this package. 
 
 Note that the `step_novel()` function is necessary here for the `state` variable to get all cross validation folds to work, because there will be different levels included in each fold test and training sets. The new levels for some of the test sets would otherwise result in an error.
 
@@ -2301,13 +2598,12 @@ The `rand_forest()` function of the `parsnip` package has three important argume
 2. `min_n` - The minimum number of data points in a node that are required for the node to be split further.
 3. `trees` - the number of trees in the ensemble
 
-We will start by trying an `mtry` value of 10 and a `min_n` value of 3.
+We will start by trying an `mtry` value of 10 and a `min_n` value of 3. As you might imagine it is a bit difficult to know what to choose. This is where the tuning process that we just started to describe will come in helpful as we can test different models with different values. However, first let's just start with these values.
 
 Now that we have our recipe (`RF_rec`), let's specify the model with `rand_forest()` from `parsnip`.
 
 ```{r}
-PMtree_model <- 
-  parsnip::rand_forest(mtry = 10, min_n = 3)
+PMtree_model <- parsnip::rand_forest(mtry = 10, min_n = 3)
 PMtree_model
 ```
 
@@ -2324,8 +2620,7 @@ We also need to specify with the `set_mode()` function that our outcome variable
 
 ```{r}
 
-RF_PM_model <- 
-  PMtree_model %>%
+RF_PM_model <- PMtree_model %>%
   set_engine("randomForest") %>%
   set_mode("regression")
 
@@ -2339,19 +2634,20 @@ Then, we put this all together into a `workflow`:
 
 See if you can come up with the code to do this.
 
-####
-
 ***
 <details> <summary> Click here to reveal the answer. </summary>
 
 ```{r}
 RF_wflow <- workflows::workflow() %>%
-            workflows::add_recipe(RF_rec) %>%
-            workflows::add_model(RF_PM_model)
+  workflows::add_recipe(RF_rec) %>%
+  workflows::add_model(RF_PM_model)
 
 ```
 </details> 
+
 ***
+
+####
 
 ```{r}
 RF_wflow
@@ -2365,16 +2661,20 @@ Finally, we fit the data to the model:
 
 Do you recall how to do this?
 
-####
-
 ***
 <details> <summary> Click here to reveal the answer. </summary>
 
 ```{r}
 RF_wflow_fit <- parsnip::fit(RF_wflow, data = train_pm)
 ```
+
+If you get an error "Can not handle categorical predictors with more than 53 categories." then you should scroll up a bit and make sure that you removed the categorical variables that have more than 53 categories as this method can't handle such variables at this time.
+
 </details> 
+
 ***
+
+####
 
 ```{r}
 RF_wflow_fit
@@ -2387,11 +2687,10 @@ Let's take a look at the top 10 contributing variables:
 
 See if you can recall how to do this.
 
-####
 
 ```{r, echo = FALSE}
 RF_wflow_fit %>% 
-  pull_workflow_fit() %>% 
+  extract_fit_parsnip() %>% 
   vip(num_features = 10)
 
 ```
@@ -2402,14 +2701,17 @@ RF_wflow_fit %>%
 
 ```{r}
 RF_wflow_fit %>% 
-  pull_workflow_fit() %>% 
+  extract_fit_parsnip() %>% 
   vip(num_features = 10)
 ```
 </details>
+
 ***
 
+####
 
-Interesting! In the previous model the CMAQ values and the state where the monitor was located were also the top two most important, however predictors about education levels of the communities where the monitor was located was among the top most important. Now we see that population density and proximity to sources of emissions and roads are among the top ten.
+
+Interesting! In the previous model the CMAQ values and the state where the monitor was located (being in California or not) were also the top two most important, however predictors about education levels of the communities where the monitor was located was among the top most important. Now we see that population density and proximity to sources of emissions and roads are among the top ten.
 
 
 Now let's take a look at model performance by fitting the data using cross validation:
@@ -2419,8 +2721,6 @@ Now let's take a look at model performance by fitting the data using cross valid
 
 See if you can recall how to do this.
 
-####
-
 ***
 <details> <summary> Click here to reveal the answer. </summary>
 
@@ -2431,7 +2731,10 @@ collect_metrics(resample_RF_fit)
 ```
 
 </details>
+
 ***
+
+####
 
 ```{r, echo = FALSE}
 set.seed(456)
@@ -2439,33 +2742,37 @@ resample_RF_fit <- tune::fit_resamples(RF_wflow, vfold_pm)
 collect_metrics(resample_RF_fit)
 ```
 
-Now let's compare the performance of this model with our linear regression model - if you have been following along you could type this to take a look. 
+## **Model Comparison**
+***
+
+Now let's compare the performance of our model with our linear regression model - if you have been following along you could type this to take a look. 
 
 ```{r, eval = FALSE}
 # our initial linear regression model:
 collect_metrics(resample_fit)
 ```
 
-For those starting here we will tell you that our first model had a mean `rmse` value of 2.17.
-It looks like the random forest model had  a much lower `rmse` value of 1.72.
+For those starting here we will tell you that our first model had a cross validation mean `rmse` value of `r round(collect_metrics(resample_fit)$mean[1], 2)`.
+It looks like the random forest model had  a much lower `rmse` value of `r round(collect_metrics(resample_RF_fit)$mean[1], 2)`. This suggest that this model is better at prediction air pollution values. In addition, the R squared value is much higher (it was `r round(collect_metrics(resample_fit)$mean[2], 2)*100`% and is now `r round(collect_metrics(resample_RF_fit)$mean[2], 2)*100`%), suggesting that more of the variance of the air pollution values could be explained by the new Random Forest model. 
 
 #### {.think_question_block}
 <b><u> Question Opportunity </u></b>
 
 Do you recall how the RMSE is calculated?
 
-####
-
 ***
 
 <details> <summary> Click here to reveal the answer. </summary>
 $$RMSE = \sqrt{\frac{\sum_{i=1}^{n}{(\hat{y_t}- y_t)}^2}{n}}$$
-</details> 
+</details>
+
 ***
+
+####
 
 If we tuned our random forest model based on the number of trees or the value for `mtry` (which is "The number of predictors that will be randomly sampled at each split when creating the tree models"), we might get a model with even better performance.
 
-However, our cross validated mean rmse value of 1.72 is quite good because our range of true outcome values is much larger: (`r round(range(test_pm$value),3)`).
+However, our cross validated mean rmse value of `r round(collect_metrics(resample_RF_fit)$mean[1], 2)` is quite good because our range of true outcome values is much larger: (`r round(range(test_pm$value),3)`).
 
 
 ## **Model tuning**
@@ -2491,6 +2798,7 @@ RF_PM_model <-
 
 RF_PM_model
 ```
+
 Now instead of specifying a value for the `mtry` and `min_n` arguments, we can use the `tune()` function of the `tune` package like so: `mtry = tune()`. This indicates that these hyperparameters are to be tuned. 
 
 ```{r}
@@ -2499,7 +2807,6 @@ tune_RF_model <- rand_forest(mtry = tune(), min_n = tune()) %>%
   set_engine("randomForest") %>%
   set_mode("regression")
     
-
 tune_RF_model
 
 ```
@@ -2510,8 +2817,8 @@ Again we will add this to a workflow, the only difference here is that we are us
 ```{r}
 
 RF_tune_wflow <- workflows::workflow() %>%
-            workflows::add_recipe(RF_rec) %>%
-            workflows::add_model(tune_RF_model)
+  workflows::add_recipe(RF_rec) %>%
+  workflows::add_model(tune_RF_model)
 RF_tune_wflow
 
 ```
@@ -2538,7 +2845,7 @@ We need to use `set.seed()` here because the values chosen for `mtry` and `min_n
 Note: this step will take some time.
 
 ```{r}
-doParallel::registerDoParallel(cores=2)
+doParallel::registerDoParallel(cores = 2)
 set.seed(123)
 tune_RF_results <- tune_grid(object = RF_tune_wflow, resamples = vfold_pm, grid = 20)
 tune_RF_results
@@ -2555,22 +2862,23 @@ By default the values for the hyperparameters being tuned are chosen semi-random
 Now we can use the `collect_metrics()` function again to take a look at what happened with our cross validation tests. We can see the different values chosen for `mtry` and `min_n` and the mean rmse and rsq values across the cross validation samples.
 
 ```{r}
-tune_RF_results%>%
+tune_RF_results %>%
   collect_metrics()
 ```
 
-We can now use the `show_best()` function as it was truly intended, to see what values for `min_n` and `mtry` resulted in the best performance.
+We can now use the `show_best()` function (which we used previously to get a better estimate of the RMSE using cross validation fold of the training data) as it was **truly intended**, to see what values for `min_n` and `mtry` resulted in the best performance.
 
 ```{r}
-show_best(tune_RF_results, metric = "rmse", n =1)
+show_best(tune_RF_results, metric = "rmse", n = 1)
 ```
-There we have it... looks like an `mtry` of 17 and `min_n` of 4 had the best `rmse` value. You can verify this in the above output, but it is easier to just pull this row out using this function. We can see that the mean `rmse` value across the cross validation sets was 1.712. Before tuning it was 1.725  with a similar `std_err` so the performance was very slightly improved.
+
+There we have it... looks like an `mtry` of `r show_best(tune_RF_results, metric = "rmse", n = 1)$mtry` and `show_best(tune_RF_results, metric = "rmse", n = 1)$min_n` of 4 had the best `rmse` value. You can verify this in the above output, but it is easier to just pull this row out using this function. We can see that the mean `rmse` value across the cross validation sets was `r round(show_best(tune_RF_results, metric = "rmse", n = 1)$mean, 2)`. Before tuning it was `r round(collect_metrics(resample_RF_fit)$mean[1], 2)`  with a fairly similar `std_err` so the performance may be slightly improved. In other words the model was slightly better at predicting air pollution values.
 
 
 ## **Final model performance evaluation**
 ***
 
-Now that we have decided that we have reasonable performance with our training data, we can stop building our model and evaluate performance with our testing data. 
+Now that we have decided that we have reasonable performance with our training data using the Random Forest method and tuning, we can stop building our model and evaluate performance with our testing data. Note that you might often need to try a variety of methods to optimize your model.
 
 Here, we will use the random forest model that we built to predict values for the monitors in the testing data and we will use the values for `mtry` and `min_n` that we just determined based on our tuning analysis to achieve the best performance.
 
@@ -2599,26 +2907,26 @@ The results will show the performance using the testing data.
 
 
 ```{r}
-overallfit <-tune::last_fit(RF_tuned_wflow, pm_split)
+overallfit <- tune::last_fit(RF_tuned_wflow, pm_split)
  # or
-overallfit <-RF_wflow %>%
+overallfit <- RF_wflow %>%
   tune::last_fit(pm_split)
 ```
 
 The `overallfit` output has a lot of really useful information about the model, the testing and training data split, and the predictions for the testing data.
 
 To see the performance on the test data we can use the `collect_metrics()` function like we did before.
+
 ```{r}
-  collect_metrics(overallfit)
- 
+collect_metrics(overallfit)
 ```
 
-Awesome! We can see that our rmse of 1.44 is quite similar with our testing data cross validation sets. We achieved quite good performance, which suggests that we could predict other locations with more sparse monitoring based on our predictors with reasonable accuracy.
+Awesome! We can see that our rmse of `r round(collect_metrics(overallfit)$.estimate, 2)[1]` is quite similar to that of our testing data cross validation sets (where rmse was `r round(show_best(tune_RF_results, metric = "rmse", n = 1)$mean, 2)` . We achieved quite good performance, which suggests that we could predict other locations with more sparse monitoring based on our predictors with reasonable accuracy, however some of our predictors involve monitoring itself, so the accuracy would likely be lower.
 
 Now if you wanted to take a look at the predicted values for the test set (the 292 rows with predictions out of the 876 original monitor values) you can use the  `collect_predictions()` function of the `tune` package:
 
 ```{r}
-test_predictions <-collect_predictions(overallfit)
+test_predictions <- collect_predictions(overallfit)
 ```
 
 ```{r, eval = FALSE}
@@ -2899,49 +3207,51 @@ yardstick::metrics(mpg_pred_test,
 # **Data Visualization**
 ***
 
-If you were starting the case study around here, you can obtain the data  [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
+If you have been following along but stopped and are starting here you could load the wrangled data using the following command:
 
-Load the data like so if you are starting here:
-
-```{r, eval=FALSE}
-load(here::here("data", "wrangled", "wrangled_pm.rda"))
-```
 
 ```{r, echo=FALSE}
 load(here::here("www", "data", "wrangled", "wrangled_pm.rda"))
 ```
 
 ***
-<details> <summary> If you skipped previous sections click here for more information. </summary>
-Download this file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda) (same as above) and then place it in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data" to copy and paste our code. We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
-***
-<details> <summary> Click here to see more about creating new projects in RStudio. </summary>
+#### {.click_to_expand_block}
 
-You can create a project by going to the File menu of RStudio like so:
+<details> <summary> If you skipped previous sections click here for more information on how to obtain and load the data. </summary>
 
+First you need to install the `OCSdata` package:
 
-```{r, echo = FALSE, out.width="60%"}
-knitr::include_graphics(here::here("www", "img", "New_project.png"))
+```{r, eval=FALSE}
+install.packages("OCSdata")
 ```
 
-You can also do so by clicking the project button:
+Then, you may download and load the wrangled data `.rda` file using the following code:
 
-```{r, echo = FALSE, out.width="60%"}
-knitr::include_graphics(here::here("www", "img", "project_button.png"))
+```{r, eval=FALSE}
+OCSdata::wrangled_rda("ocs-bp-air-pollution", outpath = getwd())
+load(here::here("OCSdata", "data", "wrangled", "wrangled_pm.rda"))
 ```
 
-See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) to learn more about using RStudio projects and [here](https://github.com/jennybc/here_here) to learn more about the `here` package.
+If the package does not work for you, you may also download this `.rda` file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
 
-</details>
-***
-</details>
-***
+To load the downloaded data into your environment, you may double click on the `.rda` file in Rstudio or using the `load()` function.
+
+To copy and paste our code below, place the downloaded `.rda` file in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
+
+```{r}
+load(here::here("data", "wrangled", "wrangled_pm.rda"))
+```
+
+<hr style="height:1px;border:none;color:#333;background-color:#333;" />
+
+
+####
 
 
 Our main question for this case study was:  
 
-> Can we predict annual average air pollution concentrations at the granularity of zip code regional levels using predictors such as data about population density, urbanization, road density, as well as, satellite pollution data and chemical modeling data?
+> Can we predict regional annual average air pollution concentrations by zip-code using predictors such as population density, urbanization, road density, as well as, satellite pollution data and chemical modeling data?
 
 Thus far, we have built a machine learning (ML) model to predict fine particulate matter air pollution levels based on our predictor variables (or features).
 
@@ -3004,6 +3314,7 @@ ggplot(data = world) +
                shape = 23, fill = "darkred")
 
 ```
+
 Nice!
 
 Now let's add county lines.
@@ -3012,9 +3323,8 @@ County graphical data is available from the `maps` package.
 The `sf` package which again is short for simple features creates a data frame about this graphical data so that we can work with it.
 
 ```{r}
-counties <- 
-  sf::st_as_sf(maps::map("county", plot = FALSE, 
-                         fill = TRUE))
+counties <- sf::st_as_sf(maps::map("county", plot = FALSE,
+                                   fill = TRUE))
 
 counties
 ```
@@ -3030,11 +3340,11 @@ monitors <- ggplot(data = world) +
                shape = 23, fill = "darkred") +
     ggtitle("Monitor Locations") +
     theme(axis.title.x=element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        axis.title.y=element_blank(),
-        axis.text.y=element_blank(),
-        axis.ticks.y=element_blank())
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank())
 
 monitors
 ```
@@ -3067,7 +3377,9 @@ counties %<>%
 
 head(counties)
 ```
+
 Now we just need to make these names in the new `county` variable of the `counties` data to be in title format. We can use the `str_to_title()` function of the `stringr` package to do this. 
+
 ```{r}
 counties[["county"]] <- stringr::str_to_title(counties[["county"]])
 ```
@@ -3077,11 +3389,12 @@ Great! Now the county information is the same for the `counties` and `pm` data.
 We can use the `inner_join()` function of the `dplyr` package to join the datasets together based on the `county` variables in each. This function will keep all rows that are in both datasets.
 
 ```{r}
-map_data <-dplyr::inner_join(counties, pm, by = "county")
+map_data <- dplyr::inner_join(counties, pm, by = "county")
 
 glimpse(map_data)
 
 ```
+
 Nice! we can see that we have add a `geom` variable to the `pm` data.
 
 Now we can use this to color the counties in our plot based on the `value` variable of our `pm` data, which you may recall is the actual monitor data for fine particulate air pollution at each monitor. 
@@ -3091,24 +3404,29 @@ WE can do so using the `scale_fill_gradientn()` function of the `ggplot2` packag
 This `scale_fill_gradientn()` function  also allows you to specify the colors, what to do about NA values (should they be a specific color or transparent) and the breaks, limits, labels and name/title on the legend for the color gradient. 
 
 ```{r}
-
-truth <-ggplot(data = world) +
-  coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)+
-    geom_sf(data = map_data, aes(fill = value)) +
-  scale_fill_gradientn(colours=topo.colors(7), na.value = "transparent",
-                           breaks=c(0,10,20),labels=c(0,10,20),
-                           limits=c(0,23.5), name = "PM ug/m3") +
+truth <- ggplot(data = world) +
+  coord_sf(xlim = c(-125,-66),
+           ylim = c(24.5, 50),
+           expand = FALSE) +
+  geom_sf(data = map_data, aes(fill = value)) +
+  scale_fill_gradientn(colours = topo.colors(7),
+                       na.value = "transparent",
+                       breaks = c(0, 10, 20),
+                       labels = c(0, 10, 20),
+                       limits = c(0, 23.5),
+                       name = "PM ug/m3") +
   ggtitle("True PM 2.5 levels") +
-    theme(axis.title.x=element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        axis.title.y=element_blank(),
-        axis.text.y=element_blank(),
-        axis.ticks.y=element_blank())
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
 
 truth
 
 ```
+
 Nice!
 
 Now let's do the same with our predicted outcome values.
@@ -3125,8 +3443,6 @@ Thus we will use the parsnip `fit()` and `predict()` functions of the `parsnip` 
 
 Why do we not need pre-processed data?
 
-####
-
 ***
 
 <details> <summary> Click here to reveal the answer. </summary>
@@ -3134,7 +3450,10 @@ Why do we not need pre-processed data?
 Since we are using a workflow, the data will be pre-processed when it is fit as well.
 
 </details>
+
 ***
+
+####
 
 
 ```{r}
@@ -3143,14 +3462,12 @@ RF_final_train_fit <- parsnip::fit(RF_tuned_wflow, data = train_pm)
 RF_final_test_fit <- parsnip::fit(RF_tuned_wflow, data = test_pm)
 
 
-values_pred_train <- 
-  predict(RF_final_train_fit, train_pm) %>% 
+values_pred_train <- predict(RF_final_train_fit, train_pm) %>% 
   bind_cols(train_pm %>% select(value, fips, county, id)) 
 
 values_pred_train
 
-values_pred_test <- 
-  predict(RF_final_test_fit, test_pm) %>% 
+values_pred_test <- predict(RF_final_test_fit, test_pm) %>% 
   bind_cols(test_pm %>% select(value, fips, county, id)) 
 
 values_pred_test
@@ -3171,14 +3488,18 @@ Great! as we can see there are 876 values like we would expect for all of the mo
 map_data <- inner_join(counties, all_pred, by = "county")
 
 pred <- ggplot(data = world) +
-          coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), 
-                 expand = FALSE) +
-    geom_sf(data = map_data, aes(fill = .pred)) +
-  scale_fill_gradientn(colours=topo.colors(7), na.value = "transparent",
-                       breaks=c(0,10,20),labels=c(0,10,20),
-                       limits=c(0,23.5), name = "PM ug/m3") +
-  ggtitle("Predicted PM 2.5 levels")+
-    theme(axis.title.x=element_blank(),
+  coord_sf(xlim = c(-125,-66),
+           ylim = c(24.5, 50),
+           expand = FALSE) +
+  geom_sf(data = map_data, aes(fill = .pred)) +
+  scale_fill_gradientn(colours = topo.colors(7),
+                       na.value = "transparent",
+                       breaks = c(0, 10, 20),
+                       labels = c(0, 10, 20),
+                       limits = c(0, 23.5),
+                       name = "PM ug/m3") +
+  ggtitle("Predicted PM 2.5 levels") +
+  theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
         axis.title.y=element_blank(),
@@ -3202,7 +3523,10 @@ We can see that the predicted fine particle air pollution values in (ug/m3) are 
 Let's add some text to our plot to explain it a bit more. We can do so using the `plot_annotation()` function of the `patchwork` package. The `theme` argument of this function takes the same theme information using the `theme()` function of the `ggplot2` package as when creating `ggplot2`plots.
 
 ```{r}
-(truth/pred) + plot_annotation(title = "Machine Learning Methods Allow for Prediction of Air Pollution", subtitle = "A random forest model predicts true monitored levels of fine particulate matter (PM 2.5) air pollution based on\ndata about population density and other predictors reasonably well, thus suggesting that we can predict levels\nof pollution in places with poor monitoring", theme = theme(plot.title = element_text(size =12, face = "bold"), plot.subtitle = element_text(size = 8)))
+(truth/pred) + 
+  plot_annotation(title = "Machine Learning Methods Allow for Prediction of Air Pollution", subtitle = "A random forest model predicts true monitored levels of fine particulate matter (PM 2.5) air pollution based on\ndata about population density and other predictors reasonably well, thus suggesting that we can use similar methods to predict levels\nof pollution in places with poor monitoring",
+                  theme = theme(plot.title = element_text(size =12, face = "bold"), 
+                                plot.subtitle = element_text(size = 8)))
 
 ```
 
@@ -3210,7 +3534,10 @@ Let's add some text to our plot to explain it a bit more. We can do so using the
 ```{r, echo = FALSE, message=FALSE, eval=FALSE, include = FALSE}
 png(here::here("img", "main_plot_maps.png"), 
     height = 1500, width = 2000, res = 300)
-(truth/pred) + plot_annotation(title = "Machine Learning Methods Allow for Prediction of Air Pollution", subtitle = "A random forest model predicts true monitored levels of fine particulate matter (PM 2.5) air pollution based on\ndata about population density and other predictors reasonably well, thus suggesting that we can predict levels\nof pollution in places with poor monitoring", theme = theme(plot.title = element_text(size =12, face = "bold"), plot.subtitle = element_text(size = 8)))
+(truth/pred) + 
+  plot_annotation(title = "Machine Learning Methods Allow for Prediction of Air Pollution", subtitle = "A random forest model predicts true monitored levels of fine particulate matter (PM 2.5) air pollution based on\ndata about population density and other predictors reasonably well, thus suggesting that we can use similar methods predict levels\nof pollution in places with poor monitoring",
+                  theme = theme(plot.title = element_text(size =12, face = "bold"),
+                                plot.subtitle = element_text(size = 8)))
 dev.off()
 ```
 
@@ -3275,7 +3602,7 @@ Our learning objectives were:
 - Demonstrate how to build a machine learning model with `tidymodels`
 - Demonstrate how to visualize geo-spatial data using `ggplot2`
 
-Using the machine learning models built in this case study, we could now extend this model to be used to predict air pollution levels in areas with poor monitoring, to help identify regions where populations maybe especially at risk for the health effects of air pollution.  
+Using the machine learning models built in this case study, we could now extend this model to predict air pollution levels in areas with poor monitoring, to help identify regions where populations maybe especially at risk for the health effects of air pollution.  
 
 Analyses like the one in our case study are important for defining which groups could benefit the most from interventions, education, and policy changes when attempting to mitigate public health challenges. You can see in this [article](https://www.nejm.org/doi/full/10.1056/NEJMoa1702747){target="_blank"} that many additional considerations would be involved to adequately understand the data enough to recommend policy changes.
 
@@ -3295,7 +3622,7 @@ knitr::include_graphics(here::here("www", "img","full_tidymodels_overview.png"))
 ```
 
 
-
+#### {.click_to_expand_block}
 
 <details><summary> Click here for more on what we learned with `tidymodels` </summary>
 
@@ -3329,12 +3656,13 @@ We learned that if the model fits well than the estimated values will be very si
 
 5. Overall model performance evaluation  
 
-Once we chose our final model, we evaluated the final model performance using the testing data using the `last_fit()` function of the `tune` package. This gives us a better estimate about how well the model will predict or classify the outcome variable of interest with new independent data. Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources. 
+Once we chose our final model, we evaluated the final model performance using the testing data using the `last_fit()` function of the `tune` package. This gives us a better estimate about how well the model will predict or classify the outcome variable of interest with new independent data. **Ideally one would also perform an evaluation with independent data to provide a sense of how generalizable the model is to other data sources.**
 
 We also saw that we can use the `collect_predictions()` function of the `tune` package to get the predictions for our test data. We saw that we can get more detailed prediction data using the `predict()` function of the `parsnip` package.
 
 </details>
 
+####
 
 
 ## **Suggested Homework**
@@ -3428,12 +3756,22 @@ Package   | Use in this case study
 sessionInfo()
 ```
 
+**Estimate of RMarkdown Compilation Time: **
+
+```{r, echo=FALSE}
+rmarkdown:::perf_timer_stop("render")
+pts = rmarkdown:::perf_timer_summary()
+cat("About", round(pts$time[1]/1000 + 5), "-", round(pts$time[1]/1000 + 15),"seconds")
+```
+
+This compilation time was measured on a PC machine operating on Windows 10. This range should only be used as an estimate as compilation time will vary with different machines and operating systems.
 
 ## **Acknowledgments**
 ***
 
-
 We would like to acknowledge [Roger Peng](http://www.biostat.jhsph.edu/~rpeng/), [Megan Latshaw](https://www.jhsph.edu/faculty/directory/profile/1708/megan-weil-latshaw), and [Kirsten Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler) for assisting in framing the major direction of the case study.
+
+We would like to acknowledge [Michael Breshock](https://mbreshock.github.io/) for his contributions to this case study and developing the `OCSdata` package.
 
 We would also like to acknowledge the [Bloomberg American Health Initiative](https://americanhealth.jhu.edu/) for funding this work. 
 

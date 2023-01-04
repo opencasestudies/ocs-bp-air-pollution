@@ -100,9 +100,18 @@ li.toctree-l2:first-child {
     color: black;
 }
 
+
 .exercise_block {
     padding: .5em;
     border: 1px solid lightgrey;
     background: white;
+    color: black;
+}
+
+.click_to_expand_block {
+    padding: 1em;
+    padding-top: .5em;
+    border: 1px grey;
+    background: #E8E8E8;
     color: black;
 }
