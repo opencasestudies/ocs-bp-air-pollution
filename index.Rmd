@@ -99,8 +99,8 @@ This case study is part of a series of public health case studies for the [Bloom
 The total reading time for this case study is calculated via [koRpus](https://github.com/unDocUMeantIt/koRpus) and shown below: 
 
 ```{r, echo=FALSE}
-readtable = text_stats("index.Rmd") # producing reading time markdown table
-readtime = read.so::read.md(readtable) %>% dplyr::select(Method, koRpus) %>% # reading table into dataframe, selecting relevant factors
+readtable <- text_stats("index.Rmd") # producing reading time markdown table
+readtime <- read.so::read.md(readtable) %>% dplyr::select(Method, koRpus) %>% # reading table into dataframe, selecting relevant factors
   dplyr::filter(Method == "Reading time") %>% # dropping unnecessary rows
   dplyr::mutate(koRpus = paste(round(as.numeric(stringr::str_split(koRpus, " ")[[1]][1])), "minutes")) %>% # rounding reading time estimate
   dplyr::mutate(Method = "koRpus") %>% dplyr::relocate(koRpus, .before = Method) %>% dplyr::rename(`Reading Time` = koRpus) # reorganizing table
@@ -114,10 +114,10 @@ knitr::kable(readtime, format="markdown")
 A readability index estimates the reading difficulty level of a particular text. Flesch-Kincaid, FORCAST, and SMOG are three common readability indices that were calculated for this case study via [koRpus](https://github.com/unDocUMeantIt/koRpus). These indices provide an estimation of the minimum reading level required to comprehend this case study by grade and age. 
 
 ```{r, echo=FALSE}
-rt = suppressMessages(suppressWarnings(
+rt <- suppressMessages(suppressWarnings(
   wordcountaddin::readability("index.Rmd", quiet = TRUE)
 )) # producing readability markdown table
-df = read.so::read.md(rt) %>% dplyr::select(index, grade, age) %>%  # reading table into dataframe, selecting relevant factors
+df <- read.so::read.md(rt) %>% dplyr::select(index, grade, age) %>%  # reading table into dataframe, selecting relevant factors
   tidyr::drop_na() %>% dplyr::mutate(grade = round(as.numeric(grade)), # dropping rows with missing values, rounding age and grade columns
                                      age = round(as.numeric(age))
                                      )
@@ -367,7 +367,6 @@ Package   | Use in this case study
 [dplyr](https://dplyr.tidyverse.org/){target="_blank"}      | to view/arrange/filter/select/compare specific subsets of data 
 [skimr](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data
 [summarytools](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data in a different style
-[magrittr](https://magrittr.tidyverse.org/articles/magrittr.html){target="_blank"}   | to use the `%<>%` pipping operator 
 [corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
 [tidymodels](https://www.tidymodels.org){target="_blank"} | to load in a set of packages (broom, dials, infer, parsnip, purrr, recipes, rsample, tibble, yardstick)
@@ -819,14 +818,13 @@ So let's convert these variables into factors.
 We can do this using the `across()` function of the `dplyr` package and the `as.factor()` base function. 
 The `across()` function has two main arguments: (i) the columns you want to operate on and (ii) the function or list of functions to apply to each column. 
 
-In this case, we are also using the `magrittr` assignment pipe or double pipe that looks like this `%<>%` of the `magrittr` package. 
-This allows us use the `pm` data as input, but also reassigns the output to the same data object name.
+We can reassign the transformed data to the same object using the `<-` assignment operator.
 
 #### {.scrollable }
 
 ```{r}
 # Scroll through the output!
-pm %<>%
+pm <- pm %>%
   dplyr::mutate(across(c(id, fips, zcta), as.factor)) 
 
 glimpse(pm)
@@ -1544,7 +1542,7 @@ one_hot_rec <- recipe(train_pm) %>%
   update_role(everything(), new_role = "predictor") %>%
   update_role(value, new_role = "outcome") %>%
   update_role(id, new_role = "id variable")
-one_hot_rec %<>% step_dummy(state, county, city, zcta, one_hot = TRUE)
+one_hot_rec <- one_hot_rec %>% step_dummy(state, county, city, zcta, one_hot = TRUE)
 prepped_one_hot_rec <- prep(one_hot_rec , verbose = TRUE, retain = TRUE )
 baked_one_hot_rec <- bake(prepped_one_hot_rec, new_data = NULL)
 ```
@@ -1623,7 +1621,7 @@ Again, we do not want to remove the `CMAQ` and `aod` variables, so we can make s
 If we specifically wanted to remove a predictor we could use `step_rm()`.
 
 ```{r}
-simple_rec %<>%
+simple_rec <- simple_rec %>%
   update_role("fips", new_role = "county id") %>%
   step_novel(state, county, city, zcta) %>%
   step_dummy(state, county, city, zcta, one_hot = TRUE) %>%
@@ -1819,7 +1817,7 @@ The `county` variables appears to get dropped due to either correlation or near 
 It is likely due to near zero variance because this is the more granular of these geographic categorical variables and likely sparse.
 
 ```{r}
-pm %<>%
+pm <- pm %>%
   mutate(city = case_when(city == "Not in a city" ~ "Not in a city",
                           city != "Not in a city" ~ "In a city"))
 
@@ -2398,7 +2396,7 @@ See [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Project
 Then you can modify the data to match what we did for the previous model like so to prepare the `city` variable and to split the data into testing and training sets. (You will see later that this would be required due to the number of levels for the city variable in the original data).
 
 ```{r}
-pm %<>%
+pm <- pm %>%
   mutate(city = case_when(city == "Not in a city" ~ "Not in a city",
                           city != "Not in a city" ~ "In a city"))
 
@@ -3015,7 +3013,7 @@ dplyr::pull(pm, county) %>%
 We can use the `separate()` function of the `tidyr` package to separate the `ID` variable of our `counties` data into two `variables` based on the comma as a separator.
 
 ```{r}
-counties %<>% 
+counties <- counties %>%
   tidyr::separate(ID, into = c("state", "county"), sep = ",")
 
 head(counties)
@@ -3331,7 +3329,6 @@ Package   | Use in this case study
 [dplyr](https://dplyr.tidyverse.org/){target="_blank"}      | to view/arrange/filter/select/compare specific subsets of the data 
 [skimr](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data
 [summarytools](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data in a different style
-[magrittr](https://magrittr.tidyverse.org/articles/magrittr.html){target="_blank"}   | to use the `%<>%` pipping operator 
 [corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
 [rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets and to split the training set for cross-validation  
@@ -3368,7 +3365,7 @@ sessionInfo()
 
 ```{r, echo=FALSE}
 rmarkdown:::perf_timer_stop("render")
-pts = rmarkdown:::perf_timer_summary()
+pts <- rmarkdown:::perf_timer_summary()
 cat("About", round(pts$time[1]/1000 + 5), "-", round(pts$time[1]/1000 + 15),"seconds")
 ```
 
