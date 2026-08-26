@@ -114,7 +114,9 @@ knitr::kable(readtime, format="markdown")
 A readability index estimates the reading difficulty level of a particular text. Flesch-Kincaid, FORCAST, and SMOG are three common readability indices that were calculated for this case study via [koRpus](https://github.com/unDocUMeantIt/koRpus). These indices provide an estimation of the minimum reading level required to comprehend this case study by grade and age. 
 
 ```{r, echo=FALSE}
-rt = wordcountaddin::readability("index.Rmd", quiet=TRUE) # producing readability markdown table
+rt = suppressMessages(suppressWarnings(
+  wordcountaddin::readability("index.Rmd", quiet = TRUE)
+)) # producing readability markdown table
 df = read.so::read.md(rt) %>% dplyr::select(index, grade, age) %>%  # reading table into dataframe, selecting relevant factors
   tidyr::drop_na() %>% dplyr::mutate(grade = round(as.numeric(grade)), # dropping rows with missing values, rounding age and grade columns
                                      age = round(as.numeric(age))
@@ -305,6 +307,27 @@ library(here)
 library(readr)
 library(dplyr)
 library(skimr)
+
+# Note: `summarytools` requires additional system software before it can be
+# installed from GitHub. See https://github.com/dcomtois/summarytools#installing-from-github
+# for complete installation instructions.
+#
+# macOS: install XQuartz (https://www.xquartz.org/) and Magick++
+# (https://imagemagick.org/Magick++/). Magick++ is available through Homebrew
+# (https://formulae.brew.sh/formula/imagemagick) or MacPorts
+# (https://ports.macports.org/port/ImageMagick/).
+# Debian / Ubuntu / Linux Mint: sudo apt install libmagick++-dev
+# Older Ubuntu (Trusty 14.04 or Xenial 16.04):
+#   sudo add-apt-repository -y ppa:opencpu/imagemagick
+#   sudo apt-get update
+#   sudo apt-get install -y libmagick++-dev
+# Fedora / Red Hat / CentOS: sudo yum install ImageMagick-c++-devel
+# Solaris:
+#   pkgadd -d http://get.opencsw.org/now
+#   /opt/csw/bin/pkgutil -U
+#   /opt/csw/bin/pkgutil -y -i imagemagick
+#   /usr/sbin/pkgchk -L CSWimagemagick
+
 library(summarytools)
 library(magrittr)
 # Load packages for making correlation plots
@@ -325,10 +348,10 @@ library(tidyr)
 library(lwgeom)
 library(proxy)# needed for lwgeom
 library(sf)
+library(terra)
 library(maps)
 library(rnaturalearth)
 library(rnaturalearthdata) # needed for rnaturalearth
-library(rgeos)
 library(patchwork)
 # Load package for downloading the case study data files
 library(OCSdata)
@@ -366,7 +389,7 @@ Package   | Use in this case study
 [maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get map database data about counties to draw them on our US map
 [sf](https://r-spatial.github.io/sf/){target="_blank"} | to convert the map data into a data frame
 [lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert map geographical data
-[rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
+[terra](https://rspatial.github.io/terra/){target="_blank"} | to work with vector and raster spatial data
 [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
 [OCSdata](https://github.com/opencasestudies/OCSdata){target="_blank"} | to access and download OCS data files
 ___
@@ -1595,16 +1618,18 @@ Let's put all this together now.
 
 **Remember: it is important to add the steps to the recipe in an order that makes sense just like with a cooking recipe.**
 
-First, we are going to create numeric values for our categorical variables, then we will look at correlation and near-zero variance. 
+First, we are going to create numeric values for our categorical variables, remove near-zero-variance and exactly redundant predictors, then look at correlation.
 Again, we do not want to remove the `CMAQ` and `aod` variables, so we can make sure they are kept in the model by excluding them from those steps. 
 If we specifically wanted to remove a predictor we could use `step_rm()`.
 
 ```{r}
 simple_rec %<>%
   update_role("fips", new_role = "county id") %>%
+  step_novel(state, county, city, zcta) %>%
   step_dummy(state, county, city, zcta, one_hot = TRUE) %>%
-  step_corr(all_predictors(), - CMAQ, - aod)%>%
-  step_nzv(all_predictors(), - CMAQ, - aod)
+  step_nzv(all_predictors(), - CMAQ, - aod) %>%
+  step_lincomb(all_numeric_predictors()) %>%
+  step_corr(all_predictors(), - CMAQ, - aod)
   
 simple_rec
 ```
@@ -1755,12 +1780,9 @@ glimpse(baked_test_pm)
 ####
 
 
-Notice that our `city_Not.in.a.city` variable seems to be NA values. 
-Why might that be?
+The recipe's `step_novel()` step creates a dedicated level for values that appear only in the test data, so the dummy variables do not contain missing values.
 
-Ah! Perhaps it is because some of our levels were not previously seen in the training set!
-
-Let's take a look using the [set operations](https://www.probabilitycourse.com/chapter1/1_2_2_set_operations.php){target="_blank"} of the `dplyr` package. 
+Let's use the [set operations](https://www.probabilitycourse.com/chapter1/1_2_2_set_operations.php){target="_blank"} of the `dplyr` package to inspect the cities that differ between the training and test sets.
 We can take a look at cities that were different between the test and training set.
 
 ```{r}
@@ -1774,7 +1796,7 @@ dim(dplyr::setdiff(traincities, testcities))
 dim(dplyr::intersect(traincities, testcities))
 ```
 
-Indeed, there are lots of different cities in our test data that are not in our training data!
+Indeed, there are lots of cities in the test data that are not in the training data. `step_novel()` handles these safely during preprocessing.
 
 
 So, let's go back to our `pm` data set and modify the `city` variable to just be values of `in a city` or `not in a city` using the `case_when()` function of `dplyr`.
@@ -1825,9 +1847,11 @@ novel_rec <- recipe(train_pm) %>%
     update_role(value, new_role = "outcome") %>%
     update_role(id, new_role = "id variable") %>%
     update_role("fips", new_role = "county id") %>%
+    step_novel(state, county, city, zcta) %>%
     step_dummy(state, county, city, zcta, one_hot = TRUE) %>%
-    step_corr(all_numeric()) %>%
-    step_nzv(all_numeric()) 
+    step_nzv(all_predictors()) %>%
+    step_lincomb(all_numeric_predictors()) %>%
+    step_corr(all_predictors())
 ```
 </details>
 
@@ -2701,7 +2725,14 @@ Note: this step will take some time.
 ```{r}
 doParallel::registerDoParallel(cores = 2)
 set.seed(123)
-tune_RF_results <- tune_grid(object = RF_tune_wflow, resamples = vfold_pm, grid = 20)
+RF_tuning_parameters <- tune::extract_parameter_set_dials(RF_tune_wflow) %>%
+  update(mtry = dials::mtry(range = c(1L, 35L)))
+tune_RF_results <- tune_grid(
+  object = RF_tune_wflow,
+  resamples = vfold_pm,
+  param_info = RF_tuning_parameters,
+  grid = 20
+)
 tune_RF_results
 ```
 
@@ -2742,7 +2773,7 @@ So, first we need to specify these values in a workflow. We can use the `select_
 
 ```{r}
 
-tuned_RF_values<- select_best(tune_RF_results, "rmse")
+tuned_RF_values <- select_best(tune_RF_results, metric = "rmse")
 tuned_RF_values
 ```
 
@@ -2875,7 +2906,7 @@ To do this, we will use the following packages to create a map of the US:
 1. `sf` - the simple features package helps to convert geographical coordinates into `geometry` variables which are useful for making 2D plots
 2. `maps` - this package contains geographical outlines and plotting functions to create plots with maps 
 3. `rnaturalearth`- this allows for easy interaction with map data from [Natural Earth](http://www.naturalearthdata.com/) which is a public domain map dataset
-4. `rgeos` - this package interfaces with the Geometry Engine-Open Source (`GEOS`) which is also helpful for coordinate conversion
+4. `terra` - this package provides modern tools for working with vector and raster spatial data
 
 We will start with getting an outline of the US with the `ne_countries()` function of the `rnaturalearth` package which will return polygons of the countries in the [Natural Earth](http://www.naturalearthdata.com/) dataset.
 
@@ -2993,15 +3024,21 @@ head(counties)
 Now we just need to make these names in the new `county` variable of the `counties` data to be in title format. We can use the `str_to_title()` function of the `stringr` package to do this. 
 
 ```{r}
+counties[["state"]] <- stringr::str_to_title(counties[["state"]])
 counties[["county"]] <- stringr::str_to_title(counties[["county"]])
 ```
 
 Great! Now the county information is the same for the `counties` and `pm` data.
 
-We can use the `inner_join()` function of the `dplyr` package to join the datasets together based on the `county` variables in each. This function will keep all rows that are in both datasets.
+We can use the `inner_join()` function of the `dplyr` package to join the datasets together by both `state` and `county`. This prevents counties with the same name in different states from being incorrectly matched.
 
 ```{r}
-map_data <- dplyr::inner_join(counties, pm, by = "county")
+map_data <- dplyr::inner_join(
+  counties,
+  pm,
+  by = c("state", "county"),
+  relationship = "one-to-many"
+)
 
 glimpse(map_data)
 
@@ -3074,13 +3111,13 @@ RF_final_train_fit <- parsnip::fit(RF_tuned_wflow, data = train_pm)
 RF_final_test_fit <- parsnip::fit(RF_tuned_wflow, data = test_pm)
 
 
-values_pred_train <- predict(RF_final_train_fit, train_pm) %>% 
-  bind_cols(train_pm %>% select(value, fips, county, id)) 
+values_pred_train <- predict(RF_final_train_fit, train_pm) %>%
+  bind_cols(train_pm %>% select(value, fips, state, county, id))
 
 values_pred_train
 
-values_pred_test <- predict(RF_final_test_fit, test_pm) %>% 
-  bind_cols(test_pm %>% select(value, fips, county, id)) 
+values_pred_test <- predict(RF_final_test_fit, test_pm) %>%
+  bind_cols(test_pm %>% select(value, fips, state, county, id))
 
 values_pred_test
 ```
@@ -3093,11 +3130,16 @@ all_pred <- bind_rows(values_pred_test, values_pred_train)
 all_pred
 ```
 
-Great! as we can see there are 876 values like we would expect for all of the monitors. We can use the `county` variable to combine this with the `counties` data like we did with the `pm` data previously so that we can use the `value` variable as a color scheme for our map.
+Great! as we can see there are 876 values like we would expect for all of the monitors. We can use the `state` and `county` variables to combine this with the `counties` data like we did with the `pm` data previously so that we can use the `value` variable as a color scheme for our map.
 
 
 ```{r}
-map_data <- inner_join(counties, all_pred, by = "county")
+map_data <- inner_join(
+  counties,
+  all_pred,
+  by = c("state", "county"),
+  relationship = "one-to-many"
+)
 
 pred <- ggplot(data = world) +
   coord_sf(xlim = c(-125,-66),
@@ -3310,7 +3352,7 @@ Package   | Use in this case study
 [maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get map database data about counties to draw them on our US map
 [sf](https://r-spatial.github.io/sf/){target="_blank"}  | to convert the map data into a data frame
 [lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert the map geographical data
-[rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
+[terra](https://rspatial.github.io/terra/){target="_blank"} | to work with vector and raster spatial data
 [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
 
 
