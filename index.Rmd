@@ -1618,7 +1618,7 @@ Let's put all this together now.
 
 **Remember: it is important to add the steps to the recipe in an order that makes sense just like with a cooking recipe.**
 
-First, we are going to create numeric values for our categorical variables, remove near-zero-variance and exactly redundant predictors, then look at correlation.
+First, we are going to create numeric values for our categorical variables, remove near-zero-variance and redundant predictors, then look at correlation.
 Again, we do not want to remove the `CMAQ` and `aod` variables, so we can make sure they are kept in the model by excluding them from those steps. 
 If we specifically wanted to remove a predictor we could use `step_rm()`.
 
