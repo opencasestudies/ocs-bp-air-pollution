@@ -3276,6 +3276,10 @@ We also saw that we can use the `collect_predictions()` function of the `tune` p
 
 Students can predict air pollution monitor values using a different algorithm and provide an explanation for how that algorithm works and why it may be a good choice for modeling this data.
 
+# **More Case Studies**
+***
+
+Interested in exploring more open case studies? Visit **[opencasestudies.org](https://opencasestudies.org)** to access additional studies and open educational resources.
 
 # **Additional Information**
 ***
