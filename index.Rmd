@@ -40,15 +40,33 @@ function googleTranslateElementInit() {
 </script>
 
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, eval=TRUE}
+# Install the packages used below that are not part of the supplied package list.
+cran_packages <- c(
+  "corrplot", "doParallel", "GGally", "lwgeom", "maps", "OCSdata",
+  "patchwork", "proxy", "randomForest", "rnaturalearth",
+  "rnaturalearthdata", "sf", "skimr", "terra", "tidymodels", "tune",
+  "summarytools", "vip", "workflows"
+)
+
+missing_cran_packages <- cran_packages[!cran_packages %in% rownames(installed.packages())]
+if (length(missing_cran_packages) > 0) {
+  install.packages(missing_cran_packages)
+}
+
+if (!requireNamespace("wordcountaddin", quietly = TRUE)) {
+  remotes::install_github("benmarwick/wordcountaddin", type = "source", dependencies = TRUE)
+}
+if (!requireNamespace("read.so", quietly = TRUE)) {
+  remotes::install_github("alistaire47/read.so")
+}
+
 library(knitr)
 library(here)
 knitr::opts_chunk$set(include = TRUE, comment = NA, echo = TRUE,
                       message = FALSE, warning = FALSE, cache = FALSE,
                       fig.align = "center", out.width = '90%')
 library(magrittr)
-remotes::install_github("benmarwick/wordcountaddin", type = "source", dependencies = TRUE)
-remotes::install_github("alistaire47/read.so")
 library(wordcountaddin)
 library(read.so)
 
