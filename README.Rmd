@@ -67,7 +67,7 @@ We will use machine learning methods to predict annual air pollution levels spat
 
 ### Data
 
-The data that we will use in this case study come from a **[gravimetric air pollution  monitor system](https://publiclab.org/wiki/filter-pm){target="_blank"}** operated by the US [Enivornmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"} that measures fine particulate matter (PM~2.5~) in the United States (US). We will use data from 876 gravimetric monitors in in the contiguous US in 2008.
+The data that we will use in this case study come from a **[gravimetric air pollution  monitor system](https://publiclab.org/wiki/filter-pm){target="_blank"}** operated by the US [Environmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"} that measures fine particulate matter (PM~2.5~) in the United States (US). We will use data from 876 gravimetric monitors in in the contiguous US in 2008.
 
 Roughly 90% of these monitors are located within cities. 
 
@@ -75,7 +75,7 @@ Hence, there is an **equity issue** in terms of capturing the air pollution leve
 
 We will use data related to population density, urbanization, road density, as well as, NASA satellite pollution data and chemical modeling data to predict the monitoring values captured from this air pollution monitoring system.
 
-The data for these 48 predictors comes from the US [Enivornmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}, the [National Aeronautics and Space Administration (NASA)](https://www.nasa.gov/){target="_blank"}, the US [Census](https://www.census.gov/about/what/census-at-a-glance.html){target="_blank"}, and the [National Center for Health Statistics (NCHS)](https://www.cdc.gov/nchs/about/index.htm){target="_blank"}.
+The data for these 48 predictors comes from the US [Environmental Protection Agency (EPA)](https://www.epa.gov/){target="_blank"}, the [National Aeronautics and Space Administration (NASA)](https://www.nasa.gov/){target="_blank"}, the US [Census](https://www.census.gov/about/what/census-at-a-glance.html){target="_blank"}, and the [National Center for Health Statistics (NCHS)](https://www.cdc.gov/nchs/about/index.htm){target="_blank"}.
 
 All of our data was previously collected by a [researcher](http://www.biostat.jhsph.edu/~rpeng/) at the [Johns Hopkins School of Public Health](https://www.jhsph.edu/) who studies air pollution and climate change. 
 
@@ -112,7 +112,7 @@ The data is imported from a CSV file using the `readr` package.
 
 #### Data wrangling 
 
-This case study does not demonstrate very many data wrangling methods. However we do cover the `mutate()` and `across` functions of the `dplyr` package in the Data wrangling section. In the Data visualzation, some wrangling was required including combining data using the `inner_join()` function of the `dplyr` package, using the `separate` function of the `tidyr` package to make two columns out of one, and the `str_to_title()` function of the `stringr` package to change the format of some character strings. 
+This case study does not demonstrate very many data wrangling methods. However we do cover the `mutate()` and `across` functions of the `dplyr` package in the Data wrangling section. In the Data visualization, some wrangling was required including combining data using the `inner_join()` function of the `dplyr` package, using the `separate` function of the `tidyr` package to make two columns out of one, and the `str_to_title()` function of the `stringr` package to change the format of some character strings. 
 
 #### Data exploration
 
@@ -157,13 +157,13 @@ We cover the basics of machine learning:
 [Normalization](https://en.wikipedia.org/wiki/Normalization_(statistics)){target="_blank"}  
 [Dimensionality Reduction/Signal Extraction](https://en.wikipedia.org/wiki/Dimensionality_reduction){target="_blank"}  
 [Row Operations](https://tartarus.org/gareth/maths/Linear_Algebra/row_operations.pdf){target="_blank"}  
-[Near Zero Varaince](https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/){target="_blank"}  
+[Near Zero Variance](https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/){target="_blank"}  
 [Parameters and Hyper-parameters](https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models){target="_blank"}   
-[Supervised and Unspervised Learning](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}  
+[Supervised and Unsupervised Learning](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}  
 [Principal Component Analysis](https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007){target="_blank"}  
 [Linear Combinations](https://www.mathbootcamps.com/linear-combinations-vectors/){target="_blank"}  
 [Decision Tree](https://medium.com/greyatom/decision-trees-a-simple-way-to-visualize-a-decision-dc506a403aeb){target="_blank"}  
-[Random Forest](https://towardsdatascience.com/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9){target="_blank"}  
+[Random Forest](https://medium.com/data-science/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9){target="_blank"}  
 
 
  <u>**Packages used in this case study:** </u>
@@ -178,7 +178,7 @@ Package   | Use in this case study
 [magrittr](https://magrittr.tidyverse.org/articles/magrittr.html){target="_blank"}   | to use the `%<>%` pipping operator 
 [corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
-[rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets and to split the training set for cross-validation  
+[rsample](https://rsample.tidymodels.org/articles/rsample.html){target="_blank"}   | to split the data into testing and training sets and to split the training set for cross-validation  
 [recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `bake` which extracts pre-processed training data (used to require `juice()`) and applies recipe preprocessing steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
 [parsnip](https://tidymodels.github.io/parsnip/){target="_blank"}   | an interface to create models (major functions are  `fit()`, `set_engine()`)
 [yardstick](https://tidymodels.github.io/yardstick/){target="_blank"}   | to evaluate the performance of models
@@ -187,16 +187,16 @@ Package   | Use in this case study
 [dials](https://www.tidyverse.org/blog/2019/10/dials-0-0-3/){target="_blank"} | to specify hyper-parameter tuning
 [tune](https://tune.tidymodels.org/){target="_blank"} | to perform cross validation, tune hyper-parameters, and get performance metrics
 [workflows](https://www.rdocumentation.org/packages/workflows/versions/0.1.1){target="_blank"} | to create modeling workflow to streamline the modeling process
-[vip](https://cran.r-project.org/web/packages/vip/vip.pdf){target="_blank"} | to create variable importance plots
+[vip](https://cran.r-project.org/package=vip){target="_blank"} | to create variable importance plots
 [randomForest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf){target="_blank"} | to perform the random forest analysis
 [doParallel](https://cran.r-project.org/web/packages/doParallel/doParallel.pdf) | to fit cross validation samples in parallel 
 [stringr](https://stringr.tidyverse.org/articles/stringr.html){target="_blank"}    | to manipulate the text the map data
 [tidyr](https://tidyr.tidyverse.org/){target="_blank"}      | to separate data within a column into multiple columns
-[rnaturalearth](https://cran.r-project.org/web/packages/rnaturalearth/README.html){target="_blank"} | to get the geometry data for the earth to plot the US
+[rnaturalearth](https://cran.r-project.org/package=rnaturalearth){target="_blank"} | to get the geometry data for the earth to plot the US
 [maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get map database data about counties to draw them on our US map
 [sf](https://r-spatial.github.io/sf/){target="_blank"}  | to convert the map data into a data frame
 [lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert the map geographical data
-[rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
+[rgeos](https://cran.r-project.org/package=rgeos){target="_blank"} | to use geometry data
 [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
 
 #### For users 

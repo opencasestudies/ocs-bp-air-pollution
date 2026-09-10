@@ -366,7 +366,7 @@ Package   | Use in this case study
 [corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
 [tidymodels](https://www.tidymodels.org){target="_blank"} | to load in a set of packages (broom, dials, infer, parsnip, purrr, recipes, rsample, tibble, yardstick)
-[rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets; to split the training set for cross-validation  
+[rsample](https://rsample.tidymodels.org/articles/rsample.html){target="_blank"}   | to split the data into testing and training sets; to split the training set for cross-validation  
 [recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()`, `prep()` and various transformation `step_*()` functions, as well as `bake` which extracts pre-processed training data (used to require `juice()`) and applies recipe preprocessing steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
 [parsnip](https://tidymodels.github.io/parsnip/){target="_blank"}   | an interface to create models (major functions are `fit()`, `set_engine()`)
 [yardstick](https://tidymodels.github.io/yardstick/){target="_blank"}   | to evaluate the performance of models
@@ -375,16 +375,16 @@ Package   | Use in this case study
 [dials](https://www.tidyverse.org/blog/2019/10/dials-0-0-3/){target="_blank"} | to specify hyper-parameter tuning
 [tune](https://tune.tidymodels.org/){target="_blank"} | to perform cross validation, tune hyper-parameters, and get performance metrics
 [workflows](https://www.rdocumentation.org/packages/workflows/versions/0.1.1){target="_blank"}| to create modeling workflow to streamline the modeling process
-[vip](https://cran.r-project.org/web/packages/vip/vip.pdf){target="_blank"} | to create variable importance plots
+[vip](https://cran.r-project.org/package=vip){target="_blank"} | to create variable importance plots
 [randomForest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf){target="_blank"} | to perform the random forest analysis
 [doParallel](https://cran.r-project.org/web/packages/doParallel/doParallel.pdf) | to fit cross validation samples in parallel 
 [stringr](https://stringr.tidyverse.org/articles/stringr.html){target="_blank"}    | to manipulate the text the map data
 [tidyr](https://tidyr.tidyverse.org/){target="_blank"}      | to separate data within a column into multiple columns
-[rnaturalearth](https://cran.r-project.org/web/packages/rnaturalearth/README.html){target="_blank"} | to get the geometry data for the earth to plot the US
+[rnaturalearth](https://cran.r-project.org/package=rnaturalearth){target="_blank"} | to get the geometry data for the earth to plot the US
 [maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get map database data about counties to draw them on our US map
 [sf](https://r-spatial.github.io/sf/){target="_blank"} | to convert the map data into a data frame
 [lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert map geographical data
-[rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
+[rgeos](https://cran.r-project.org/package=rgeos){target="_blank"} | to use geometry data
 [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
 [OCSdata](https://github.com/opencasestudies/OCSdata){target="_blank"} | to access and download OCS data files
 ___
@@ -463,7 +463,7 @@ knitr::include_graphics(here::here("img", "Kansas.png"))
 ##### [[source]](https://aqicn.org/city/usa/){target="_blank"}
 
 It reports particulate values using what is called the [Air Quality Index](https://www.airnow.gov/index.cfm?action=aqibasics.aqi){target="_blank"} (AQI).
-This [calculator](https://airnow.gov/index.cfm?action=airnow.calculator){target="_blank"} indicates that 114 AQI is equivalent to 40.7 ug/m^3^ and is considered unhealthy for sensitive individuals.
+This [calculator](https://www.airnow.gov/aqi/aqi-calculator){target="_blank"} indicates that 114 AQI is equivalent to 40.7 ug/m^3^ and is considered unhealthy for sensitive individuals.
 Thus, some areas exceed the WHO annual exposure guideline (10 ug/m^3^), and this may adversely affect the health of people living in these locations.
 
 Adverse health effects have been associated with populations experiencing higher pollution exposure despite the levels being below suggested guidelines. 
@@ -543,7 +543,7 @@ The monitor data that we will be using comes from **[gravimetric monitors](https
 knitr::include_graphics(here::here("img","monitor.png"))
 ```
 
-##### [image curtesy of [Kirsten Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler)]
+##### [image courtesy of [Kirsten Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler)]
 
 These monitors use a filtration system to specifically capture fine particulate matter. 
 
@@ -563,7 +563,7 @@ For the EPA standard operating procedure for PM gravimetric analysis in 2008, we
 Gravimetric analysis is also used for [emission testing](https://www.mt.com/us/en/home/applications/Laboratory_weighing/emissions-testing-particulate-matter.html){target="_blank"}. 
 The same idea applies: a fresh filter is applied and the desired amount of time passes, then the filter is removed and weighed. 
 
-There are [other monitoring systems](https://www.sensirion.com/en/about-us/newsroom/sensirion-specialist-articles/particulate-matter-sensing-for-air-quality-measurements/){target="_blank"} that can provide hourly measurements, but we will not be using data from these monitors in our analysis. 
+There are [other monitoring systems](https://sensirion.com/products/product-insights/specialist-articles/particulate-matter-sensing-for-air-quality-measurements){target="_blank"} that can provide hourly measurements, but we will not be using data from these monitors in our analysis. 
 Gravimetric analysis is considered to be among the most accurate methods for measuring particulate matter.
 
 </details>
@@ -734,7 +734,7 @@ load(here::here("OCSdata", "data", "imported", "imported_pm.rda"))
 
 If the package does not work for you, an RDA file (stands for R data) of the data can be found on our [GitHub repository](https://github.com/opencasestudies/ocs-bp-air-pollution/tree/master/data/imported). Or you can download it more directly by clicking [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/imported/imported_pm.rda).
 
-To load the downloaded data into your environment, you may double click on the `.rda` file in Rstudio or using the `load()` function.
+To load the downloaded data into your environment, you may double click on the `.rda` file in RStudio or using the `load()` function.
 
 To copy and paste our code below, place the downloaded file in your current working directory within a subdirectory called "imported" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
@@ -916,7 +916,7 @@ pm %>%
 
 ```
 
-In fact, the county containing Albuerque had a larger population. Thus the measurements for Albuquerque were not as thorough as they were for Baltimore.
+In fact, the county containing Albuquerque had a larger population. Thus the measurements for Albuquerque were not as thorough as they were for Baltimore.
 
 This may be due to the fact that the monitor values were lower in Albuquerque. It is interesting to note here that the CMAQ values are quite similar for both cities.
 
@@ -939,9 +939,9 @@ First, we calculate the Pearson correlation coefficients between all features pa
 PM_cor <- cor(pm %>% dplyr::select_if(is.numeric))
 corrplot::corrplot(PM_cor, tl.cex = 0.5)
 ```
-Nice! Now we can see which variables show a positive (blue) or negative (red) correlation to one another. Variables that show a very little correlation with one another appear as white or lightly colored. We can see that each variable is perfectly correlated with itself, which is it why there is a line of blue squares diagnally across the plot.
+Nice! Now we can see which variables show a positive (blue) or negative (red) correlation to one another. Variables that show a very little correlation with one another appear as white or lightly colored. We can see that each variable is perfectly correlated with itself, which is it why there is a line of blue squares diagonally across the plot.
 
-We can also plot the absolute value of the Pearson correlation coefficients using the `abs()` function from base R and change the order of the columns. This can be helplful if we aren't interested in the direction of the correlation and just want to see which variables have a relationship with one another.
+We can also plot the absolute value of the Pearson correlation coefficients using the `abs()` function from base R and change the order of the columns. This can be helpful if we aren't interested in the direction of the correlation and just want to see which variables have a relationship with one another.
 
 ```{r}
 corrplot(abs(PM_cor), order = "hclust", tl.cex = 0.5, cl.lim = c(0, 1))
@@ -1227,7 +1227,7 @@ load(here::here("OCSdata", "data", "wrangled", "wrangled_pm.rda"))
 
 If the package does not work for you, you may also download this `.rda` file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
 
-To load the downloaded data into your environment, you may double click on the `.rda` file in Rstudio or using the `load()` function.
+To load the downloaded data into your environment, you may double click on the `.rda` file in RStudio or using the `load()` function.
 
 To copy and paste our code below, place the downloaded `.rda` file in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
@@ -1804,7 +1804,7 @@ pm %>%
                           city != "Not in a city" ~ "In a city"))
 ```
 
-Alternatively you could create a [custom step function](https://recipes.tidymodels.org/articles/Custom_Steps.html){target="_blank"} to do this and add this to your recipe, but that is beyond the scope of this case study. 
+Alternatively you could create a [custom step function](https://recipes.tidymodels.org/articles/index.html){target="_blank"} to do this and add this to your recipe, but that is beyond the scope of this case study. 
 
 We will need to repeat all the steps (splitting the data, pre-processing, etc) as the levels of our variables have now changed. 
 
@@ -2354,7 +2354,7 @@ load(here::here("OCSdata", "data", "wrangled", "wrangled_pm.rda"))
 
 If the package does not work for you, you may also download this `.rda` file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
 
-To load the downloaded data into your environment, you may double click on the `.rda` file in Rstudio or using the `load()` function.
+To load the downloaded data into your environment, you may double click on the `.rda` file in RStudio or using the `load()` function.
 
 To copy and paste our code below, place the downloaded `.rda` file in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
@@ -2431,7 +2431,7 @@ knitr::include_graphics("https://miro.medium.com/max/1000/1*LMoJmXCsQlciGTEyoSN3
 
 ##### [[source]](https://towardsdatascience.com/understanding-random-forest-58381e0602d2){target="_blank"}
 
-In the case of [random forest](https://towardsdatascience.com/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9){target="_blank"}, multiple decision trees are created - hence the name forest, and each tree is built using a random subset of the training data (with replacement) - hence the full name random forest. This random aspect helps to keep the algorithm from overfitting the data.
+In the case of [random forest](https://medium.com/data-science/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9){target="_blank"}, multiple decision trees are created - hence the name forest, and each tree is built using a random subset of the training data (with replacement) - hence the full name random forest. This random aspect helps to keep the algorithm from overfitting the data.
 
 The mean of the predictions from each of the trees is used in the final output.
 
@@ -2655,7 +2655,7 @@ However, our cross validated mean rmse value of `r round(collect_metrics(resampl
 
 Now let's try some tuning.
 
-Let's take a closer look at the `mtry` and `min_n` hyperparametrs in our Random Forest model.
+Let's take a closer look at the `mtry` and `min_n` hyperparameters in our Random Forest model.
 
 We aren't exactly sure what values of `mtry` and `min_n` achieve good accuracy yet keep our model generalizable for other data.
 
@@ -2710,7 +2710,7 @@ You can see how many cores you have access to on your system using the `detectCo
 parallel::detectCores()
 ```
 
-The `registerDoParallel()` function will use the number for cores specified using the `cores=` arguement, or it will assign it automatically to one-half of the number of cores detected by the `parallel` package. 
+The `registerDoParallel()` function will use the number for cores specified using the `cores=` argument, or it will assign it automatically to one-half of the number of cores detected by the `parallel` package. 
 
 We need to use `set.seed()` here because the values chosen for `mtry` and `min_n` may vary if we preform this evaluation again because they are chosen semi-randomly (meaning that they are within a range of reasonable values but still random).
 
@@ -2843,7 +2843,7 @@ load(here::here("OCSdata", "data", "wrangled", "wrangled_pm.rda"))
 
 If the package does not work for you, you may also download this `.rda` file by clicking this link [here](https://raw.githubusercontent.com/opencasestudies/ocs-bp-air-pollution/master/data/wrangled/wrangled_pm.rda).
 
-To load the downloaded data into your environment, you may double click on the `.rda` file in Rstudio or using the `load()` function.
+To load the downloaded data into your environment, you may double click on the `.rda` file in RStudio or using the `load()` function.
 
 To copy and paste our code below, place the downloaded `.rda` file in your current working directory within a subdirectory called "wrangled" within a subdirectory called "data". We used an RStudio project and the [`here` package](https://github.com/jennybc/here_here) to navigate to the file more easily. 
 
@@ -3235,7 +3235,7 @@ We used the `recipes` package to assign variable roles (such as outcome, predict
 
 We learned that the model needs to first be fit to the training data. We learned that in both classification and prediction, the model is fit to the training data and the explanatory variables are used to estimate numeric values (in the case of prediction) or categorical values (in the case of classification) of the outcome variable of interest. We learned that we specify the model and its specifications using the `parnsip` package and that we also use this package to fit the model using the `fit()` function. We learned that if we just use `parsnip` to fit the model, then we need to use the pre-processed training data (output from `bake()`). We learned that we can use the raw training data if we use the `workflows` package to create a workflow that pre-processes our data for us.   
 
-We learned that if the model fits well than the estimated values will be very similar to the true outcome variable values in our training data. We learned that we can assess model performance using the `yardstick` package with the `metrics` functio or the `tune` package and the `collect_metrics()` function (required if using cross validation or tuning). We also learned that we can use subsets of our training data (which we created with the `rsample` package) to perform cross validation to get a better estimate about the performance of our model using our training data, as we want our results to be generalizable and to perform well with other data, not just our training data. We used the `fit_resamples()` function of the tune package to fit our model on our different training data subsets and the `collect_metrics()` function (also of the `tune` package) to evaluate model performance using these subsets.  We also learned that we can potentially improve model performance by tuning aspects about the model called [hyperparameters](https://machinelearningmastery.com/difference-between-a-parameter-and-a-hyperparameter/){target="_blank"} to determine the best option for model performance. We learned that we can do this using the `tune` and `dials` packages and evaluating the performance of our model with the different hyperparameter options and our training data subsets that we used for cross validation. After we tested several different methods to model our data, we compared them to choose the best performing model as our final model.  
+We learned that if the model fits well than the estimated values will be very similar to the true outcome variable values in our training data. We learned that we can assess model performance using the `yardstick` package with the `metrics` function or the `tune` package and the `collect_metrics()` function (required if using cross validation or tuning). We also learned that we can use subsets of our training data (which we created with the `rsample` package) to perform cross validation to get a better estimate about the performance of our model using our training data, as we want our results to be generalizable and to perform well with other data, not just our training data. We used the `fit_resamples()` function of the tune package to fit our model on our different training data subsets and the `collect_metrics()` function (also of the `tune` package) to evaluate model performance using these subsets.  We also learned that we can potentially improve model performance by tuning aspects about the model called [hyperparameters](https://machinelearningmastery.com/difference-between-a-parameter-and-a-hyperparameter/){target="_blank"} to determine the best option for model performance. We learned that we can do this using the `tune` and `dials` packages and evaluating the performance of our model with the different hyperparameter options and our training data subsets that we used for cross validation. After we tested several different methods to model our data, we compared them to choose the best performing model as our final model.  
 
 
 5. Overall model performance evaluation  
@@ -3289,13 +3289,13 @@ Students can predict air pollution monitor values using a different algorithm an
 [Normalization](https://en.wikipedia.org/wiki/Normalization_(statistics)){target="_blank"}  
 [Dimensionality Reduction/Signal Extraction](https://en.wikipedia.org/wiki/Dimensionality_reduction){target="_blank"}  
 [Row Operations](https://tartarus.org/gareth/maths/Linear_Algebra/row_operations.pdf){target="_blank"}  
-[Near Zero Varaince](https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/){target="_blank"}  
+[Near Zero Variance](https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/){target="_blank"}  
 [Parameters and Hyperparameters](https://machinelearningmastery.com/difference-between-a-parameter-and-a-hyperparameter/){target="_blank"}   
-[Supervised and Unspervised Learning](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}  
+[Supervised and Unsupervised Learning](https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d){target="_blank"}  
 [Principal Component Analysis](https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007){target="_blank"}  
 [Linear Combinations](https://www.mathbootcamps.com/linear-combinations-vectors/){target="_blank"}  
 [Decision Tree](https://medium.com/greyatom/decision-trees-a-simple-way-to-visualize-a-decision-dc506a403aeb){target="_blank"}  
-[Random Forest](https://towardsdatascience.com/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9){target="_blank"}  
+[Random Forest](https://medium.com/data-science/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9){target="_blank"}  
 
 
  <u>**Packages used in this case study:** </u>
@@ -3310,7 +3310,7 @@ Package   | Use in this case study
 [magrittr](https://magrittr.tidyverse.org/articles/magrittr.html){target="_blank"}   | to use the `%<>%` pipping operator 
 [corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
-[rsample](https://tidymodels.github.io/rsample/articles/Basics.html){target="_blank"}   | to split the data into testing and training sets and to split the training set for cross-validation  
+[rsample](https://rsample.tidymodels.org/articles/rsample.html){target="_blank"}   | to split the data into testing and training sets and to split the training set for cross-validation  
 [recipes](https://tidymodels.github.io/recipes/){target="_blank"}   | to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are `recipe()` , `prep()` and various transformation `step_*()` functions, as well as `bake` which extracts pre-processed training data (used to require `juice()`) and applies recipe preprocessing steps to testing data). See [here](https://cran.r-project.org/web/packages/recipes/recipes.pdf){target="_blank"}  for more info.
 [parsnip](https://tidymodels.github.io/parsnip/){target="_blank"}   | an interface to create models (major functions are  `fit()`, `set_engine()`)
 [yardstick](https://tidymodels.github.io/yardstick/){target="_blank"}   | to evaluate the performance of models
@@ -3319,16 +3319,16 @@ Package   | Use in this case study
 [dials](https://www.tidyverse.org/blog/2019/10/dials-0-0-3/){target="_blank"} | to specify hyper-parameter tuning
 [tune](https://tune.tidymodels.org/){target="_blank"} | to perform cross validation, tune hyper-parameters, and get performance metrics
 [workflows](https://www.rdocumentation.org/packages/workflows/versions/0.1.1){target="_blank"} | to create modeling workflow to streamline the modeling process
-[vip](https://cran.r-project.org/web/packages/vip/vip.pdf){target="_blank"} | to create variable importance plots
+[vip](https://cran.r-project.org/package=vip){target="_blank"} | to create variable importance plots
 [randomForest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf){target="_blank"} | to perform the random forest analysis
 [doParallel](https://cran.r-project.org/web/packages/doParallel/doParallel.pdf) | to fit cross validation samples in parallel 
 [stringr](https://stringr.tidyverse.org/articles/stringr.html){target="_blank"}    | to manipulate the text the map data
 [tidyr](https://tidyr.tidyverse.org/){target="_blank"}      | to separate data within a column into multiple columns
-[rnaturalearth](https://cran.r-project.org/web/packages/rnaturalearth/README.html){target="_blank"} | to get the geometry data for the earth to plot the US
+[rnaturalearth](https://cran.r-project.org/package=rnaturalearth){target="_blank"} | to get the geometry data for the earth to plot the US
 [maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get map database data about counties to draw them on our US map
 [sf](https://r-spatial.github.io/sf/){target="_blank"}  | to convert the map data into a data frame
 [lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert the map geographical data
-[rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf){target="_blank"} | to use geometry data
+[rgeos](https://cran.r-project.org/package=rgeos){target="_blank"} | to use geometry data
 [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
 
 
