@@ -1,0 +1,152 @@
+# Candace Savonen 2021
+# Updated May 2025
+
+name: Pull Request
+
+on:
+  pull_request:
+    branches: [ main, master, staging ]
+
+jobs:
+
+  yaml-check:
+    name: Load user automation choices
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+        # Use the yaml-env-action action.
+      - name: Load environment from YAML
+        uses: doughepi/yaml-env-action@v1.0.0
+        with:
+            files: config_automation.yml # Pass a space-separated list of configuration files. Rightmost files take precedence.
+
+      # Delete the branch if this has been run before
+      - name: Delete branch locally and remotely
+        run: git push origin --delete preview-${{ github.event.pull_request.number }} || echo "No branch to delete"
+
+      # Make the branch fresh
+      - name: Make the branch fresh
+        run: |
+          git config --global --add safe.directory $GITHUB_WORKSPACE
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+          branch_name='preview-${{ github.event.pull_request.number }}'
+          echo branch doesnt exist
+          git checkout -b $branch_name || echo branch exists
+          git push --set-upstream origin $branch_name || echo branch exists remotely
+        shell: bash
+
+
+    outputs:
+      toggle_website: "${{ env.RENDER_WEBSITE }}"
+      toggle_spell_check: "${{ env.SPELL_CHECK }}"
+      spell_error_min: "${{ env.SPELL_ERROR_MIN }}"
+      toggle_style_code: "${{ env.STYLE_CODE }}"
+      toggle_url_check: "${{ env.URL_CHECKER }}"
+      url_error_min: "${{ env.URL_ERROR_MIN }}"
+      toggle_quiz_check: "${{ env.CHECK_QUIZZES }}"
+      quiz_error_min: "${{ env.QUIZ_ERROR_MIN }}"
+      toggle_md_linter: "${{ env.MARKDOWN_LINTER }}"
+      toggle_readability: "${{ env.READABILITY_REPORT }}"
+      toggle_render_preview: "${{ env.RENDER_PREVIEW }}"
+      toggle_dictionary_sort: "${{ env.DICTIONARY_SORT }}"
+      rendering_docker_image: "${{ env.RENDERING_DOCKER_IMAGE }}"
+
+########################## Make the error reports ##############################
+  ottr-reports:
+    name: Run Reports
+    needs: yaml-check
+    if: ${{needs.yaml-check.outputs.toggle_spell_check == 'true' || needs.yaml-check.outputs.toggle_url_check == 'true' || needs.yaml-check.outputs.toggle_quiz_check == 'true'}}
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+    - name: Checkout Actions Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Run Reports
+      id: run-reports
+      uses: ottrproject/ottr-reports@main
+      with:
+        check_spelling: ${{needs.yaml-check.outputs.toggle_spell_check}}
+        spelling_error_min: ${{needs.yaml-check.outputs.spell_error_min}}
+        check_urls: ${{needs.yaml-check.outputs.toggle_url_check}}
+        url_error_min: ${{needs.yaml-check.outputs.url_error_min}}
+        check_quiz_form: ${{needs.yaml-check.outputs.toggle_quiz_check}}
+        quiz_error_min: ${{needs.yaml-check.outputs.quiz_error_min}}
+        sort_dictionary: ${{needs.yaml-check.outputs.toggle_dictionary_sort}}
+
+############################# Style the code ###################################
+  style-code:
+    name: Style code
+    needs: yaml-check
+    runs-on: ubuntu-latest
+    if: ${{needs.yaml-check.outputs.toggle_style_code == 'true'}}
+    container:
+      image: jhudsl/base_ottr:main
+
+    steps:
+      - name: Checkout files
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run styler
+        run: Rscript -e "styler::style_file(list.files(pattern = '(R|q)md$', recursive = FALSE, full.names = TRUE));warnings()"
+
+      - name: Commit styled files
+        run: |
+          git config --system --add safe.directory "$GITHUB_WORKSPACE"
+          git add \*md
+          git commit -m 'Style *mds' || echo "No changes to commit"
+          git push origin || echo "No changes to commit"
+
+############################# Readability Report ###################################
+
+  readability-report:
+    name: Readability report
+    needs: yaml-check
+    runs-on: ubuntu-latest
+    if: ${{needs.yaml-check.outputs.toggle_readability == 'true'}}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Readability report
+        uses: Rebilly/lexi@v2
+        with:
+          github-token: ${{ secrets.GH_PAT }}
+          glob: '**/*.md'
+
+############################# Render Preview ###################################
+  render-preview:
+    name: Render preview
+    needs: yaml-check
+    runs-on: ubuntu-latest
+    if: ${{needs.yaml-check.outputs.toggle_render_preview == 'true'}}
+    permissions:
+      pull-requests: write
+      contents: write
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Run render
+      uses: ottrproject/ottr-preview@main
+      with:
+        toggle_website: ${{needs.yaml-check.outputs.toggle_website}}
+        docker_image: ${{needs.yaml-check.outputs.rendering_docker_image}}
