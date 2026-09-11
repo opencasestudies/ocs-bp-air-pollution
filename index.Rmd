@@ -46,7 +46,7 @@ cran_packages <- c(
   "corrplot", "doParallel", "GGally", "lwgeom", "maps", "OCSdata",
   "patchwork", "proxy", "randomForest", "rnaturalearth",
   "rnaturalearthdata", "sf", "skimr", "terra", "tidymodels", "tune",
-  "summarytools", "vip", "workflows"
+  "vip", "workflows"
 )
 
 missing_cran_packages <- cran_packages[!cran_packages %in% rownames(installed.packages())]
@@ -193,7 +193,6 @@ knitr::include_graphics(here::here("img", "pm2.5_scale_graphic-color_2.jpg"))
 ##### [[source]](https://www.epa.gov/pm-pollution/particulate-matter-pm-basics){target="_blank"}
 
 <!-- <p align="center"> -->
-<!--   <img width="500" src="https://www.sensirion.com/images/sensirion-specialist-article-figure-1-cdd70.jpg"> -->
 <!-- </p> -->
 
 
@@ -323,7 +322,6 @@ library(here)
 library(readr)
 library(dplyr)
 library(skimr)
-library(summarytools)
 library(magrittr)
 # Load packages for making correlation plots
 library(corrplot)
@@ -361,7 +359,6 @@ Package   | Use in this case study
 [readr](https://readr.tidyverse.org/){target="_blank"}      | to import CSV files
 [dplyr](https://dplyr.tidyverse.org/){target="_blank"}      | to view/arrange/filter/select/compare specific subsets of data 
 [skimr](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data
-[summarytools](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data in a different style
 [magrittr](https://magrittr.tidyverse.org/articles/magrittr.html){target="_blank"}   | to use the `%<>%` pipping operator 
 [corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
@@ -3221,7 +3218,7 @@ We performed the major steps of machine learning that we introduced in the begin
 
 1. Data exploration  
 
-We used packages like `skimr`, `summarytools`, `corrplot`, and `GGally` to better understand our data. These packages can tell us how many missing values each variable has (if any), the class of each variable, the distribution of values for each variable, the sparsity of each variable, and the level of correlation between variables.  
+We used packages like `skimr`, `corrplot`, and `GGally` to better understand our data. These packages can tell us how many missing values each variable has (if any), the class of each variable, the distribution of values for each variable, the sparsity of each variable, and the level of correlation between variables.
 
 2. Data splitting 
 
@@ -3306,7 +3303,6 @@ Package   | Use in this case study
 [readr](https://readr.tidyverse.org/){target="_blank"}      | to import the CSV file data
 [dplyr](https://dplyr.tidyverse.org/){target="_blank"}      | to view/arrange/filter/select/compare specific subsets of the data 
 [skimr](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data
-[summarytools](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data in a different style
 [magrittr](https://magrittr.tidyverse.org/articles/magrittr.html){target="_blank"}   | to use the `%<>%` pipping operator 
 [corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
