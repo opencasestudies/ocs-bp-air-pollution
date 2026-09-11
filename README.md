@@ -262,10 +262,6 @@ prediction and classification 2) the importance of training and testing
 <td>to get an overview of data</td>
 </tr>
 <tr class="odd">
-<td><a href="https://cran.r-project.org/web/packages/skimr/index.html" target="_blank">summarytools</a></td>
-<td>to get an overview of data in a different style</td>
-</tr>
-<tr class="even">
 <td><a href="https://magrittr.tidyverse.org/articles/magrittr.html" target="_blank">magrittr</a></td>
 <td>to use the <code>%&lt;&gt;%</code> pipping operator</td>
 </tr>

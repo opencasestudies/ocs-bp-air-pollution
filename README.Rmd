@@ -174,7 +174,6 @@ Package   | Use in this case study
 [readr](https://readr.tidyverse.org/){target="_blank"}      | to import the CSV file data
 [dplyr](https://dplyr.tidyverse.org/){target="_blank"}      | to view/arrange/filter/select/compare specific subsets of the data 
 [skimr](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data
-[summarytools](https://cran.r-project.org/web/packages/skimr/index.html){target="_blank"}      | to get an overview of data in a different style
 [magrittr](https://magrittr.tidyverse.org/articles/magrittr.html){target="_blank"}   | to use the `%<>%` pipping operator 
 [corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html){target="_blank"} | to make large correlation plots
 [GGally](https://cran.r-project.org/web/packages/GGally/GGally.pdf){target="_blank"} | to make smaller correlation plots  
@@ -220,4 +219,3 @@ Students can predict air pollution monitor values using a different algorithm an
 ~ About 148 - 158 seconds
 
 This compilation time was measured on a PC machine operating on Windows 10. This range should only be used as an estimate as compilation time will vary with different machines and operating systems.
-

@@ -43,8 +43,8 @@ function googleTranslateElementInit() {
 ```{r setup, include=FALSE, eval=TRUE}
 # Install the packages used below that are not part of the supplied package list.
 cran_packages <- c(
-  "corrplot", "doParallel", "GGally", "lwgeom", "maps", "OCSdata",
-  "patchwork", "proxy", "randomForest", "rnaturalearth",
+  "corrplot", "doParallel", "GGally", "maps", "OCSdata", "patchwork",
+  "randomForest", "rnaturalearth",
   "rnaturalearthdata", "sf", "skimr", "terra", "tidymodels", "tune",
   "vip", "workflows"
 )
@@ -338,13 +338,10 @@ library(doParallel)
 library(ggplot2)
 library(stringr)
 library(tidyr)
-library(lwgeom)
-library(proxy)# needed for lwgeom
 library(sf)
 library(maps)
 library(rnaturalearth)
 library(rnaturalearthdata) # needed for rnaturalearth
-library(rgeos)
 library(patchwork)
 # Load package for downloading the case study data files
 library(OCSdata)
@@ -380,8 +377,6 @@ Package   | Use in this case study
 [rnaturalearth](https://cran.r-project.org/package=rnaturalearth){target="_blank"} | to get the geometry data for the earth to plot the US
 [maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get map database data about counties to draw them on our US map
 [sf](https://r-spatial.github.io/sf/){target="_blank"} | to convert the map data into a data frame
-[lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert map geographical data
-[rgeos](https://cran.r-project.org/package=rgeos){target="_blank"} | to use geometry data
 [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
 [OCSdata](https://github.com/opencasestudies/OCSdata){target="_blank"} | to access and download OCS data files
 ___
@@ -2890,7 +2885,6 @@ To do this, we will use the following packages to create a map of the US:
 1. `sf` - the simple features package helps to convert geographical coordinates into `geometry` variables which are useful for making 2D plots
 2. `maps` - this package contains geographical outlines and plotting functions to create plots with maps 
 3. `rnaturalearth`- this allows for easy interaction with map data from [Natural Earth](http://www.naturalearthdata.com/) which is a public domain map dataset
-4. `rgeos` - this package interfaces with the Geometry Engine-Open Source (`GEOS`) which is also helpful for coordinate conversion
 
 We will start with getting an outline of the US with the `ne_countries()` function of the `rnaturalearth` package which will return polygons of the countries in the [Natural Earth](http://www.naturalearthdata.com/) dataset.
 
@@ -3323,8 +3317,6 @@ Package   | Use in this case study
 [rnaturalearth](https://cran.r-project.org/package=rnaturalearth){target="_blank"} | to get the geometry data for the earth to plot the US
 [maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get map database data about counties to draw them on our US map
 [sf](https://r-spatial.github.io/sf/){target="_blank"}  | to convert the map data into a data frame
-[lwgeom](https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf){target="_blank"} | to use the `sf` function to convert the map geographical data
-[rgeos](https://cran.r-project.org/package=rgeos){target="_blank"} | to use geometry data
 [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
 
 
