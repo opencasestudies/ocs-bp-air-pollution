@@ -44,8 +44,7 @@ function googleTranslateElementInit() {
 # Install the packages used below that are not part of the supplied package list.
 cran_packages <- c(
   "corrplot", "doParallel", "GGally", "maps", "OCSdata", "patchwork",
-  "randomForest", "rnaturalearth",
-  "rnaturalearthdata", "sf", "skimr", "terra", "tidymodels", "tune",
+  "randomForest", "skimr", "terra", "tidymodels", "tune",
   "vip", "workflows"
 )
 
@@ -338,10 +337,7 @@ library(doParallel)
 library(ggplot2)
 library(stringr)
 library(tidyr)
-library(sf)
 library(maps)
-library(rnaturalearth)
-library(rnaturalearthdata) # needed for rnaturalearth
 library(patchwork)
 # Load package for downloading the case study data files
 library(OCSdata)
@@ -376,7 +372,7 @@ Package   | Use in this case study
 [tidyr](https://tidyr.tidyverse.org/){target="_blank"}      | to separate data within a column into multiple columns
 [rnaturalearth](https://cran.r-project.org/package=rnaturalearth){target="_blank"} | to get the geometry data for the earth to plot the US
 [maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get map database data about counties to draw them on our US map
-[sf](https://r-spatial.github.io/sf/){target="_blank"} | to convert the map data into a data frame
+[maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get state and county boundary data for the US maps
 [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
 [OCSdata](https://github.com/opencasestudies/OCSdata){target="_blank"} | to access and download OCS data files
 ___
@@ -2880,33 +2876,25 @@ Thus far, we have built a machine learning (ML) model to predict fine particulat
 Now, let's make a plot of our predicted outcome values ($\hat{Y}$) and actual outcome values $Y$ we observed. 
 
 First, let's start by making a plot of our monitors. 
-To do this, we will use the following packages to create a map of the US:
-
-1. `sf` - the simple features package helps to convert geographical coordinates into `geometry` variables which are useful for making 2D plots
-2. `maps` - this package contains geographical outlines and plotting functions to create plots with maps 
-3. `rnaturalearth`- this allows for easy interaction with map data from [Natural Earth](http://www.naturalearthdata.com/) which is a public domain map dataset
-
-We will start with getting an outline of the US with the `ne_countries()` function of the `rnaturalearth` package which will return polygons of the countries in the [Natural Earth](http://www.naturalearthdata.com/) dataset.
 
 ```{r}
-
-world <- ne_countries(scale = "medium", returnclass = "sf")
-glimpse(world)
+us_states <- ggplot2::map_data("state")
+glimpse(us_states)
 
 ```
 
 
-Here you can see the data about the countries in the world. Notice the `geometry` variable. This is used to create the outlines that we want. 
-
-Now we can use the `geom_sf()` function of the `ggplot2` package to create a visual of simple feature (the geometry coordinates found in the `geometry` variable).
+Here the `long` and `lat` columns store the boundary coordinates, while `group` identifies the points that make up each state outline.
 
 ```{r}
 ggplot(data = world) +
     geom_sf() 
+ggplot(us_states, aes(long, lat, group = group)) +
+  geom_polygon(fill = "white", colour = "grey50") +
+  coord_fixed()
 
 ```
 
-So now we can see that we have outlines of all the countries in the world.
 
 We want to limit this just to the coordinates for the US. We will do this based on the coordinates we found on Wikipedia. According to this [link](https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States#Westernmost){target="_blank"}, these are the latitude and longitude bounds of the continental US:
 
@@ -2916,23 +2904,24 @@ We want to limit this just to the coordinates for the US. We will do this based 
 - bottom =  24.7433195 # south lat
 
 ```{r}
-
 ggplot(data = world) +
     geom_sf() +
-    coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), 
-             expand = FALSE)
+ggplot(us_states, aes(long, lat, group = group)) +
+  geom_polygon(fill = "white", colour = "grey50") +
+  coord_fixed(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)
 ```
 Now we just have a plot that is mostly limited to the outline of the US.
 
 Now we will use the `geom_point()` function of the `ggplot` package to add scatter plot on top of the map. We want to show where the monitors are located based on the latitude and longitude values in the data.
 
 ```{r}
-ggplot(data = world) +
-    geom_sf() +
     coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), 
              expand = FALSE)+
-    geom_point(data = pm, aes(x = lon, y = lat), size = 2, 
-               shape = 23, fill = "darkred")
+ggplot(us_states, aes(long, lat, group = group)) +
+  geom_polygon(fill = "white", colour = "grey50") +
+  geom_point(data = pm, aes(x = lon, y = lat), size = 2,
+             shape = 23, fill = "darkred", inherit.aes = FALSE) +
+  coord_fixed(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)
 
 ```
 
@@ -2940,32 +2929,29 @@ Nice!
 
 Now let's add county lines.
 
-County graphical data is available from the `maps` package. 
-The `sf` package which again is short for simple features creates a data frame about this graphical data so that we can work with it.
 
 ```{r}
-counties <- sf::st_as_sf(maps::map("county", plot = FALSE,
-                                   fill = TRUE))
+counties <- ggplot2::map_data("county") %>%
+  dplyr::filter(!is.na(subregion)) %>%
+  dplyr::mutate(
+    state = stringr::str_to_title(region),
+    county = stringr::str_to_title(subregion)
+  )
 
 counties
 ```
 
-Now we will use this data within the `geom_sf()` function to add this to our plot.  We will also add a title using the `ggtitle()` function, as well as remove axis ticks and titles using the `theme()` function of the `ggplot2` package.
+Now we will use `geom_polygon()` to add these county boundaries to our plot. We will also add a title and remove axis labels and ticks.
 
 ```{r}
-monitors <- ggplot(data = world) +
-    geom_sf(data = counties, fill = NA, color = gray(.5))+
-      coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), 
-             expand = FALSE) +
-    geom_point(data = pm, aes(x = lon, y = lat), size = 2, 
-               shape = 23, fill = "darkred") +
-    ggtitle("Monitor Locations") +
-    theme(axis.title.x=element_blank(),
-          axis.text.x = element_blank(),
-          axis.ticks.x = element_blank(),
-          axis.title.y = element_blank(),
-          axis.text.y = element_blank(),
-          axis.ticks.y = element_blank())
+monitors <- ggplot(counties, aes(long, lat, group = group)) +
+  geom_polygon(fill = NA, colour = gray(.5)) +
+  geom_point(data = pm, aes(x = lon, y = lat), size = 2,
+             shape = 23, fill = "darkred", inherit.aes = FALSE) +
+  coord_fixed(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE) +
+  ggtitle("Monitor Locations") +
+  theme(axis.title = element_blank(), axis.text = element_blank(),
+        axis.ticks = element_blank())
 
 monitors
 ```
@@ -2976,7 +2962,7 @@ Now, let's add a fill at the county-level for the true monitor values of air pol
 
 First, we need to get the county map data that we just got and our air pollution data to have similarly formatted county names so that we can combine the datasets together.
 
-We can see that in the `county` data the counties are listed after the state name and a comma. In addition they are all lower case.
+The `region` and `subregion` columns in this data identify the state and county in lower case. We created title-case `state` and `county` columns so that they match the county names in our air-pollution data.
 
 
 ```{r}
@@ -2990,46 +2976,37 @@ dplyr::pull(pm, county) %>%
   head()
 ```
 
-We can use the `separate()` function of the `tidyr` package to separate the `ID` variable of our `counties` data into two `variables` based on the comma as a separator.
-
-```{r}
-counties %<>% 
-  tidyr::separate(ID, into = c("state", "county"), sep = ",")
-
-head(counties)
 ```
 
 Now we just need to make these names in the new `county` variable of the `counties` data to be in title format. We can use the `str_to_title()` function of the `stringr` package to do this. 
-
-```{r}
-counties[["county"]] <- stringr::str_to_title(counties[["county"]])
-```
 
 Great! Now the county information is the same for the `counties` and `pm` data.
 
 We can use the `inner_join()` function of the `dplyr` package to join the datasets together based on the `county` variables in each. This function will keep all rows that are in both datasets.
 
 ```{r}
-map_data <- dplyr::inner_join(counties, pm, by = "county")
+map_data <- dplyr::inner_join(
+  counties,
+  dplyr::select(pm, state, county, value),
+  by = c("state", "county")
+)
 
 glimpse(map_data)
 
 ```
 
-Nice! we can see that we have add a `geom` variable to the `pm` data.
+Nice! The joined data retains the longitude, latitude, and grouping columns needed to draw each county polygon.
 
 Now we can use this to color the counties in our plot based on the `value` variable of our `pm` data, which you may recall is the actual monitor data for fine particulate air pollution at each monitor. 
 
-WE can do so using the `scale_fill_gradientn()` function of the `ggplot2` package which creates color gradient based on a variable. In this case it is the variable that was specified as the `fill` in the `aes` function of the `geom_sf()` function. We specified that it would be the `value` variable of the `pm` data.
+WE can do so using the `scale_fill_gradientn()` function of the `ggplot2` package which creates a color gradient based on a variable. In this case it is the variable that was specified as the `fill` in the `aes` function of `geom_polygon()`. We specified that it would be the `value` variable of the `pm` data.
 
 This `scale_fill_gradientn()` function  also allows you to specify the colors, what to do about NA values (should they be a specific color or transparent) and the breaks, limits, labels and name/title on the legend for the color gradient. 
 
 ```{r}
-truth <- ggplot(data = world) +
-  coord_sf(xlim = c(-125,-66),
-           ylim = c(24.5, 50),
-           expand = FALSE) +
-  geom_sf(data = map_data, aes(fill = value)) +
+truth <- ggplot(map_data, aes(long, lat, group = group, fill = value)) +
+  geom_polygon(colour = NA) +
+  coord_fixed(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE) +
   scale_fill_gradientn(colours = topo.colors(7),
                        na.value = "transparent",
                        breaks = c(0, 10, 20),
@@ -3083,13 +3060,13 @@ RF_final_train_fit <- parsnip::fit(RF_tuned_wflow, data = train_pm)
 RF_final_test_fit <- parsnip::fit(RF_tuned_wflow, data = test_pm)
 
 
-values_pred_train <- predict(RF_final_train_fit, train_pm) %>% 
-  bind_cols(train_pm %>% select(value, fips, county, id)) 
+values_pred_train <- predict(RF_final_train_fit, train_pm) %>%
+  bind_cols(train_pm %>% select(value, fips, state, county, id))
 
 values_pred_train
 
-values_pred_test <- predict(RF_final_test_fit, test_pm) %>% 
-  bind_cols(test_pm %>% select(value, fips, county, id)) 
+values_pred_test <- predict(RF_final_test_fit, test_pm) %>%
+  bind_cols(test_pm %>% select(value, fips, state, county, id))
 
 values_pred_test
 ```
@@ -3106,13 +3083,15 @@ Great! as we can see there are 876 values like we would expect for all of the mo
 
 
 ```{r}
-map_data <- inner_join(counties, all_pred, by = "county")
+map_data <- inner_join(
+  counties,
+  all_pred,
+  by = c("state", "county")
+)
 
-pred <- ggplot(data = world) +
-  coord_sf(xlim = c(-125,-66),
-           ylim = c(24.5, 50),
-           expand = FALSE) +
-  geom_sf(data = map_data, aes(fill = .pred)) +
+pred <- ggplot(map_data, aes(long, lat, group = group, fill = .pred)) +
+  geom_polygon(colour = NA) +
+  coord_fixed(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE) +
   scale_fill_gradientn(colours = topo.colors(7),
                        na.value = "transparent",
                        breaks = c(0, 10, 20),
@@ -3150,7 +3129,6 @@ Let's add some text to our plot to explain it a bit more. We can do so using the
                                 plot.subtitle = element_text(size = 8)))
 
 ```
-
 
 ```{r, echo = FALSE, message=FALSE, eval=FALSE, include = FALSE}
 png(here::here("img", "main_plot_maps.png"), 
