@@ -2,6 +2,9 @@
 
 # OpenCaseStudies
 
+[![render-index](https://github.com/opencasestudies/ocs-bp-air-pollution/actions/workflows/render-index.yaml/badge.svg?branch=master)](https://github.com/opencasestudies/ocs-bp-air-pollution/actions/workflows/render-index.yaml)
+[![render-README](https://github.com/opencasestudies/ocs-bp-air-pollution/actions/workflows/render-readme.yaml/badge.svg?branch=master)](https://github.com/opencasestudies/ocs-bp-air-pollution/actions/workflows/render-readme.yaml)
+
 ### Important links
 
 - HTML: <https://www.opencasestudies.org/ocs-bp-air-pollution/>
