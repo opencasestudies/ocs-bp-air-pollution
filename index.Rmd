@@ -328,7 +328,6 @@ library(sf)
 library(maps)
 library(rnaturalearth)
 library(rnaturalearthdata) # needed for rnaturalearth
-library(rgeos)
 library(patchwork)
 # Load package for downloading the case study data files
 library(OCSdata)

@@ -1,0 +1,43 @@
+Package: ocsbpairpollution
+Title: Open Case Studies: Predicting Annual Air Pollution
+Version: 0.0.0.9000
+Authors@R:
+    person("Open Case Studies", role = "cph")
+Description:
+    Dependencies required to render the air-pollution case study.
+License: CC BY-NC 3.0
+Encoding: UTF-8
+Imports:
+    corrplot,
+    doParallel,
+    dplyr,
+    GGally,
+    ggplot2,
+    here,
+    knitr,
+    lwgeom,
+    magrittr,
+    maps,
+    OCSdata,
+    patchwork,
+    proxy,
+    randomForest,
+    rmarkdown,
+    rnaturalearth,
+    rnaturalearthdata,
+    RColorBrewer,
+    readr,
+    read.so,
+    sf,
+    skimr,
+    stringr,
+    summarytools,
+    tidymodels,
+    tidyr,
+    tune,
+    vip,
+    wordcountaddin,
+    workflows
+Remotes:
+    alistaire47/read.so,
+    benmarwick/wordcountaddin
