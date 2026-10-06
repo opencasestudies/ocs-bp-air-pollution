@@ -370,8 +370,6 @@ Package   | Use in this case study
 [doParallel](https://cran.r-project.org/web/packages/doParallel/doParallel.pdf) | to fit cross validation samples in parallel 
 [stringr](https://stringr.tidyverse.org/articles/stringr.html){target="_blank"}    | to manipulate the text the map data
 [tidyr](https://tidyr.tidyverse.org/){target="_blank"}      | to separate data within a column into multiple columns
-[rnaturalearth](https://cran.r-project.org/package=rnaturalearth){target="_blank"} | to get the geometry data for the earth to plot the US
-[maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get map database data about counties to draw them on our US map
 [maps](https://cran.r-project.org/web/packages/maps/maps.pdf){target="_blank"} | to get state and county boundary data for the US maps
 [patchwork](https://cran.r-project.org/web/packages/patchwork/patchwork.pdf){target="_blank"} | to allow plots to be combined
 [OCSdata](https://github.com/opencasestudies/OCSdata){target="_blank"} | to access and download OCS data files
@@ -2876,6 +2874,7 @@ Thus far, we have built a machine learning (ML) model to predict fine particulat
 Now, let's make a plot of our predicted outcome values ($\hat{Y}$) and actual outcome values $Y$ we observed. 
 
 First, let's start by making a plot of our monitors. 
+To do this, we will use the `maps` package, which provides state and county boundaries as ordinary data frames. These data frames work directly with `ggplot2` and do not require a spatial-data package.
 
 ```{r}
 us_states <- ggplot2::map_data("state")
@@ -2887,14 +2886,13 @@ glimpse(us_states)
 Here the `long` and `lat` columns store the boundary coordinates, while `group` identifies the points that make up each state outline.
 
 ```{r}
-ggplot(data = world) +
-    geom_sf() 
 ggplot(us_states, aes(long, lat, group = group)) +
   geom_polygon(fill = "white", colour = "grey50") +
   coord_fixed()
 
 ```
 
+So now we can see the outlines of the US states.
 
 We want to limit this just to the coordinates for the US. We will do this based on the coordinates we found on Wikipedia. According to this [link](https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States#Westernmost){target="_blank"}, these are the latitude and longitude bounds of the continental US:
 
@@ -2904,8 +2902,6 @@ We want to limit this just to the coordinates for the US. We will do this based 
 - bottom =  24.7433195 # south lat
 
 ```{r}
-ggplot(data = world) +
-    geom_sf() +
 ggplot(us_states, aes(long, lat, group = group)) +
   geom_polygon(fill = "white", colour = "grey50") +
   coord_fixed(xlim = c(-125, -66), ylim = c(24.5, 50), expand = FALSE)
@@ -2915,8 +2911,6 @@ Now we just have a plot that is mostly limited to the outline of the US.
 Now we will use the `geom_point()` function of the `ggplot` package to add scatter plot on top of the map. We want to show where the monitors are located based on the latitude and longitude values in the data.
 
 ```{r}
-    coord_sf(xlim = c(-125, -66), ylim = c(24.5, 50), 
-             expand = FALSE)+
 ggplot(us_states, aes(long, lat, group = group)) +
   geom_polygon(fill = "white", colour = "grey50") +
   geom_point(data = pm, aes(x = lon, y = lat), size = 2,
@@ -2929,6 +2923,7 @@ Nice!
 
 Now let's add county lines.
 
+County graphical data is also available from the `maps` package.
 
 ```{r}
 counties <- ggplot2::map_data("county") %>%
@@ -2975,10 +2970,6 @@ In contrast, our air pollution `pm` data shows counties as titles with the first
 dplyr::pull(pm, county) %>%
   head()
 ```
-
-```
-
-Now we just need to make these names in the new `county` variable of the `counties` data to be in title format. We can use the `str_to_title()` function of the `stringr` package to do this. 
 
 Great! Now the county information is the same for the `counties` and `pm` data.
 
