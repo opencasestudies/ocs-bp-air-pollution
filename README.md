@@ -1,16 +1,13 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-OpenCaseStudies
-===============
+# OpenCaseStudies
 
 ### Important links
 
--   HTML:
-    <a href="https://www.opencasestudies.org/ocs-bp-air-pollution/" class="uri">https://www.opencasestudies.org/ocs-bp-air-pollution/</a>
--   GitHub:
-    <a href="https://github.com/opencasestudies/ocs-bp-air-pollution/" class="uri">https://github.com/opencasestudies/ocs-bp-air-pollution/</a>
--   Bloomberg American Health Initiative:
-    <a href="https://americanhealth.jhu.edu/open-case-studies" class="uri">https://americanhealth.jhu.edu/open-case-studies</a>
+- HTML: <https://www.opencasestudies.org/ocs-bp-air-pollution/>
+- GitHub: <https://github.com/opencasestudies/ocs-bp-air-pollution/>
+- Bloomberg American Health Initiative:
+  <https://americanhealth.jhu.edu/open-case-studies>
 
 ### Disclaimer
 
@@ -34,9 +31,10 @@ States License.
 
 To cite this case study please use:
 
-Wright, Carrie and Jager, Leah and Taub, Margaret and Hicks, Stephanie.
-(2020). <https://github.com//opencasestudies/ocs-bp-air-pollution>.
-Predicting Annual Air Pollution (Version v1.0.0).
+Wright, Carrie and Meng, Qier and Jager, Leah and Taub, Margaret and
+Hicks, Stephanie. (2020).
+<https://github.com//opencasestudies/ocs-bp-air-pollution>. Predicting
+Annual Air Pollution (Version v1.0.0).
 
 ### Acknowledgments
 
@@ -47,8 +45,20 @@ and [Kirsten
 Koehler](https://www.jhsph.edu/faculty/directory/profile/2928/kirsten-koehler)
 for assisting in framing the major direction of the case study.
 
+We would like to acknowledge [Michael
+Breshock](https://mbreshock.github.io/) for his contributions to this
+case study and developing the `OCSdata` package.
+
 We would also like to acknowledge the [Bloomberg American Health
 Initiative](https://americanhealth.jhu.edu/) for funding this work.
+
+### Reading Metrics
+
+The total reading time for this case study was calculated with
+[koRpus](https://github.com/unDocUMeantIt/koRpus): **About 100 minutes**
+
+The Flesch-Kincaid Readability Index was also calculated with
+[koRpus](https://github.com/unDocUMeantIt/koRpus): **Grade 10, Age 15**
 
 ### Title
 
@@ -76,12 +86,13 @@ chemical modeling data.
 ### Data
 
 The data that we will use in this case study come from a
-**<a href="https://publiclab.org/wiki/filter-pm" target="_blank">gravimetric air pollution monitor system</a>**
-operated by the US
-<a href="https://www.epa.gov/" target="_blank">Enivornmental Protection Agency (EPA)</a>
-that measures fine particulate matter (PM<sub>2.5</sub>) in the United
-States (US). We will use data from 876 gravimetric monitors in in the
-contiguous US in 2008.
+**<a href="https://publiclab.org/wiki/filter-pm"
+target="_blank">gravimetric air pollution monitor system</a>** operated
+by the US
+<a href="https://www.epa.gov/" target="_blank">Enivornmental Protection
+Agency (EPA)</a> that measures fine particulate matter
+(PM<sub>2.5</sub>) in the United States (US). We will use data from 876
+gravimetric monitors in in the contiguous US in 2008.
 
 Roughly 90% of these monitors are located within cities.
 
@@ -97,13 +108,14 @@ data to predict the monitoring values captured from this air pollution
 monitoring system.
 
 The data for these 48 predictors comes from the US
-<a href="https://www.epa.gov/" target="_blank">Enivornmental Protection Agency (EPA)</a>,
-the
-<a href="https://www.nasa.gov/" target="_blank">National Aeronautics and Space Administration (NASA)</a>,
-the US
-<a href="https://www.census.gov/about/what/census-at-a-glance.html" target="_blank">Census</a>,
-and the
-<a href="https://www.cdc.gov/nchs/about/index.htm" target="_blank">National Center for Health Statistics (NCHS)</a>.
+<a href="https://www.epa.gov/" target="_blank">Enivornmental Protection
+Agency (EPA)</a>, the
+<a href="https://www.nasa.gov/" target="_blank">National Aeronautics and
+Space Administration (NASA)</a>, the US
+<a href="https://www.census.gov/about/what/census-at-a-glance.html"
+target="_blank">Census</a>, and the
+<a href="https://www.cdc.gov/nchs/about/index.htm"
+target="_blank">National Center for Health Statistics (NCHS)</a>.
 
 All of our data was previously collected by a
 [researcher](http://www.biostat.jhsph.edu/~rpeng/) at the [Johns Hopkins
@@ -172,64 +184,96 @@ prediction and classification 2) the importance of training and testing
 
 ### Other notes and resources
 
-1.  A review of
-    <a href="https://rviews.rstudio.com/2019/06/19/a-gentle-intro-to-tidymodels/" target="_blank">tidymodels</a>  
-2.  A
-    <a href="https://juliasilge.com/blog/tidymodels-ml-course/" target="_blank">course on tidymodels</a>
-    by Julia Silge  
-3.  <a href="https://www.tidymodels.org/learn/" target="_blank">More examples, explanations, and info about tidymodels development</a>
+1.  A review of <a
+    href="https://rviews.rstudio.com/2019/06/19/a-gentle-intro-to-tidymodels/"
+    target="_blank">tidymodels</a>  
+2.  A <a href="https://juliasilge.com/blog/tidymodels-ml-course/"
+    target="_blank">course on tidymodels</a> by Julia Silge  
+3.  <a href="https://www.tidymodels.org/learn/" target="_blank">More
+    examples, explanations, and info about tidymodels development</a>
     from the developers  
 4.  A guide for
-    <a href="http://www.rebeccabarter.com/blog/2019-06-06_pre_processing/" target="_blank">pre-processing with recipes</a>  
+    <a href="http://www.rebeccabarter.com/blog/2019-06-06_pre_processing/"
+    target="_blank">pre-processing with recipes</a>  
 5.  A
     <a href="https://briatte.github.io/ggcorr/" target="_blank">guide</a>
     for using GGally to create correlation plots  
-6.  A
-    <a href="https://www.tidyverse.org/blog/2018/11/parsnip-0-0-1/" target="_blank">guide</a>
-    for using parsnip to try different algorithms or engines  
+6.  A <a href="https://www.tidyverse.org/blog/2018/11/parsnip-0-0-1/"
+    target="_blank">guide</a> for using parsnip to try different
+    algorithms or engines  
 7.  A
-    <a href="https://tidymodels.github.io/recipes/reference/index.html" target="_blank">list of recipe functions</a>  
-8.  A great blog post about
-    <a href="https://towardsdatascience.com/train-test-split-and-cross-validation-in-python-80b61beca4b6" target="_blank">cross validation</a>  
-9.  A discussion about
-    <a href="https://medium.com/@limavallantin/metrics-to-measure-machine-learning-model-performance-e8c963665476" target="_blank">evaluating model performance</a>
-    for a deeper explanation about how to evaluate model performance  
-10. <a href="https://rstudio.com/resources/cheatsheets/" target="_blank">RStudio cheatsheets</a>
-11. An
-    <a href="https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d" target="_blank">explanation</a>
-    of supervised vs unsupervised machine learning and bias-variance
-    trade-off.
-12. A thorough
-    <a href="https://royalsocietypublishing.org/doi/10.1098/rsta.2015.0202#:~:text=Principal%20component%20analysis%20(PCA)%20is,variables%20that%20successively%20maximize%20variance." target="_blank">explanation</a>
-    of principal component analysis.
-13. If you have access, this is a great
-    <a href="https://www.tandfonline.com/doi/abs/10.1080/00031305.1984.10483183" target="_blank">discussion</a>
-    about the difference between independence, orthogonality, and lack
-    of correlation.
-14. Great
-    <a href="https://youtu.be/_UVHneBUBW0" target="_blank">video explanation</a>
-    of PCA.
+    <a href="https://tidymodels.github.io/recipes/reference/index.html"
+    target="_blank">list of recipe functions</a>  
+8.  A great blog post about <a
+    href="https://towardsdatascience.com/train-test-split-and-cross-validation-in-python-80b61beca4b6"
+    target="_blank">cross validation</a>  
+9.  A discussion about <a
+    href="https://medium.com/@limavallantin/metrics-to-measure-machine-learning-model-performance-e8c963665476"
+    target="_blank">evaluating model performance</a> for a deeper
+    explanation about how to evaluate model performance  
+10. <a href="https://rstudio.com/resources/cheatsheets/"
+    target="_blank">RStudio cheatsheets</a>
+11. An <a
+    href="https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d"
+    target="_blank">explanation</a> of supervised vs unsupervised
+    machine learning and bias-variance trade-off.
+12. A thorough <a
+    href="https://royalsocietypublishing.org/doi/10.1098/rsta.2015.0202#:~:text=Principal%20component%20analysis%20(PCA)%20is,variables%20that%20successively%20maximize%20variance."
+    target="_blank">explanation</a> of principal component analysis.
+13. If you have access, this is a great <a
+    href="https://www.tandfonline.com/doi/abs/10.1080/00031305.1984.10483183"
+    target="_blank">discussion</a> about the difference between
+    independence, orthogonality, and lack of correlation.
+14. Great <a href="https://youtu.be/_UVHneBUBW0" target="_blank">video
+    explanation</a> of PCA.
 
 <u>Terms and concepts covered:</u>
 
 <a href="https://www.tidyverse.org/" target="_blank">Tidyverse</a>  
-<a href="https://en.wikipedia.org/wiki/Imputation_(statistics)" target="_blank">Imputation</a>  
-<a href="https://en.wikipedia.org/wiki/Data_transformation_(statistics)" target="_blank">Transformation</a>  
-<a href="https://en.wikipedia.org/wiki/Discretization_of_continuous_features" target="_blank">Discretization</a>  
-<a href="https://en.wikipedia.org/wiki/Dummy_variable_(statistics)" target="_blank">Dummy Variables</a>  
-<a href="https://machinelearningmastery.com/why-one-hot-encode-data-in-machine-learning/" target="_blank">One Hot Encoding</a>  
-<a href="https://cran.r-project.org/web/packages/hablar/vignettes/convert.html" target="_blank">Data Type Conversions</a>  
-<a href="https://statisticsbyjim.com/regression/interaction-effects/" target="_blank">Interaction</a>  
-<a href="https://en.wikipedia.org/wiki/Normalization_(statistics)" target="_blank">Normalization</a>  
-<a href="https://en.wikipedia.org/wiki/Dimensionality_reduction" target="_blank">Dimensionality Reduction/Signal Extraction</a>  
-<a href="https://tartarus.org/gareth/maths/Linear_Algebra/row_operations.pdf" target="_blank">Row Operations</a>  
-<a href="https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/" target="_blank">Near Zero Varaince</a>  
-<a href="https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models" target="_blank">Parameters and Hyper-parameters</a>  
-<a href="https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d" target="_blank">Supervised and Unspervised Learning</a>  
-<a href="https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007" target="_blank">Principal Component Analysis</a>  
-<a href="https://www.mathbootcamps.com/linear-combinations-vectors/" target="_blank">Linear Combinations</a>  
-<a href="https://medium.com/greyatom/decision-trees-a-simple-way-to-visualize-a-decision-dc506a403aeb" target="_blank">Decision Tree</a>  
-<a href="https://towardsdatascience.com/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9" target="_blank">Random Forest</a>
+<a href="https://en.wikipedia.org/wiki/Imputation_(statistics)"
+target="_blank">Imputation</a>  
+<a href="https://en.wikipedia.org/wiki/Data_transformation_(statistics)"
+target="_blank">Transformation</a>  
+<a
+href="https://en.wikipedia.org/wiki/Discretization_of_continuous_features"
+target="_blank">Discretization</a>  
+<a href="https://en.wikipedia.org/wiki/Dummy_variable_(statistics)"
+target="_blank">Dummy Variables</a>  
+<a
+href="https://machinelearningmastery.com/why-one-hot-encode-data-in-machine-learning/"
+target="_blank">One Hot Encoding</a>  
+<a
+href="https://cran.r-project.org/web/packages/hablar/vignettes/convert.html"
+target="_blank">Data Type Conversions</a>  
+<a href="https://statisticsbyjim.com/regression/interaction-effects/"
+target="_blank">Interaction</a>  
+<a href="https://en.wikipedia.org/wiki/Normalization_(statistics)"
+target="_blank">Normalization</a>  
+<a href="https://en.wikipedia.org/wiki/Dimensionality_reduction"
+target="_blank">Dimensionality Reduction/Signal Extraction</a>  
+<a
+href="https://tartarus.org/gareth/maths/Linear_Algebra/row_operations.pdf"
+target="_blank">Row Operations</a>  
+<a
+href="https://www.r-bloggers.com/near-zero-variance-predictors-should-we-remove-them/"
+target="_blank">Near Zero Varaince</a>  
+<a
+href="https://www.datacamp.com/community/tutorials/parameter-optimization-machine-learning-models"
+target="_blank">Parameters and Hyper-parameters</a>  
+<a
+href="https://towardsdatascience.com/supervised-vs-unsupervised-learning-14f68e32ea8d"
+target="_blank">Supervised and Unspervised Learning</a>  
+<a
+href="https://medium.com/@savastamirko/pca-a-linear-transformation-f8aacd4eb007"
+target="_blank">Principal Component Analysis</a>  
+<a href="https://www.mathbootcamps.com/linear-combinations-vectors/"
+target="_blank">Linear Combinations</a>  
+<a
+href="https://medium.com/greyatom/decision-trees-a-simple-way-to-visualize-a-decision-dc506a403aeb"
+target="_blank">Decision Tree</a>  
+<a
+href="https://towardsdatascience.com/decision-tree-ensembles-bagging-and-boosting-266a8ba60fd9"
+target="_blank">Random Forest</a>
 
 <u>**Packages used in this case study:** </u>
 
@@ -239,122 +283,167 @@ prediction and classification 2) the importance of training and testing
 <col style="width: 56%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Package</th>
 <th>Use in this case study</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td><a href="https://github.com/jennybc/here_here" target="_blank">here</a></td>
+<tr>
+<td><a href="https://github.com/jennybc/here_here"
+target="_blank">here</a></td>
 <td>to easily load and save data</td>
 </tr>
-<tr class="even">
-<td><a href="https://readr.tidyverse.org/" target="_blank">readr</a></td>
+<tr>
+<td><a href="https://readr.tidyverse.org/"
+target="_blank">readr</a></td>
 <td>to import the CSV file data</td>
 </tr>
-<tr class="odd">
-<td><a href="https://dplyr.tidyverse.org/" target="_blank">dplyr</a></td>
-<td>to view/arrange/filter/select/compare specific subsets of the data</td>
+<tr>
+<td><a href="https://dplyr.tidyverse.org/"
+target="_blank">dplyr</a></td>
+<td>to view/arrange/filter/select/compare specific subsets of the
+data</td>
 </tr>
-<tr class="even">
-<td><a href="https://cran.r-project.org/web/packages/skimr/index.html" target="_blank">skimr</a></td>
+<tr>
+<td><a href="https://cran.r-project.org/web/packages/skimr/index.html"
+target="_blank">skimr</a></td>
 <td>to get an overview of data</td>
 </tr>
-<tr class="odd">
-<td><a href="https://cran.r-project.org/web/packages/skimr/index.html" target="_blank">summarytools</a></td>
+<tr>
+<td><a href="https://cran.r-project.org/web/packages/skimr/index.html"
+target="_blank">summarytools</a></td>
 <td>to get an overview of data in a different style</td>
 </tr>
-<tr class="even">
-<td><a href="https://magrittr.tidyverse.org/articles/magrittr.html" target="_blank">magrittr</a></td>
+<tr>
+<td><a href="https://magrittr.tidyverse.org/articles/magrittr.html"
+target="_blank">magrittr</a></td>
 <td>to use the <code>%&lt;&gt;%</code> pipping operator</td>
 </tr>
-<tr class="odd">
-<td><a href="https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html" target="_blank">corrplot</a></td>
+<tr>
+<td><a
+href="https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html"
+target="_blank">corrplot</a></td>
 <td>to make large correlation plots</td>
 </tr>
-<tr class="even">
-<td><a href="https://cran.r-project.org/web/packages/GGally/GGally.pdf" target="_blank">GGally</a></td>
+<tr>
+<td><a href="https://cran.r-project.org/web/packages/GGally/GGally.pdf"
+target="_blank">GGally</a></td>
 <td>to make smaller correlation plots</td>
 </tr>
-<tr class="odd">
-<td><a href="https://tidymodels.github.io/rsample/articles/Basics.html" target="_blank">rsample</a></td>
-<td>to split the data into testing and training sets and to split the training set for cross-validation</td>
+<tr>
+<td><a href="https://tidymodels.github.io/rsample/articles/Basics.html"
+target="_blank">rsample</a></td>
+<td>to split the data into testing and training sets and to split the
+training set for cross-validation</td>
 </tr>
-<tr class="even">
-<td><a href="https://tidymodels.github.io/recipes/" target="_blank">recipes</a></td>
-<td>to pre-process data for modeling in a tidy and reproducible way and to extract pre-processed data (major functions are <code>recipe()</code> , <code>prep()</code> and various transformation <code>step_*()</code> functions, as well as <code>bake</code> which extracts pre-processed training data (used to require <code>juice()</code>) and applies recipe preprocessing steps to testing data). See <a href="https://cran.r-project.org/web/packages/recipes/recipes.pdf" target="_blank">here</a> for more info.</td>
+<tr>
+<td><a href="https://tidymodels.github.io/recipes/"
+target="_blank">recipes</a></td>
+<td>to pre-process data for modeling in a tidy and reproducible way and
+to extract pre-processed data (major functions are <code>recipe()</code>
+, <code>prep()</code> and various transformation <code>step_*()</code>
+functions, as well as <code>bake</code> which extracts pre-processed
+training data (used to require <code>juice()</code>) and applies recipe
+preprocessing steps to testing data). See <a
+href="https://cran.r-project.org/web/packages/recipes/recipes.pdf"
+target="_blank">here</a> for more info.</td>
 </tr>
-<tr class="odd">
-<td><a href="https://tidymodels.github.io/parsnip/" target="_blank">parsnip</a></td>
-<td>an interface to create models (major functions are <code>fit()</code>, <code>set_engine()</code>)</td>
+<tr>
+<td><a href="https://tidymodels.github.io/parsnip/"
+target="_blank">parsnip</a></td>
+<td>an interface to create models (major functions are
+<code>fit()</code>, <code>set_engine()</code>)</td>
 </tr>
-<tr class="even">
-<td><a href="https://tidymodels.github.io/yardstick/" target="_blank">yardstick</a></td>
+<tr>
+<td><a href="https://tidymodels.github.io/yardstick/"
+target="_blank">yardstick</a></td>
 <td>to evaluate the performance of models</td>
 </tr>
-<tr class="odd">
-<td><a href="https://www.tidyverse.org/blog/2018/07/broom-0-5-0/" target="_blank">broom</a></td>
+<tr>
+<td><a href="https://www.tidyverse.org/blog/2018/07/broom-0-5-0/"
+target="_blank">broom</a></td>
 <td>to get tidy output for our model fit and performance</td>
 </tr>
-<tr class="even">
-<td><a href="https://ggplot2.tidyverse.org/" target="_blank">ggplot2</a></td>
+<tr>
+<td><a href="https://ggplot2.tidyverse.org/"
+target="_blank">ggplot2</a></td>
 <td>to make visualizations with multiple layers</td>
 </tr>
-<tr class="odd">
-<td><a href="https://www.tidyverse.org/blog/2019/10/dials-0-0-3/" target="_blank">dials</a></td>
+<tr>
+<td><a href="https://www.tidyverse.org/blog/2019/10/dials-0-0-3/"
+target="_blank">dials</a></td>
 <td>to specify hyper-parameter tuning</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://tune.tidymodels.org/" target="_blank">tune</a></td>
-<td>to perform cross validation, tune hyper-parameters, and get performance metrics</td>
+<td>to perform cross validation, tune hyper-parameters, and get
+performance metrics</td>
 </tr>
-<tr class="odd">
-<td><a href="https://www.rdocumentation.org/packages/workflows/versions/0.1.1" target="_blank">workflows</a></td>
+<tr>
+<td><a
+href="https://www.rdocumentation.org/packages/workflows/versions/0.1.1"
+target="_blank">workflows</a></td>
 <td>to create modeling workflow to streamline the modeling process</td>
 </tr>
-<tr class="even">
-<td><a href="https://cran.r-project.org/web/packages/vip/vip.pdf" target="_blank">vip</a></td>
+<tr>
+<td><a href="https://cran.r-project.org/web/packages/vip/vip.pdf"
+target="_blank">vip</a></td>
 <td>to create variable importance plots</td>
 </tr>
-<tr class="odd">
-<td><a href="https://cran.r-project.org/web/packages/randomForest/randomForest.pdf" target="_blank">randomForest</a></td>
+<tr>
+<td><a
+href="https://cran.r-project.org/web/packages/randomForest/randomForest.pdf"
+target="_blank">randomForest</a></td>
 <td>to perform the random forest analysis</td>
 </tr>
-<tr class="even">
-<td><a href="https://cran.r-project.org/web/packages/doParallel/doParallel.pdf">doParallel</a></td>
+<tr>
+<td><a
+href="https://cran.r-project.org/web/packages/doParallel/doParallel.pdf">doParallel</a></td>
 <td>to fit cross validation samples in parallel</td>
 </tr>
-<tr class="odd">
-<td><a href="https://stringr.tidyverse.org/articles/stringr.html" target="_blank">stringr</a></td>
+<tr>
+<td><a href="https://stringr.tidyverse.org/articles/stringr.html"
+target="_blank">stringr</a></td>
 <td>to manipulate the text the map data</td>
 </tr>
-<tr class="even">
-<td><a href="https://tidyr.tidyverse.org/" target="_blank">tidyr</a></td>
+<tr>
+<td><a href="https://tidyr.tidyverse.org/"
+target="_blank">tidyr</a></td>
 <td>to separate data within a column into multiple columns</td>
 </tr>
-<tr class="odd">
-<td><a href="https://cran.r-project.org/web/packages/rnaturalearth/README.html" target="_blank">rnaturalearth</a></td>
+<tr>
+<td><a
+href="https://cran.r-project.org/web/packages/rnaturalearth/README.html"
+target="_blank">rnaturalearth</a></td>
 <td>to get the geometry data for the earth to plot the US</td>
 </tr>
-<tr class="even">
-<td><a href="https://cran.r-project.org/web/packages/maps/maps.pdf" target="_blank">maps</a></td>
-<td>to get map database data about counties to draw them on our US map</td>
+<tr>
+<td><a href="https://cran.r-project.org/web/packages/maps/maps.pdf"
+target="_blank">maps</a></td>
+<td>to get map database data about counties to draw them on our US
+map</td>
 </tr>
-<tr class="odd">
-<td><a href="https://r-spatial.github.io/sf/" target="_blank">sf</a></td>
+<tr>
+<td><a href="https://r-spatial.github.io/sf/"
+target="_blank">sf</a></td>
 <td>to convert the map data into a data frame</td>
 </tr>
-<tr class="even">
-<td><a href="https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf" target="_blank">lwgeom</a></td>
-<td>to use the <code>sf</code> function to convert the map geographical data</td>
+<tr>
+<td><a href="https://cran.r-project.org/web/packages/lwgeom/lwgeom.pdf"
+target="_blank">lwgeom</a></td>
+<td>to use the <code>sf</code> function to convert the map geographical
+data</td>
 </tr>
-<tr class="odd">
-<td><a href="https://cran.r-project.org/web/packages/rgeos/rgeos.pdf" target="_blank">rgeos</a></td>
+<tr>
+<td><a href="https://cran.r-project.org/web/packages/rgeos/rgeos.pdf"
+target="_blank">rgeos</a></td>
 <td>to use geometry data</td>
 </tr>
-<tr class="even">
-<td><a href="https://cran.r-project.org/web/packages/patchwork/patchwork.pdf" target="_blank">patchwork</a></td>
+<tr>
+<td><a
+href="https://cran.r-project.org/web/packages/patchwork/patchwork.pdf"
+target="_blank">patchwork</a></td>
 <td>to allow plots to be combined</td>
 </tr>
 </tbody>
@@ -383,3 +472,11 @@ regression and R programming.
 Students can predict air pollution monitor values using a different
 algorithm and provide an explanation for how that algorithm works and
 why it may be a good choice for modeling this data.
+
+#### Estimate of RMarkdown Compilation Time:
+
+~ About 148 - 158 seconds
+
+This compilation time was measured on a PC machine operating on Windows
+10. This range should only be used as an estimate as compilation time
+will vary with different machines and operating systems.
