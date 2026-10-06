@@ -12,10 +12,6 @@ output:
     theme: cosmo
     toc: yes
     toc_float: yes
-  pdf_document:
-    toc: yes
-  word_document:
-    toc: yes
 
 ---
 <style>
